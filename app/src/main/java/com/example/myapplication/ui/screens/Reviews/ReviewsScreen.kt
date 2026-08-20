@@ -1,58 +1,125 @@
 package com.example.myapplication.ui.screens.Reviews
 
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myapplication.ui.components.BarraSuperior
-import com.example.myapplication.ui.screens.Reviews.componentes.BarraEstrellas
-import com.example.myapplication.ui.screens.Reviews.componentes.ResenaEjemplo
-import com.example.myapplication.ui.screens.Reviews.componentes.ResumenReviews
-import com.example.myapplication.ui.screens.Reviews.componentes.EncabezadoReviews
-import com.example.myapplication.ui.screens.Reviews.componentes.ResumenNumerico
-import com.example.myapplication.ui.screens.Reviews.componentes.TituloProductoReviews
-import com.example.myapplication.ui.screens.Reviews.componentes.ContenidoReviews
+import com.example.myapplication.data.DatosLocales
+import com.example.myapplication.model.Producto
+import com.example.myapplication.model.Resena
+import com.example.myapplication.ui.components.ChipFiltro
+import com.example.myapplication.ui.components.Estrellas
+import com.example.myapplication.ui.components.TarjetaResena
+import com.example.myapplication.ui.theme.MyApplicationTheme
 
+private enum class FiltroReviews(val etiqueta: String) {
+    RECIENTES("Recientes"),
+    MEJOR_VALORADAS("Mejor valoradas"),
+    CON_FOTOS("Con fotos")
+}
+
+/**
+ * Pantalla "Reseñas (n)" del producto: filtros + lista completa en un
+ * LazyColumn. El filtro seleccionado es estado propio de esta pantalla.
+ */
 @Composable
 fun ReviewsScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    producto: Producto,
+    resenas: List<Resena>
 ) {
-    Scaffold(
-        modifier = modifier.fillMaxSize()
-    ) { paddingValues ->
+    var filtro by remember { mutableStateOf(FiltroReviews.RECIENTES) }
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
+    val resenasFiltradas = when (filtro) {
+        FiltroReviews.RECIENTES -> resenas
+        FiltroReviews.MEJOR_VALORADAS -> resenas.sortedByDescending { it.puntuacion }
+        FiltroReviews.CON_FOTOS -> emptyList()
+    }
 
-            BarraSuperior(
-                modifier = Modifier.fillMaxWidth()
-            )
+    LazyColumn(
+        modifier = modifier.fillMaxSize(),
+        contentPadding = PaddingValues(20.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Reseñas (${producto.totalResenas})",
+                    fontSize = 19.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Row {
+                    Estrellas(puntuacion = Math.round(producto.puntuacionPromedio).toInt().coerceIn(0, 5))
+                    Text(
+                        text = " ${producto.puntuacionPromedio}",
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
 
-            ContenidoReviews(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            )
+        item {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FiltroReviews.entries.forEach { opcion ->
+                    ChipFiltro(
+                        texto = opcion.etiqueta,
+                        seleccionado = filtro == opcion,
+                        onClick = { filtro = opcion }
+                    )
+                }
+            }
+        }
+
+        if (resenasFiltradas.isEmpty()) {
+            item {
+                Text(
+                    text = "No hay reseñas con fotos todavía.",
+                    fontSize = 13.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        } else {
+            items(items = resenasFiltradas, key = { it.id }) { resena ->
+                TarjetaResena(resena = resena)
+            }
+
+            item {
+                Text(
+                    text = "Cargar más reseñas",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(1.5.dp, MaterialTheme.colorScheme.onSurface, RoundedCornerShape(4.dp))
+                        .padding(11.dp),
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 }
@@ -60,27 +127,10 @@ fun ReviewsScreen(
 @Preview(showBackground = true, name = "ReviewsScreen - Preview")
 @Composable
 fun ReviewsScreenPreview() {
-    ReviewsScreen()
-}
-@Composable
-fun BarrasCalificacion(modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-    ) {
-        BarraEstrellas(estrellas = 5, porcentaje = 0.88f, modifier = Modifier.fillMaxWidth())
-        BarraEstrellas(estrellas = 4, porcentaje = 0.55f, modifier = Modifier.fillMaxWidth())
-        BarraEstrellas(estrellas = 3, porcentaje = 0.40f, modifier = Modifier.fillMaxWidth())
-        BarraEstrellas(estrellas = 2, porcentaje = 0.28f, modifier = Modifier.fillMaxWidth())
-        BarraEstrellas(estrellas = 1, porcentaje = 0.12f, modifier = Modifier.fillMaxWidth())
+    MyApplicationTheme(darkTheme = false) {
+        ReviewsScreen(
+            producto = DatosLocales.productoDestacado,
+            resenas = DatosLocales.resenas
+        )
     }
-}
-
-@Preview(showBackground = true, name = "BarrasCalificacion - Preview")
-@Composable
-fun BarrasCalificacionPreview() {
-    BarrasCalificacion(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    )
 }

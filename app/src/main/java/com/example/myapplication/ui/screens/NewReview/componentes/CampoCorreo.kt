@@ -1,39 +1,52 @@
 package com.example.myapplication.ui.screens.NewReview.componentes
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.example.myapplication.ui.theme.RequeridoRojo
 
 @Composable
 fun CampoCorreo(
-    modifier: Modifier = Modifier,
     correo: String,
-    onCorreoChange: (String) -> Unit
+    onCorreoChange: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-
-    OutlinedTextField(
-        value = correo,
-        onValueChange = onCorreoChange,
-        label = {
-            Text("*Correo")
-        },
-        modifier = modifier
-    )
+    Column(modifier = modifier) {
+        Row {
+            Text(text = "*", fontSize = 11.sp, color = RequeridoRojo)
+            Text(text = "Correo:", fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        OutlinedTextField(
+            value = correo,
+            onValueChange = onCorreoChange,
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            shape = RoundedCornerShape(4.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
 }
 
 @Preview(showBackground = true, name = "CampoCorreo - Preview")
 @Composable
 fun CampoCorreoPreview() {
-    CampoCorreo(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        correo = "camila@example.com",
-        onCorreoChange = {}
-    )
+    MyApplicationTheme(darkTheme = false) {
+        CampoCorreo(correo = "camila@example.com", onCorreoChange = {})
+    }
 }
