@@ -1,12 +1,3 @@
 <resources>
-    <string name="app_name">My Application</string>
-    <string name="from_one_meeting_to_the_next_this_is_perfect_for_you">from one meeting to the next, this is perfect for you.</string>
-    <string name="i_hadn_t_even_had_my_recorder_a_week_and_i_had_used_almost_300_minutes_if_you_are_constantly_going_from_one_meeting_to_the_next_this_is_perfect_for_you">I hadn\'t even had my recorder a week and I had used almost 300 minutes! If you are constantly going from one meeting to the next this is perfect for you</string>
-    <string name="_100000_10_recommend">100000/10 recommend!!</string>
-    <string name="estrellas">★★★★★</string>
-    <string name="verified_buyer">Verified Buyer</string>
-    <string name="name">Emily</string>
-    <string name="escribe_una_rese_a">Escribir una reseña\n</string>
-    <string name="comparte_tus_pensamientos_con_otras_personas">Comparte tus pensamientos con otras personas</string>
-    <string name="calificaciones_y_rese_as">Calificaciones y reseñas</string>
+    <string name="app_name">ReviewLab</string>
 </resources>

@@ -2,10 +2,21 @@ package com.example.myapplication.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+// Paleta ReviewLab "1b" — tal como está definida en el diseño (Figma / html.to.design).
+val ElectricLime = Color(0xFFD8FF3E)
+val DeepLime = Color(0xFF7A8F00)
+val Ink = Color(0xFF101012)
+val Paper = Color(0xFFF4F4F2)
+val Gray = Color(0xFF8A8A90)
+val Border = Color(0xFFC9C9C6)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+// Tonos de apoyo usados en el diseño que no forman parte de las 6 muestras
+// principales de la paleta, pero aparecen consistentemente en las pantallas.
+val BorderLight = Color(0xFFECECEA)
+val StripeLight = Color(0xFFF7F7F5)
+val TextComentario = Color(0xFF4A4A4E)
+val RequeridoRojo = Color(0xFFB3261E)
+
+// Tonos oscuros usados para las cabeceras negras (Login, Perfil) — el mismo
+// Ink pero con una variante un poco más clara para texto secundario sobre fondo oscuro.
+val OnDarkSecondary = Color(0xFF8A8A90)
