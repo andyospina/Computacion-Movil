@@ -15,8 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.ui.components.BarraSuperior
+import com.example.myapplication.ui.components.TopBarNavigation
 import com.example.myapplication.ui.screens.NewReview.componentes.ContenidoNuevaResena
-
 
 @Composable
 fun NewReviewScreen(
@@ -51,23 +51,25 @@ fun NewReviewScreen(
     }
 
     Scaffold(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
+        topBar = {
+            BarraSuperior(
+                title = "Nueva reseña",
+                navigation = TopBarNavigation.BACK,
+                onNavigationClick = onCancelar
+            )
+        }
     ) { paddingValues ->
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .padding(16.dp)
         ) {
 
-            BarraSuperior(
-                modifier = Modifier.fillMaxWidth()
-            )
-
             ContenidoNuevaResena(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+                modifier = Modifier.fillMaxWidth(),
                 puntuacion = puntuacion,
                 titulo = titulo,
                 resena = resena,
