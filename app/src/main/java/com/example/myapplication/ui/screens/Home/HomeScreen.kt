@@ -12,19 +12,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myapplication.data.LocalProductProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.data.LocalUserProvider
 import com.example.myapplication.ui.components.BarraSuperior
 import com.example.myapplication.ui.components.InitialsAvatar
@@ -37,51 +34,42 @@ import com.example.myapplication.ui.screens.Home.componentes.ListaProductosTende
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = viewModel(),
     onSearchBarClick: () -> Unit,
     onProductoClick: (String) -> Unit,
     onAvatarClick: () -> Unit,
     onNotificationsClick: () -> Unit
 ) {
-    var categoriaSeleccionada by remember { mutableStateOf("Todo") }
+    val uiState by viewModel.uiState.collectAsState()
 
-    val productos = remember(categoriaSeleccionada) {
-        if (categoriaSeleccionada == "Todo") {
-            LocalProductProvider.trending()
-        } else {
-            LocalProductProvider.products.filter { it.category == categoriaSeleccionada }
-        }
-    }
+    Column(
+        modifier = modifier.fillMaxSize()
+    ) {
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
-            BarraSuperior(
-                navigation = TopBarNavigation.MENU,
-                trailingContent = {
-                    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Filled.Notifications,
-                            contentDescription = "Notificaciones",
-                            tint = Ink,
-                            modifier = Modifier.clickable { onNotificationsClick() }
-                        )
+        BarraSuperior(
+            navigation = TopBarNavigation.MENU,
+            trailingContent = {
+                Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Filled.Notifications,
+                        contentDescription = "Notificaciones",
+                        tint = Ink,
+                        modifier = Modifier.clickable { onNotificationsClick() }
+                    )
 
-                        Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(12.dp))
 
-                        InitialsAvatar(
-                            initials = LocalUserProvider.currentUser.initials,
-                            modifier = Modifier.clickable { onAvatarClick() }
-                        )
-                    }
+                    InitialsAvatar(
+                        initials = LocalUserProvider.currentUser.initials,
+                        modifier = Modifier.clickable { onAvatarClick() }
+                    )
                 }
-            )
-        }
-    ) { paddingValues ->
+            }
+        )
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .padding(20.dp)
         ) {
 
@@ -93,8 +81,8 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             ChipsCategorias(
-                categoriaSeleccionada = categoriaSeleccionada,
-                onCategoriaChange = { categoriaSeleccionada = it }
+                categoriaSeleccionada = uiState.categoriaSeleccionada,
+                onCategoriaChange = viewModel::updateCategoria
             )
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -108,7 +96,7 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             ListaProductosTendencia(
-                productos = productos,
+                productos = uiState.productos,
                 onProductoClick = onProductoClick,
                 modifier = Modifier.fillMaxSize()
             )

@@ -20,6 +20,7 @@ import com.example.myapplication.ui.screens.NewReview.NewReviewScreen
 import com.example.myapplication.ui.screens.Notifications.NotificationsScreen
 import com.example.myapplication.ui.screens.ProductDetail.ProductDetailScreen
 import com.example.myapplication.ui.screens.Profile.ProfileScreen
+import com.example.myapplication.ui.screens.Register.RegisterScreen
 import com.example.myapplication.ui.screens.ReviewPublished.ReviewPublishedScreen
 import com.example.myapplication.ui.screens.Reviews.ReviewsListScreen
 import com.example.myapplication.ui.screens.Search.SearchScreen
@@ -69,10 +70,19 @@ fun AppNavigation(
                         }
                     },
                     onRegistrateClick = {
+                        navController.navigate(Routes.Register.route)
+                    }
+                )
+            }
+
+            composable(Routes.Register.route) {
+                RegisterScreen(
+                    onRegistroExitoso = {
                         navController.navigate(Routes.Home.route) {
                             popUpTo(Routes.Login.route) { inclusive = true }
                         }
-                    }
+                    },
+                    onIniciarSesionClick = { navController.popBackStack() }
                 )
             }
 

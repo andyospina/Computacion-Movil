@@ -3,6 +3,7 @@ package com.example.myapplication.navigation
 sealed class Routes(val route: String) {
 
     object Login : Routes("login")
+    object Register : Routes("register")
     object Home : Routes("home")
     object Search : Routes("search")
     object WriteReviewHub : Routes("write_review_hub")

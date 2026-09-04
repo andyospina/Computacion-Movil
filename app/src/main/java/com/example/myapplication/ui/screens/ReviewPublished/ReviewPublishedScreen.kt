@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -38,29 +37,27 @@ fun ReviewPublishedScreen(
 ) {
     val producto = remember(productId) { LocalProductProvider.findById(productId) }
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
-            BarraSuperior(
-                navigation = TopBarNavigation.NONE,
-                trailingContent = {
-                    Icon(
-                        imageVector = Icons.Filled.Close,
-                        contentDescription = "Cerrar",
-                        tint = Ink,
-                        modifier = Modifier
-                            .clickable { onCloseClick() }
-                            .padding(4.dp)
-                    )
-                }
-            )
-        }
-    ) { paddingValues ->
+    Column(
+        modifier = modifier.fillMaxSize()
+    ) {
+
+        BarraSuperior(
+            navigation = TopBarNavigation.NONE,
+            trailingContent = {
+                Icon(
+                    imageVector = Icons.Filled.Close,
+                    contentDescription = "Cerrar",
+                    tint = Ink,
+                    modifier = Modifier
+                        .clickable { onCloseClick() }
+                        .padding(4.dp)
+                )
+            }
+        )
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

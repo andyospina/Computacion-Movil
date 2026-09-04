@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.screens.Login
+package com.example.myapplication.ui.screens.Register
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,14 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,25 +26,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.ui.components.AppLogo
-import com.example.myapplication.ui.screens.Login.componentes.BotonIniciarSesion
 import com.example.myapplication.ui.screens.Login.componentes.CampoContrasena
-import com.example.myapplication.ui.screens.Login.componentes.CampoCorreoLogin
+import com.example.myapplication.ui.screens.Register.componentes.BotonRegistrarse
+import com.example.myapplication.ui.screens.Register.componentes.CampoCelular
+import com.example.myapplication.ui.screens.Register.componentes.CampoCorreoRegistro
 import com.example.myapplication.ui.theme.DeepLime
 import com.example.myapplication.ui.theme.GraySecondary
 import com.example.myapplication.ui.theme.Ink
 
 @Composable
-fun LoginScreen(
+fun RegisterScreen(
     modifier: Modifier = Modifier,
-    viewModel: LoginViewModel = viewModel(),
-    onIniciarSesionClick: () -> Unit,
-    onRegistrateClick: () -> Unit
+    viewModel: RegisterViewModel = viewModel(),
+    onRegistroExitoso: () -> Unit,
+    onIniciarSesionClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(uiState.navigate) {
         if (uiState.navigate) {
-            onIniciarSesionClick()
+            onRegistroExitoso()
             viewModel.onNavigated()
         }
     }
@@ -67,7 +66,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "ReviewLab",
+                text = "Crea tu cuenta",
                 color = Color.White,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold
@@ -76,7 +75,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Opiniones reales de compradores reales",
+                text = "Únete a la comunidad de ReviewLab",
                 color = GraySecondary,
                 textAlign = TextAlign.Center
             )
@@ -89,10 +88,18 @@ fun LoginScreen(
             verticalArrangement = Arrangement.Top
         ) {
 
-            CampoCorreoLogin(
+            CampoCorreoRegistro(
                 modifier = Modifier.fillMaxWidth(),
                 correo = uiState.email,
                 onCorreoChange = viewModel::updateEmail
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            CampoCelular(
+                modifier = Modifier.fillMaxWidth(),
+                celular = uiState.cellphone,
+                onCelularChange = viewModel::updateCellphone
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -114,41 +121,12 @@ fun LoginScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            Text(
-                text = "¿Olvidaste tu contraseña?",
-                color = DeepLime,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.align(Alignment.End)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            BotonIniciarSesion(
+            BotonRegistrarse(
                 modifier = Modifier.fillMaxWidth(),
-                habilitado = uiState.email.isNotBlank() && uiState.password.isNotBlank(),
-                onClick = viewModel::loginButtonPress
+                onClick = viewModel::registerButtonPress
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                HorizontalDivider(modifier = Modifier.weight(1f))
-                Text(text = "  o  ", color = GraySecondary)
-                HorizontalDivider(modifier = Modifier.weight(1f))
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedButton(
-                onClick = viewModel::loginButtonPress,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp)
-            ) {
-                Text(text = "Continuar con Google", fontWeight = FontWeight.Bold)
-            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -156,23 +134,23 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                Text(text = "¿No tienes cuenta? ", color = GraySecondary)
+                Text(text = "¿Ya tienes cuenta? ", color = GraySecondary)
                 Text(
-                    text = "Regístrate",
+                    text = "Inicia sesión",
                     color = DeepLime,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.clickable { onRegistrateClick() }
+                    modifier = Modifier.clickable { onIniciarSesionClick() }
                 )
             }
         }
     }
 }
 
-@Preview(showBackground = true, name = "LoginScreen - Preview")
+@Preview(showBackground = true, name = "RegisterScreen - Preview")
 @Composable
-fun LoginScreenPreview() {
-    LoginScreen(
-        onIniciarSesionClick = {},
-        onRegistrateClick = {}
+fun RegisterScreenPreview() {
+    RegisterScreen(
+        onRegistroExitoso = {},
+        onIniciarSesionClick = {}
     )
 }

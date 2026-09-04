@@ -11,7 +11,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -38,24 +37,22 @@ fun ProductDetailScreen(
     val producto = remember(productId) { LocalProductProvider.findById(productId) }
     val resenasDestacadas = remember(productId) { LocalReviewProvider.featuredForProduct(productId) }
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
-            BarraSuperior(
-                title = "Producto",
-                navigation = TopBarNavigation.BACK,
-                onNavigationClick = onBackClick,
-                trailingContent = {
-                    Icon(imageVector = Icons.Filled.MoreVert, contentDescription = "Más opciones", tint = GraySecondary)
-                }
-            )
-        }
-    ) { paddingValues ->
+    Column(
+        modifier = modifier.fillMaxSize()
+    ) {
+
+        BarraSuperior(
+            title = "Producto",
+            navigation = TopBarNavigation.BACK,
+            onNavigationClick = onBackClick,
+            trailingContent = {
+                Icon(imageVector = Icons.Filled.MoreVert, contentDescription = "Más opciones", tint = GraySecondary)
+            }
+        )
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
         ) {
 

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,25 +28,23 @@ fun WriteReviewHubScreen(
     onEscribirResenaClick: () -> Unit,
     onAvatarClick: () -> Unit
 ) {
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
-            BarraSuperior(
-                navigation = TopBarNavigation.MENU,
-                trailingContent = {
-                    InitialsAvatar(
-                        initials = LocalUserProvider.currentUser.initials,
-                        modifier = Modifier.clickable { onAvatarClick() }
-                    )
-                }
-            )
-        }
-    ) { paddingValues ->
+    Column(
+        modifier = modifier.fillMaxSize()
+    ) {
+
+        BarraSuperior(
+            navigation = TopBarNavigation.MENU,
+            trailingContent = {
+                InitialsAvatar(
+                    initials = LocalUserProvider.currentUser.initials,
+                    modifier = Modifier.clickable { onAvatarClick() }
+                )
+            }
+        )
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top

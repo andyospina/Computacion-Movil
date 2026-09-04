@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -36,59 +35,52 @@ fun ProfileScreen(
     val user = LocalUserProvider.currentUser
     val misResenas = LocalReviewProvider.byUser("Emily")
 
-    Scaffold(
+    Column(
         modifier = modifier.fillMaxSize()
-    ) { paddingValues ->
+    ) {
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
+                .fillMaxWidth()
+                .background(Ink)
+                .padding(20.dp)
         ) {
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Ink)
-                    .padding(20.dp)
-            ) {
-                EncabezadoPerfil(
-                    user = user,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-
-            Column(modifier = Modifier.padding(vertical = 16.dp)) {
-                EstadisticasPerfil(user = user, modifier = Modifier.fillMaxWidth())
-            }
-
-            SelectorTema(
-                modoOscuro = modoOscuro,
-                onModoOscuroChange = onModoOscuroChange,
-                modifier = Modifier.padding(horizontal = 20.dp)
+            EncabezadoPerfil(
+                user = user,
+                modifier = Modifier.fillMaxWidth()
             )
+        }
 
-            Spacer(modifier = Modifier.height(16.dp))
+        Column(modifier = Modifier.padding(vertical = 16.dp)) {
+            EstadisticasPerfil(user = user, modifier = Modifier.fillMaxWidth())
+        }
 
-            Text(
-                text = "Mis reseñas",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 20.dp)
-            )
+        SelectorTema(
+            modoOscuro = modoOscuro,
+            onModoOscuroChange = onModoOscuroChange,
+            modifier = Modifier.padding(horizontal = 20.dp)
+        )
 
-            Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(misResenas, key = { it.id }) { resena ->
-                    val producto = LocalProductProvider.findById(resena.productId)
-                    TarjetaMiResena(resena = resena, nombreProducto = producto.name)
-                }
+        Text(
+            text = "Mis reseñas",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(horizontal = 20.dp)
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(misResenas, key = { it.id }) { resena ->
+                val producto = LocalProductProvider.findById(resena.productId)
+                TarjetaMiResena(resena = resena, nombreProducto = producto.name)
             }
         }
     }
