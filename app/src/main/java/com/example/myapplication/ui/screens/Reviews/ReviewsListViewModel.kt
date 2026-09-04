@@ -15,7 +15,7 @@ class ReviewsListViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(ReviewsListState())
     val uiState = _uiState.asStateFlow()
 
-    fun init(productId: String) {
+    fun getResenas(productId: String) {
         if (_uiState.value.productId == productId) return
 
         val todasLasResenas = LocalReviewProvider.forProduct(productId)

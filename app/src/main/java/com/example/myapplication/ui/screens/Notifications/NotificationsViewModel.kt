@@ -11,14 +11,20 @@ class NotificationsViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(NotificationsState())
     val uiState = _uiState.asStateFlow()
 
+    init {
+        getNotificaciones()
+    }
+
     fun marcarTodasLeidas() {
         _uiState.update {
             it.copy(
                 leidas = true,
-                notificaciones = LocalNotificationProvider.notifications.map { item ->
-                    item.copy(highlighted = false)
-                }
+                notificaciones = it.notificaciones.map { item -> item.copy(highlighted = false) }
             )
         }
+    }
+
+    private fun getNotificaciones() {
+        _uiState.update { it.copy(notificaciones = LocalNotificationProvider.notifications) }
     }
 }

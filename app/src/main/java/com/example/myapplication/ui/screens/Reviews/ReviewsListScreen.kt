@@ -39,7 +39,7 @@ fun ReviewsListScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(productId) {
-        viewModel.init(productId)
+        viewModel.getResenas(productId)
     }
 
     Column(
