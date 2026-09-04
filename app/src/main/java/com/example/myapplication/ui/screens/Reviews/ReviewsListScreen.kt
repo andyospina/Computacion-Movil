@@ -19,13 +19,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.R
 import com.example.myapplication.ui.components.BarraSuperior
 import com.example.myapplication.ui.components.TopBarNavigation
 import com.example.myapplication.ui.screens.Reviews.componentes.EncabezadoResenas
 import com.example.myapplication.ui.screens.Reviews.componentes.FiltrosResenas
+import com.example.myapplication.ui.screens.Reviews.componentes.OrdenResenas
 import com.example.myapplication.ui.screens.Reviews.componentes.TarjetaResena
 import com.example.myapplication.ui.theme.GraySecondary
 
@@ -42,6 +45,25 @@ fun ReviewsListScreen(
         viewModel.getResenas(productId)
     }
 
+    ReviewsListContent(
+        modifier = modifier,
+        uiState = uiState,
+        onOrdenChange = viewModel::updateOrden,
+        onConFotosChange = viewModel::updateConFotos,
+        onCargarMasClick = viewModel::cargarMas,
+        onBackClick = onBackClick
+    )
+}
+
+@Composable
+fun ReviewsListContent(
+    modifier: Modifier = Modifier,
+    uiState: ReviewsListState,
+    onOrdenChange: (OrdenResenas) -> Unit,
+    onConFotosChange: (Boolean) -> Unit,
+    onCargarMasClick: () -> Unit,
+    onBackClick: () -> Unit
+) {
     Column(
         modifier = modifier.fillMaxSize()
     ) {
@@ -50,7 +72,11 @@ fun ReviewsListScreen(
             navigation = TopBarNavigation.BACK,
             onNavigationClick = onBackClick,
             trailingContent = {
-                Icon(imageVector = Icons.Filled.MoreVert, contentDescription = "Más opciones", tint = GraySecondary)
+                Icon(
+                    imageVector = Icons.Filled.MoreVert,
+                    contentDescription = stringResource(R.string.content_description_more_options),
+                    tint = GraySecondary
+                )
             }
         )
 
@@ -68,8 +94,8 @@ fun ReviewsListScreen(
             FiltrosResenas(
                 orden = uiState.orden,
                 conFotos = uiState.conFotos,
-                onOrdenChange = viewModel::updateOrden,
-                onConFotosChange = viewModel::updateConFotos
+                onOrdenChange = onOrdenChange,
+                onConFotosChange = onConFotosChange
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -85,10 +111,10 @@ fun ReviewsListScreen(
                 if (uiState.cantidadVisible < uiState.resenasFiltradas.size) {
                     item {
                         OutlinedButton(
-                            onClick = viewModel::cargarMas,
+                            onClick = onCargarMasClick,
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text(text = "Cargar más reseñas")
+                            Text(text = stringResource(R.string.reviews_load_more))
                         }
                     }
                 }
@@ -100,8 +126,11 @@ fun ReviewsListScreen(
 @Preview(showBackground = true, name = "ReviewsListScreen - Preview")
 @Composable
 fun ReviewsListScreenPreview() {
-    ReviewsListScreen(
-        productId = "grabadora-voz-ai",
+    ReviewsListContent(
+        uiState = ReviewsListState(),
+        onOrdenChange = {},
+        onConFotosChange = {},
+        onCargarMasClick = {},
         onBackClick = {}
     )
 }

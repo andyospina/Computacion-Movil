@@ -10,8 +10,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.R
 
 @Composable
 fun CampoBusqueda(
@@ -23,7 +25,7 @@ fun CampoBusqueda(
         value = query,
         onValueChange = onQueryChange,
         modifier = modifier,
-        placeholder = { androidx.compose.material3.Text("audifonos") },
+        placeholder = { androidx.compose.material3.Text(stringResource(R.string.search_placeholder_example)) },
         singleLine = true,
         shape = RoundedCornerShape(28.dp),
         leadingIcon = {
@@ -32,7 +34,10 @@ fun CampoBusqueda(
         trailingIcon = {
             if (query.isNotEmpty()) {
                 IconButton(onClick = { onQueryChange("") }) {
-                    Icon(imageVector = Icons.Filled.Close, contentDescription = "Limpiar")
+                    Icon(
+                        imageVector = Icons.Filled.Close,
+                        contentDescription = stringResource(R.string.content_description_clear)
+                    )
                 }
             }
         },

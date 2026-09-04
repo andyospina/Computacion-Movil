@@ -1,6 +1,8 @@
 package com.example.myapplication.ui.screens.Register
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
+import com.example.myapplication.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -34,19 +36,19 @@ class RegisterViewModel : ViewModel() {
 
         when {
             state.email.isBlank() || state.cellphone.isBlank() || state.password.isBlank() -> {
-                showError("Todos los campos son obligatorios")
+                showError(R.string.error_all_fields_required)
             }
 
             state.password.length < LONGITUD_MINIMA_PASSWORD -> {
-                showError("La contraseña debe tener al menos 6 caracteres")
+                showError(R.string.error_password_too_short)
             }
 
             state.email.equals(EMAIL_YA_REGISTRADO, ignoreCase = true) -> {
-                showError("Este correo ya está en uso")
+                showError(R.string.error_email_already_registered)
             }
 
             else -> {
-                _uiState.update { it.copy(showError = false, errorMessage = "", navigate = true) }
+                _uiState.update { it.copy(showError = false, navigate = true) }
             }
         }
     }
@@ -55,7 +57,7 @@ class RegisterViewModel : ViewModel() {
         _uiState.update { it.copy(navigate = false) }
     }
 
-    private fun showError(mensaje: String) {
-        _uiState.update { it.copy(showError = true, errorMessage = mensaje) }
+    private fun showError(@StringRes mensajeRes: Int) {
+        _uiState.update { it.copy(showError = true, errorMessageRes = mensajeRes) }
     }
 }

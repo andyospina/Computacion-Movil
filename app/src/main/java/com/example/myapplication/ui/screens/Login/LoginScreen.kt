@@ -21,12 +21,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.R
 import com.example.myapplication.ui.components.AppLogo
 import com.example.myapplication.ui.screens.Login.componentes.BotonIniciarSesion
 import com.example.myapplication.ui.screens.Login.componentes.CampoContrasena
@@ -51,6 +53,27 @@ fun LoginScreen(
         }
     }
 
+    LoginContent(
+        modifier = modifier,
+        uiState = uiState,
+        onCorreoChange = viewModel::updateEmail,
+        onContrasenaChange = viewModel::updatePassword,
+        onVisibleChange = { viewModel.togglePasswordVisibility() },
+        onLoginClick = viewModel::loginButtonPress,
+        onRegistrateClick = onRegistrateClick
+    )
+}
+
+@Composable
+fun LoginContent(
+    modifier: Modifier = Modifier,
+    uiState: LoginState,
+    onCorreoChange: (String) -> Unit,
+    onContrasenaChange: (String) -> Unit,
+    onVisibleChange: (Boolean) -> Unit,
+    onLoginClick: () -> Unit,
+    onRegistrateClick: () -> Unit
+) {
     Column(
         modifier = modifier.fillMaxSize()
     ) {
@@ -67,7 +90,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "ReviewLab",
+                text = stringResource(R.string.app_name),
                 color = Color.White,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold
@@ -76,7 +99,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Opiniones reales de compradores reales",
+                text = stringResource(R.string.login_tagline),
                 color = GraySecondary,
                 textAlign = TextAlign.Center
             )
@@ -92,7 +115,7 @@ fun LoginScreen(
             CampoCorreoLogin(
                 modifier = Modifier.fillMaxWidth(),
                 correo = uiState.email,
-                onCorreoChange = viewModel::updateEmail
+                onCorreoChange = onCorreoChange
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -101,14 +124,14 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 contrasena = uiState.password,
                 visible = uiState.showPassword,
-                onContrasenaChange = viewModel::updatePassword,
-                onVisibleChange = { viewModel.togglePasswordVisibility() }
+                onContrasenaChange = onContrasenaChange,
+                onVisibleChange = onVisibleChange
             )
 
             if (uiState.showError) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = uiState.errorMessage,
+                    text = stringResource(uiState.errorMessageRes),
                     color = MaterialTheme.colorScheme.error,
                     fontWeight = FontWeight.Medium
                 )
@@ -117,7 +140,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "¿Olvidaste tu contraseña?",
+                text = stringResource(R.string.login_forgot_password),
                 color = DeepLime,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.align(Alignment.End)
@@ -128,26 +151,26 @@ fun LoginScreen(
             BotonIniciarSesion(
                 modifier = Modifier.fillMaxWidth(),
                 habilitado = uiState.email.isNotBlank() && uiState.password.isNotBlank(),
-                onClick = viewModel::loginButtonPress
+                onClick = onLoginClick
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 HorizontalDivider(modifier = Modifier.weight(1f))
-                Text(text = "  o  ", color = GraySecondary)
+                Text(text = stringResource(R.string.divider_or), color = GraySecondary)
                 HorizontalDivider(modifier = Modifier.weight(1f))
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedButton(
-                onClick = viewModel::loginButtonPress,
+                onClick = onLoginClick,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp)
             ) {
-                Text(text = "Continuar con Google", fontWeight = FontWeight.Bold)
+                Text(text = stringResource(R.string.login_continue_with_google), fontWeight = FontWeight.Bold)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -156,9 +179,9 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                Text(text = "¿No tienes cuenta? ", color = GraySecondary)
+                Text(text = stringResource(R.string.login_no_account_prompt), color = GraySecondary)
                 Text(
-                    text = "Regístrate",
+                    text = stringResource(R.string.login_register_link),
                     color = DeepLime,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.clickable { onRegistrateClick() }
@@ -171,8 +194,12 @@ fun LoginScreen(
 @Preview(showBackground = true, name = "LoginScreen - Preview")
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen(
-        onIniciarSesionClick = {},
+    LoginContent(
+        uiState = LoginState(),
+        onCorreoChange = {},
+        onContrasenaChange = {},
+        onVisibleChange = {},
+        onLoginClick = {},
         onRegistrateClick = {}
     )
 }

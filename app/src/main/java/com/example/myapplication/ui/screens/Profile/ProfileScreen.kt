@@ -15,11 +15,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.R
 import com.example.myapplication.data.LocalProductProvider
 import com.example.myapplication.ui.screens.Profile.componentes.EncabezadoPerfil
 import com.example.myapplication.ui.screens.Profile.componentes.EstadisticasPerfil
@@ -36,6 +38,21 @@ fun ProfileScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    ProfileContent(
+        modifier = modifier,
+        uiState = uiState,
+        modoOscuro = modoOscuro,
+        onModoOscuroChange = onModoOscuroChange
+    )
+}
+
+@Composable
+fun ProfileContent(
+    modifier: Modifier = Modifier,
+    uiState: ProfileState,
+    modoOscuro: Boolean,
+    onModoOscuroChange: (Boolean) -> Unit
+) {
     Column(
         modifier = modifier.fillMaxSize()
     ) {
@@ -67,7 +84,7 @@ fun ProfileScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Mis reseñas",
+            text = stringResource(R.string.profile_my_reviews_title),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(horizontal = 20.dp)
@@ -92,7 +109,8 @@ fun ProfileScreen(
 @Preview(showBackground = true, name = "ProfileScreen - Preview")
 @Composable
 fun ProfileScreenPreview() {
-    ProfileScreen(
+    ProfileContent(
+        uiState = ProfileState(),
         modoOscuro = false,
         onModoOscuroChange = {}
     )

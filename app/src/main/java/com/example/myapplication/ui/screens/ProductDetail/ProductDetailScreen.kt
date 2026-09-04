@@ -16,9 +16,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.R
 import com.example.myapplication.ui.components.BarraSuperior
 import com.example.myapplication.ui.components.TopBarNavigation
 import com.example.myapplication.ui.screens.ProductDetail.componentes.BotonesAccionProducto
@@ -42,16 +44,37 @@ fun ProductDetailScreen(
         viewModel.getProducto(productId)
     }
 
+    ProductDetailContent(
+        modifier = modifier,
+        uiState = uiState,
+        onBackClick = onBackClick,
+        onEscribirResenaClick = { onEscribirResenaClick(productId) },
+        onVerTodasResenasClick = { onVerTodasResenasClick(productId) }
+    )
+}
+
+@Composable
+fun ProductDetailContent(
+    modifier: Modifier = Modifier,
+    uiState: ProductDetailState,
+    onBackClick: () -> Unit,
+    onEscribirResenaClick: () -> Unit,
+    onVerTodasResenasClick: () -> Unit
+) {
     Column(
         modifier = modifier.fillMaxSize()
     ) {
 
         BarraSuperior(
-            title = "Producto",
+            title = stringResource(R.string.product_detail_title),
             navigation = TopBarNavigation.BACK,
             onNavigationClick = onBackClick,
             trailingContent = {
-                Icon(imageVector = Icons.Filled.MoreVert, contentDescription = "Más opciones", tint = GraySecondary)
+                Icon(
+                    imageVector = Icons.Filled.MoreVert,
+                    contentDescription = stringResource(R.string.content_description_more_options),
+                    tint = GraySecondary
+                )
             }
         )
 
@@ -72,7 +95,7 @@ fun ProductDetailScreen(
 
                     BotonesAccionProducto(
                         modifier = Modifier.fillMaxWidth(),
-                        onEscribirResenaClick = { onEscribirResenaClick(productId) },
+                        onEscribirResenaClick = onEscribirResenaClick,
                         onGuardarClick = {}
                     )
 
@@ -80,7 +103,7 @@ fun ProductDetailScreen(
 
                     ResenasDestacadas(
                         resenas = uiState.resenasDestacadas,
-                        onVerTodasClick = { onVerTodasResenasClick(productId) },
+                        onVerTodasClick = onVerTodasResenasClick,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -92,8 +115,8 @@ fun ProductDetailScreen(
 @Preview(showBackground = true, name = "ProductDetailScreen - Preview")
 @Composable
 fun ProductDetailScreenPreview() {
-    ProductDetailScreen(
-        productId = "grabadora-voz-ai",
+    ProductDetailContent(
+        uiState = ProductDetailState(),
         onBackClick = {},
         onEscribirResenaClick = {},
         onVerTodasResenasClick = {}

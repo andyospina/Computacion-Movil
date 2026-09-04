@@ -14,14 +14,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.R
 import com.example.myapplication.ui.theme.BorderColor
 import com.example.myapplication.ui.theme.ElectricLime
 import com.example.myapplication.ui.theme.Ink
-
-val categorias = listOf("Todo", "Tecnología", "Belleza", "Hogar")
 
 @Composable
 fun ChipsCategorias(
@@ -29,6 +29,8 @@ fun ChipsCategorias(
     onCategoriaChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val categorias = stringArrayResource(R.array.categorias).toList()
+
     Row(
         modifier = modifier.horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(8.dp)

@@ -17,11 +17,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.R
 import com.example.myapplication.data.LocalUserProvider
 import com.example.myapplication.ui.components.BarraSuperior
 import com.example.myapplication.ui.components.InitialsAvatar
@@ -42,6 +44,27 @@ fun HomeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    HomeContent(
+        modifier = modifier,
+        uiState = uiState,
+        onCategoriaChange = viewModel::updateCategoria,
+        onSearchBarClick = onSearchBarClick,
+        onProductoClick = onProductoClick,
+        onAvatarClick = onAvatarClick,
+        onNotificationsClick = onNotificationsClick
+    )
+}
+
+@Composable
+fun HomeContent(
+    modifier: Modifier = Modifier,
+    uiState: HomeState,
+    onCategoriaChange: (String) -> Unit,
+    onSearchBarClick: () -> Unit,
+    onProductoClick: (String) -> Unit,
+    onAvatarClick: () -> Unit,
+    onNotificationsClick: () -> Unit
+) {
     Column(
         modifier = modifier.fillMaxSize()
     ) {
@@ -52,7 +75,7 @@ fun HomeScreen(
                 Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.Filled.Notifications,
-                        contentDescription = "Notificaciones",
+                        contentDescription = stringResource(R.string.content_description_notifications),
                         tint = Ink,
                         modifier = Modifier.clickable { onNotificationsClick() }
                     )
@@ -82,13 +105,13 @@ fun HomeScreen(
 
             ChipsCategorias(
                 categoriaSeleccionada = uiState.categoriaSeleccionada,
-                onCategoriaChange = viewModel::updateCategoria
+                onCategoriaChange = onCategoriaChange
             )
 
             Spacer(modifier = Modifier.height(20.dp))
 
             Text(
-                text = "Tendencias esta semana",
+                text = stringResource(R.string.home_trending_title),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -107,7 +130,9 @@ fun HomeScreen(
 @Preview(showBackground = true, name = "HomeScreen - Preview")
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen(
+    HomeContent(
+        uiState = HomeState(),
+        onCategoriaChange = {},
         onSearchBarClick = {},
         onProductoClick = {},
         onAvatarClick = {},

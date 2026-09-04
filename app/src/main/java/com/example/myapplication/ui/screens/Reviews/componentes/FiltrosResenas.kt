@@ -15,9 +15,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.R
 import com.example.myapplication.ui.theme.BorderColor
 
 enum class OrdenResenas { RECIENTES, MEJOR_VALORADAS }
@@ -36,12 +38,12 @@ fun FiltrosResenas(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             FiltroTab(
-                texto = "Recientes",
+                texto = stringResource(R.string.reviews_filter_recent),
                 seleccionado = orden == OrdenResenas.RECIENTES,
                 onClick = { onOrdenChange(OrdenResenas.RECIENTES) }
             )
             FiltroTab(
-                texto = "Mejor valoradas",
+                texto = stringResource(R.string.reviews_filter_best_rated),
                 seleccionado = orden == OrdenResenas.MEJOR_VALORADAS,
                 onClick = { onOrdenChange(OrdenResenas.MEJOR_VALORADAS) }
             )
@@ -49,7 +51,7 @@ fun FiltrosResenas(
 
         Row(modifier = Modifier.padding(top = 8.dp)) {
             FiltroTab(
-                texto = "Con fotos",
+                texto = stringResource(R.string.reviews_filter_with_photos),
                 seleccionado = conFotos,
                 onClick = { onConFotosChange(!conFotos) }
             )

@@ -6,8 +6,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.R
 
 @Composable
 fun CampoTitulo(
@@ -20,7 +22,7 @@ fun CampoTitulo(
         value = titulo,
         onValueChange = onTituloChange,
         label = {
-            Text("Título")
+            Text(stringResource(R.string.new_review_label_title))
         },
         modifier = modifier
     )

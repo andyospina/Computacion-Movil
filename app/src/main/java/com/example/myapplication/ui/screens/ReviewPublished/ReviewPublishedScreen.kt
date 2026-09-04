@@ -17,9 +17,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.R
 import com.example.myapplication.ui.components.BarraSuperior
 import com.example.myapplication.ui.components.TopBarNavigation
 import com.example.myapplication.ui.screens.ReviewPublished.componentes.BotonesResumenPublicado
@@ -44,6 +46,25 @@ fun ReviewPublishedScreen(
         viewModel.getProducto(productId)
     }
 
+    ReviewPublishedContent(
+        modifier = modifier,
+        uiState = uiState,
+        rating = rating,
+        onCloseClick = onCloseClick,
+        onVerMiResenaClick = onVerMiResenaClick,
+        onVolverInicioClick = onVolverInicioClick
+    )
+}
+
+@Composable
+fun ReviewPublishedContent(
+    modifier: Modifier = Modifier,
+    uiState: ReviewPublishedState,
+    rating: Int,
+    onCloseClick: () -> Unit,
+    onVerMiResenaClick: () -> Unit,
+    onVolverInicioClick: () -> Unit
+) {
     Column(
         modifier = modifier.fillMaxSize()
     ) {
@@ -53,7 +74,7 @@ fun ReviewPublishedScreen(
             trailingContent = {
                 Icon(
                     imageVector = Icons.Filled.Close,
-                    contentDescription = "Cerrar",
+                    contentDescription = stringResource(R.string.content_description_close),
                     tint = Ink,
                     modifier = Modifier
                         .clickable { onCloseClick() }
@@ -101,8 +122,8 @@ fun ReviewPublishedScreen(
 @Preview(showBackground = true, name = "ReviewPublishedScreen - Preview")
 @Composable
 fun ReviewPublishedScreenPreview() {
-    ReviewPublishedScreen(
-        productId = "grabadora-voz-ai",
+    ReviewPublishedContent(
+        uiState = ReviewPublishedState(),
         rating = 4,
         onCloseClick = {},
         onVerMiResenaClick = {},

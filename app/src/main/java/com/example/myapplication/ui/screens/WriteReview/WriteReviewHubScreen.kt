@@ -28,6 +28,21 @@ fun WriteReviewHubScreen(
     onEscribirResenaClick: () -> Unit,
     onAvatarClick: () -> Unit
 ) {
+    WriteReviewHubContent(
+        modifier = modifier,
+        initialesUsuario = LocalUserProvider.currentUser.initials,
+        onEscribirResenaClick = onEscribirResenaClick,
+        onAvatarClick = onAvatarClick
+    )
+}
+
+@Composable
+fun WriteReviewHubContent(
+    modifier: Modifier = Modifier,
+    initialesUsuario: String,
+    onEscribirResenaClick: () -> Unit,
+    onAvatarClick: () -> Unit
+) {
     Column(
         modifier = modifier.fillMaxSize()
     ) {
@@ -36,7 +51,7 @@ fun WriteReviewHubScreen(
             navigation = TopBarNavigation.MENU,
             trailingContent = {
                 InitialsAvatar(
-                    initials = LocalUserProvider.currentUser.initials,
+                    initials = initialesUsuario,
                     modifier = Modifier.clickable { onAvatarClick() }
                 )
             }
@@ -75,7 +90,8 @@ fun WriteReviewHubScreen(
 @Preview(showBackground = true, name = "WriteReviewHubScreen - Preview")
 @Composable
 fun WriteReviewHubScreenPreview() {
-    WriteReviewHubScreen(
+    WriteReviewHubContent(
+        initialesUsuario = "EM",
         onEscribirResenaClick = {},
         onAvatarClick = {}
     )

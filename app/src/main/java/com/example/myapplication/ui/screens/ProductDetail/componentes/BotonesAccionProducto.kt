@@ -10,9 +10,11 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.R
 import com.example.myapplication.ui.theme.ElectricLime
 import com.example.myapplication.ui.theme.Ink
 
@@ -34,7 +36,7 @@ fun BotonesAccionProducto(
             colors = ButtonDefaults.buttonColors(containerColor = ElectricLime, contentColor = Ink),
             shape = RoundedCornerShape(6.dp)
         ) {
-            Text(text = "Escribir reseña", fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.product_write_review), fontWeight = FontWeight.Bold)
         }
 
         OutlinedButton(
@@ -44,7 +46,7 @@ fun BotonesAccionProducto(
                 .height(48.dp),
             shape = RoundedCornerShape(6.dp)
         ) {
-            Text(text = "Guardar", fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.action_save), fontWeight = FontWeight.Bold)
         }
     }
 }

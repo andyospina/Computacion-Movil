@@ -9,4 +9,110 @@
     <string name="escribe_una_rese_a">Escribir una reseña\n</string>
     <string name="comparte_tus_pensamientos_con_otras_personas">Comparte tus pensamientos con otras personas</string>
     <string name="calificaciones_y_rese_as">Calificaciones y reseñas</string>
+
+    <!-- Comunes -->
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_save">Guardar</string>
+    <string name="content_description_menu">Menú</string>
+    <string name="content_description_back">Volver</string>
+    <string name="content_description_close">Cerrar</string>
+    <string name="content_description_clear">Limpiar</string>
+    <string name="content_description_more_options">Más opciones</string>
+    <string name="content_description_notifications">Notificaciones</string>
+    <string name="divider_or">"  o  "</string>
+    <string name="label_email">Correo:</string>
+    <string name="label_password">Contraseña:</string>
+    <string name="password_visibility_show">Ver</string>
+    <string name="password_visibility_hide">Ocultar</string>
+    <string name="label_cellphone">Celular:</string>
+    <string name="status_draft">Borrador</string>
+    <string name="status_published">Publicada</string>
+
+    <!-- Home -->
+    <string name="home_trending_title">Tendencias esta semana</string>
+    <string name="home_search_placeholder">"  Busca un producto..."</string>
+
+    <!-- Login -->
+    <string name="login_tagline">Opiniones reales de compradores reales</string>
+    <string name="login_forgot_password">¿Olvidaste tu contraseña?</string>
+    <string name="login_continue_with_google">Continuar con Google</string>
+    <string name="login_no_account_prompt">¿No tienes cuenta? </string>
+    <string name="login_register_link">Regístrate</string>
+    <string name="login_button">Iniciar Sesión</string>
+
+    <!-- Register -->
+    <string name="register_title">Crea tu cuenta</string>
+    <string name="register_tagline">Únete a la comunidad de ReviewLab</string>
+    <string name="register_has_account_prompt">¿Ya tienes cuenta? </string>
+    <string name="register_login_link">Inicia sesión</string>
+    <string name="register_button">Registrarse</string>
+
+    <!-- Errores de autenticación -->
+    <string name="error_all_fields_required">Todos los campos son obligatorios</string>
+    <string name="error_password_too_short">La contraseña debe tener al menos 6 caracteres</string>
+    <string name="error_email_already_registered">Este correo ya está en uso</string>
+
+    <!-- Search -->
+    <string name="search_recent_title">Búsquedas recientes</string>
+    <string name="search_placeholder_example">audifonos</string>
+    <string name="search_results_count">"%1$d resultados para \"%2$s\""</string>
+
+    <!-- Reviews -->
+    <string name="reviews_load_more">Cargar más reseñas</string>
+    <string name="reviews_header_count">Reseñas (%1$d)</string>
+    <string name="reviews_verified_buyer_label">" Comprador verificado"</string>
+    <string name="reviews_useful_count">" · Útil (%1$d)"</string>
+    <string name="reviews_recommended_label">" · Recomendado"</string>
+    <string name="reviews_filter_recent">Recientes</string>
+    <string name="reviews_filter_best_rated">Mejor valoradas</string>
+    <string name="reviews_filter_with_photos">Con fotos</string>
+
+    <!-- Product detail / list -->
+    <string name="product_detail_title">Producto</string>
+    <string name="product_write_review">Escribir reseña</string>
+    <string name="product_photo_placeholder">Foto del producto</string>
+    <string name="product_featured_reviews_title">Reseñas destacadas</string>
+    <string name="product_view_all_reviews">Ver todas &gt;</string>
+    <string name="product_info_summary">"  %1$s · %2$d reseñas · %3$d%% recomiendan"</string>
+    <string name="product_list_item_summary">"  %1$s · %2$d reseñas"</string>
+
+    <!-- New Review -->
+    <string name="new_review_title">Nueva reseña</string>
+    <string name="new_review_label_email_required">*Correo</string>
+    <string name="new_review_label_review">Reseña</string>
+    <string name="new_review_label_title">Título</string>
+    <string name="new_review_label_user_required">*Usuario</string>
+    <string name="new_review_label_rating">Puntuación:</string>
+    <string name="new_review_label_option">Opción 1:</string>
+    <string name="new_review_post_button">Post</string>
+    <string name="tag_light">Light</string>
+    <string name="tag_fair">Fair</string>
+    <string name="tag_medium">Medium</string>
+    <string name="tag_dark">Dark</string>
+
+    <!-- Review Published -->
+    <string name="review_published_title">¡Reseña publicada!</string>
+    <string name="review_published_message">Gracias por compartir tu experiencia. Tu reseña ayudará a otros compradores a decidir mejor.</string>
+    <string name="review_published_your_rating">"  Tu calificación"</string>
+    <string name="review_published_view_my_review">Ver mi reseña</string>
+    <string name="review_published_back_home">Volver al inicio</string>
+
+    <!-- Notifications -->
+    <string name="notifications_title">Notificaciones</string>
+    <string name="notifications_mark_all_read">Marcar leídas</string>
+
+    <!-- Profile -->
+    <string name="profile_my_reviews_title">Mis reseñas</string>
+    <string name="profile_dark_mode">Modo oscuro</string>
+    <string name="profile_stat_reviews">Reseñas</string>
+    <string name="profile_stat_useful_votes">Votos útiles</string>
+    <string name="profile_stat_average">Promedio</string>
+    <string name="profile_member_since">Miembro desde %1$d</string>
+
+    <string-array name="categorias">
+        <item>Todo</item>
+        <item>Tecnología</item>
+        <item>Belleza</item>
+        <item>Hogar</item>
+    </string-array>
 </resources>

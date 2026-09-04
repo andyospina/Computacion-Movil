@@ -7,9 +7,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.R
 
 @Composable
 fun CampoCorreoLogin(
@@ -18,7 +20,7 @@ fun CampoCorreoLogin(
     onCorreoChange: (String) -> Unit
 ) {
     Column(modifier = modifier) {
-        Text(text = "Correo:", fontWeight = FontWeight.Medium)
+        Text(text = stringResource(R.string.label_email), fontWeight = FontWeight.Medium)
 
         OutlinedTextField(
             value = correo,

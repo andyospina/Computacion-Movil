@@ -10,10 +10,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.myapplication.R
 import com.example.myapplication.data.LocalReviewProvider
 import com.example.myapplication.data.Review
 import com.example.myapplication.data.ReviewStatus
@@ -58,7 +60,7 @@ fun TarjetaMiResena(
         ) {
             Text(text = resena.date, fontSize = 12.sp, color = GraySecondary)
             Text(
-                text = if (esBorrador) "Borrador" else "Publicada",
+                text = stringResource(if (esBorrador) R.string.status_draft else R.string.status_published),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (esBorrador) GraySecondary else DeepLime

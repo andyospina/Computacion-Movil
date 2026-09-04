@@ -14,9 +14,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.R
 import com.example.myapplication.ui.theme.BorderColor
 
 val busquedasRecientes = listOf("grabadora de voz", "sérum vitamina c", "cafetera")
@@ -27,7 +29,7 @@ fun BusquedasRecientes(
     onBusquedaClick: (String) -> Unit
 ) {
     Column(modifier = modifier) {
-        Text(text = "Búsquedas recientes", fontWeight = FontWeight.Bold)
+        Text(text = stringResource(R.string.search_recent_title), fontWeight = FontWeight.Bold)
 
         Spacer(modifier = Modifier.height(12.dp))
 

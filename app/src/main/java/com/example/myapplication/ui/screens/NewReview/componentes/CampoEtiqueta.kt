@@ -10,9 +10,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.R
 
 @Composable
 fun CampoEtiquetas(
@@ -24,7 +26,7 @@ fun CampoEtiquetas(
     ) {
 
         Text(
-            text = "Opción 1:",
+            text = stringResource(R.string.new_review_label_option),
             fontWeight = FontWeight.Bold
         )
 
@@ -36,10 +38,10 @@ fun CampoEtiquetas(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
 
-            Etiqueta("Light")
-            Etiqueta("Fair")
-            Etiqueta("Medium")
-            Etiqueta("Dark")
+            Etiqueta(stringResource(R.string.tag_light))
+            Etiqueta(stringResource(R.string.tag_fair))
+            Etiqueta(stringResource(R.string.tag_medium))
+            Etiqueta(stringResource(R.string.tag_dark))
         }
     }
 }

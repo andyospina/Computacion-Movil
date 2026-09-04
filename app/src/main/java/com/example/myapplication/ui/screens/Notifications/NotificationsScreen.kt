@@ -14,11 +14,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.R
 import com.example.myapplication.ui.components.BarraSuperior
 import com.example.myapplication.ui.components.TopBarNavigation
 import com.example.myapplication.ui.screens.Notifications.componentes.TarjetaNotificacion
@@ -32,6 +34,21 @@ fun NotificationsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    NotificationsContent(
+        modifier = modifier,
+        uiState = uiState,
+        onMarcarTodasLeidasClick = viewModel::marcarTodasLeidas,
+        onBackClick = onBackClick
+    )
+}
+
+@Composable
+fun NotificationsContent(
+    modifier: Modifier = Modifier,
+    uiState: NotificationsState,
+    onMarcarTodasLeidasClick: () -> Unit,
+    onBackClick: () -> Unit
+) {
     Column(
         modifier = modifier.fillMaxSize()
     ) {
@@ -41,10 +58,10 @@ fun NotificationsScreen(
             onNavigationClick = onBackClick,
             trailingContent = {
                 Text(
-                    text = "Marcar leídas",
+                    text = stringResource(R.string.notifications_mark_all_read),
                     color = Ink,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.clickable { viewModel.marcarTodasLeidas() }
+                    modifier = Modifier.clickable { onMarcarTodasLeidasClick() }
                 )
             }
         )
@@ -55,7 +72,7 @@ fun NotificationsScreen(
                 .padding(20.dp)
         ) {
 
-            Text(text = "Notificaciones", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.notifications_title), fontSize = 24.sp, fontWeight = FontWeight.Bold)
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -71,5 +88,9 @@ fun NotificationsScreen(
 @Preview(showBackground = true, name = "NotificationsScreen - Preview")
 @Composable
 fun NotificationsScreenPreview() {
-    NotificationsScreen(onBackClick = {})
+    NotificationsContent(
+        uiState = NotificationsState(),
+        onMarcarTodasLeidasClick = {},
+        onBackClick = {}
+    )
 }

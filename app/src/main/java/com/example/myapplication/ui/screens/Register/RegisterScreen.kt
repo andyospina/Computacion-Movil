@@ -19,12 +19,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.R
 import com.example.myapplication.ui.components.AppLogo
 import com.example.myapplication.ui.screens.Login.componentes.CampoContrasena
 import com.example.myapplication.ui.screens.Register.componentes.BotonRegistrarse
@@ -50,6 +52,29 @@ fun RegisterScreen(
         }
     }
 
+    RegisterContent(
+        modifier = modifier,
+        uiState = uiState,
+        onCorreoChange = viewModel::updateEmail,
+        onCelularChange = viewModel::updateCellphone,
+        onContrasenaChange = viewModel::updatePassword,
+        onVisibleChange = { viewModel.togglePasswordVisibility() },
+        onRegistrarseClick = viewModel::registerButtonPress,
+        onIniciarSesionClick = onIniciarSesionClick
+    )
+}
+
+@Composable
+fun RegisterContent(
+    modifier: Modifier = Modifier,
+    uiState: RegisterState,
+    onCorreoChange: (String) -> Unit,
+    onCelularChange: (String) -> Unit,
+    onContrasenaChange: (String) -> Unit,
+    onVisibleChange: (Boolean) -> Unit,
+    onRegistrarseClick: () -> Unit,
+    onIniciarSesionClick: () -> Unit
+) {
     Column(
         modifier = modifier.fillMaxSize()
     ) {
@@ -66,7 +91,7 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Crea tu cuenta",
+                text = stringResource(R.string.register_title),
                 color = Color.White,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold
@@ -75,7 +100,7 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Únete a la comunidad de ReviewLab",
+                text = stringResource(R.string.register_tagline),
                 color = GraySecondary,
                 textAlign = TextAlign.Center
             )
@@ -91,7 +116,7 @@ fun RegisterScreen(
             CampoCorreoRegistro(
                 modifier = Modifier.fillMaxWidth(),
                 correo = uiState.email,
-                onCorreoChange = viewModel::updateEmail
+                onCorreoChange = onCorreoChange
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -99,7 +124,7 @@ fun RegisterScreen(
             CampoCelular(
                 modifier = Modifier.fillMaxWidth(),
                 celular = uiState.cellphone,
-                onCelularChange = viewModel::updateCellphone
+                onCelularChange = onCelularChange
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -108,14 +133,14 @@ fun RegisterScreen(
                 modifier = Modifier.fillMaxWidth(),
                 contrasena = uiState.password,
                 visible = uiState.showPassword,
-                onContrasenaChange = viewModel::updatePassword,
-                onVisibleChange = { viewModel.togglePasswordVisibility() }
+                onContrasenaChange = onContrasenaChange,
+                onVisibleChange = onVisibleChange
             )
 
             if (uiState.showError) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = uiState.errorMessage,
+                    text = stringResource(uiState.errorMessageRes),
                     color = MaterialTheme.colorScheme.error,
                     fontWeight = FontWeight.Medium
                 )
@@ -125,7 +150,7 @@ fun RegisterScreen(
 
             BotonRegistrarse(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = viewModel::registerButtonPress
+                onClick = onRegistrarseClick
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -134,9 +159,9 @@ fun RegisterScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                Text(text = "¿Ya tienes cuenta? ", color = GraySecondary)
+                Text(text = stringResource(R.string.register_has_account_prompt), color = GraySecondary)
                 Text(
-                    text = "Inicia sesión",
+                    text = stringResource(R.string.register_login_link),
                     color = DeepLime,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.clickable { onIniciarSesionClick() }
@@ -149,8 +174,13 @@ fun RegisterScreen(
 @Preview(showBackground = true, name = "RegisterScreen - Preview")
 @Composable
 fun RegisterScreenPreview() {
-    RegisterScreen(
-        onRegistroExitoso = {},
+    RegisterContent(
+        uiState = RegisterState(),
+        onCorreoChange = {},
+        onCelularChange = {},
+        onContrasenaChange = {},
+        onVisibleChange = {},
+        onRegistrarseClick = {},
         onIniciarSesionClick = {}
     )
 }

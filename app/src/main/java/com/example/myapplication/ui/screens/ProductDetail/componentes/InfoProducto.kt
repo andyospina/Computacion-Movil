@@ -6,10 +6,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.myapplication.R
 import com.example.myapplication.data.Product
 import com.example.myapplication.ui.components.StarRatingDisplay
 import com.example.myapplication.ui.theme.GraySecondary
@@ -29,7 +31,12 @@ fun InfoProducto(
         Row(verticalAlignment = Alignment.CenterVertically) {
             StarRatingDisplay(rating = Math.round(producto.rating).toInt())
             Text(
-                text = "  ${producto.rating} · ${producto.reviewCount} reseñas · ${producto.recommendPercent}% recomiendan",
+                text = stringResource(
+                    R.string.product_info_summary,
+                    producto.rating.toString(),
+                    producto.reviewCount,
+                    producto.recommendPercent
+                ),
                 color = GraySecondary,
                 fontSize = 13.sp
             )

@@ -13,10 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.R
 import com.example.myapplication.ui.components.BarraSuperior
 import com.example.myapplication.ui.components.ProductListItem
 import com.example.myapplication.ui.components.TopBarNavigation
@@ -33,6 +35,23 @@ fun SearchScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    SearchContent(
+        modifier = modifier,
+        uiState = uiState,
+        onQueryChange = viewModel::updateQuery,
+        onBackClick = onBackClick,
+        onProductoClick = onProductoClick
+    )
+}
+
+@Composable
+fun SearchContent(
+    modifier: Modifier = Modifier,
+    uiState: SearchState,
+    onQueryChange: (String) -> Unit,
+    onBackClick: () -> Unit,
+    onProductoClick: (String) -> Unit
+) {
     Column(
         modifier = modifier.fillMaxSize()
     ) {
@@ -51,18 +70,22 @@ fun SearchScreen(
             CampoBusqueda(
                 modifier = Modifier.fillMaxWidth(),
                 query = uiState.query,
-                onQueryChange = viewModel::updateQuery
+                onQueryChange = onQueryChange
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             if (uiState.query.isBlank()) {
                 BusquedasRecientes(
-                    onBusquedaClick = viewModel::updateQuery
+                    onBusquedaClick = onQueryChange
                 )
             } else {
                 Text(
-                    text = "${uiState.resultados.size} resultados para \"${uiState.query}\"",
+                    text = stringResource(
+                        R.string.search_results_count,
+                        uiState.resultados.size,
+                        uiState.query
+                    ),
                     color = GraySecondary
                 )
 
@@ -86,7 +109,9 @@ fun SearchScreen(
 @Preview(showBackground = true, name = "SearchScreen - Preview")
 @Composable
 fun SearchScreenPreview() {
-    SearchScreen(
+    SearchContent(
+        uiState = SearchState(),
+        onQueryChange = {},
         onBackClick = {},
         onProductoClick = {}
     )

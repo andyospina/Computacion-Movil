@@ -12,9 +12,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.R
 
 @Composable
 fun BotonesNuevaResena(
@@ -29,7 +31,7 @@ fun BotonesNuevaResena(
     ) {
 
         Text(
-            text = "Cancelar",
+            text = stringResource(R.string.action_cancel),
             fontWeight = FontWeight.Bold,
             modifier = Modifier.clickable {
                 onCancelar()
@@ -45,7 +47,7 @@ fun BotonesNuevaResena(
         ) {
 
             Text(
-                text = "Post",
+                text = stringResource(R.string.new_review_post_button),
                 color = Color.Black,
                 fontWeight = FontWeight.Bold
             )

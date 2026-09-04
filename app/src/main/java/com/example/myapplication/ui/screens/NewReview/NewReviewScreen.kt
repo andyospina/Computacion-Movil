@@ -9,9 +9,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.R
 import com.example.myapplication.ui.components.BarraSuperior
 import com.example.myapplication.ui.components.TopBarNavigation
 import com.example.myapplication.ui.screens.NewReview.componentes.ContenidoNuevaResena
@@ -37,12 +39,37 @@ fun NewReviewScreen(
         }
     }
 
+    NewReviewContent(
+        modifier = modifier,
+        uiState = uiState,
+        onPuntuacionChange = viewModel::updatePuntuacion,
+        onTituloChange = viewModel::updateTitulo,
+        onResenaChange = viewModel::updateResena,
+        onUsuarioChange = viewModel::updateUsuario,
+        onCorreoChange = viewModel::updateCorreo,
+        onPublicarClick = viewModel::publicarButtonPress,
+        onCancelar = onCancelar
+    )
+}
+
+@Composable
+fun NewReviewContent(
+    modifier: Modifier = Modifier,
+    uiState: NewReviewState,
+    onPuntuacionChange: (Int) -> Unit,
+    onTituloChange: (String) -> Unit,
+    onResenaChange: (String) -> Unit,
+    onUsuarioChange: (String) -> Unit,
+    onCorreoChange: (String) -> Unit,
+    onPublicarClick: () -> Unit,
+    onCancelar: () -> Unit
+) {
     Column(
         modifier = modifier.fillMaxSize()
     ) {
 
         BarraSuperior(
-            title = "Nueva reseña",
+            title = stringResource(R.string.new_review_title),
             navigation = TopBarNavigation.BACK,
             onNavigationClick = onCancelar
         )
@@ -60,12 +87,12 @@ fun NewReviewScreen(
                 resena = uiState.resena,
                 usuario = uiState.usuario,
                 correo = uiState.correo,
-                onPuntuacionChange = viewModel::updatePuntuacion,
-                onTituloChange = viewModel::updateTitulo,
-                onResenaChange = viewModel::updateResena,
-                onUsuarioChange = viewModel::updateUsuario,
-                onCorreoChange = viewModel::updateCorreo,
-                onPublicar = viewModel::publicarButtonPress,
+                onPuntuacionChange = onPuntuacionChange,
+                onTituloChange = onTituloChange,
+                onResenaChange = onResenaChange,
+                onUsuarioChange = onUsuarioChange,
+                onCorreoChange = onCorreoChange,
+                onPublicar = onPublicarClick,
                 onCancelar = onCancelar
             )
         }
@@ -75,8 +102,14 @@ fun NewReviewScreen(
 @Preview(showBackground = true, name = "NewReviewScreen - Preview")
 @Composable
 fun NewReviewScreenPreview() {
-    NewReviewScreen(
-        onPublicar = { _, _, _, _ -> },
+    NewReviewContent(
+        uiState = NewReviewState(),
+        onPuntuacionChange = {},
+        onTituloChange = {},
+        onResenaChange = {},
+        onUsuarioChange = {},
+        onCorreoChange = {},
+        onPublicarClick = {},
         onCancelar = {}
     )
 }

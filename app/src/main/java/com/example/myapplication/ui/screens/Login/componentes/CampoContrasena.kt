@@ -9,12 +9,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.R
 import com.example.myapplication.ui.theme.DeepLime
 
 @Composable
@@ -26,7 +28,7 @@ fun CampoContrasena(
     onVisibleChange: (Boolean) -> Unit
 ) {
     Column(modifier = modifier) {
-        Text(text = "Contraseña:", fontWeight = FontWeight.Medium)
+        Text(text = stringResource(R.string.label_password), fontWeight = FontWeight.Medium)
 
         OutlinedTextField(
             value = contrasena,
@@ -37,7 +39,12 @@ fun CampoContrasena(
             visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 TextButton(onClick = { onVisibleChange(!visible) }) {
-                    Text(text = if (visible) "Ocultar" else "Ver", color = DeepLime)
+                    Text(
+                        text = stringResource(
+                            if (visible) R.string.password_visibility_hide else R.string.password_visibility_show
+                        ),
+                        color = DeepLime
+                    )
                 }
             }
         )

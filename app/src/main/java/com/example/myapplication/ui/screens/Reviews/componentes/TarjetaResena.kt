@@ -16,10 +16,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.myapplication.R
 import com.example.myapplication.data.LocalReviewProvider
 import com.example.myapplication.data.Review
 import com.example.myapplication.ui.components.StarRatingDisplay
@@ -49,7 +51,7 @@ fun TarjetaResena(
                     tint = DeepLime,
                     modifier = Modifier.height(14.dp)
                 )
-                Text(text = " Comprador verificado", color = DeepLime, fontSize = 12.sp)
+                Text(text = stringResource(R.string.reviews_verified_buyer_label), color = DeepLime, fontSize = 12.sp)
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -69,9 +71,18 @@ fun TarjetaResena(
 
         Row {
             Text(text = resena.date, fontSize = 12.sp, color = GraySecondary)
-            Text(text = " · Útil (${resena.usefulCount})", fontSize = 12.sp, color = GraySecondary)
+            Text(
+                text = stringResource(R.string.reviews_useful_count, resena.usefulCount),
+                fontSize = 12.sp,
+                color = GraySecondary
+            )
             if (resena.recommended) {
-                Text(text = " · Recomendado", fontSize = 12.sp, color = DeepLime, fontWeight = FontWeight.Bold)
+                Text(
+                    text = stringResource(R.string.reviews_recommended_label),
+                    fontSize = 12.sp,
+                    color = DeepLime,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }

@@ -8,10 +8,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.myapplication.R
 import com.example.myapplication.data.LocalUserProvider
 import com.example.myapplication.data.User
 import com.example.myapplication.ui.theme.DeepLime
@@ -26,9 +28,9 @@ fun EstadisticasPerfil(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceEvenly
     ) {
-        Estadistica(valor = "${user.reviewCount}", etiqueta = "Reseñas")
-        Estadistica(valor = "${user.usefulVotes}", etiqueta = "Votos útiles")
-        Estadistica(valor = "${user.averageRating}★", etiqueta = "Promedio", color = DeepLime)
+        Estadistica(valor = "${user.reviewCount}", etiqueta = stringResource(R.string.profile_stat_reviews))
+        Estadistica(valor = "${user.usefulVotes}", etiqueta = stringResource(R.string.profile_stat_useful_votes))
+        Estadistica(valor = "${user.averageRating}★", etiqueta = stringResource(R.string.profile_stat_average), color = DeepLime)
     }
 }
 

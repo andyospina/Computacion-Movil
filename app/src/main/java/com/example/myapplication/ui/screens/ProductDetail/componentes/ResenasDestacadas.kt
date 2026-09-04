@@ -13,10 +13,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.myapplication.R
 import com.example.myapplication.data.LocalReviewProvider
 import com.example.myapplication.data.Review
 import com.example.myapplication.ui.components.StarRatingDisplay
@@ -35,9 +37,9 @@ fun ResenasDestacadas(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = "Reseñas destacadas", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.product_featured_reviews_title), fontSize = 18.sp, fontWeight = FontWeight.Bold)
             Text(
-                text = "Ver todas >",
+                text = stringResource(R.string.product_view_all_reviews),
                 color = DeepLime,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.clickable { onVerTodasClick() }
