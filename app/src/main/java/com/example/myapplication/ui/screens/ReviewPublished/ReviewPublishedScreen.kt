@@ -12,12 +12,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.data.LocalProductProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.ui.components.BarraSuperior
 import com.example.myapplication.ui.components.TopBarNavigation
 import com.example.myapplication.ui.screens.ReviewPublished.componentes.BotonesResumenPublicado
@@ -31,11 +33,16 @@ fun ReviewPublishedScreen(
     productId: String,
     rating: Int,
     modifier: Modifier = Modifier,
+    viewModel: ReviewPublishedViewModel = viewModel(),
     onCloseClick: () -> Unit,
     onVerMiResenaClick: () -> Unit,
     onVolverInicioClick: () -> Unit
 ) {
-    val producto = remember(productId) { LocalProductProvider.findById(productId) }
+    val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(productId) {
+        viewModel.getProducto(productId)
+    }
 
     Column(
         modifier = modifier.fillMaxSize()
@@ -72,11 +79,13 @@ fun ReviewPublishedScreen(
 
             Spacer(modifier = Modifier.height(28.dp))
 
-            TarjetaResumenPublicado(
-                producto = producto,
-                calificacion = rating,
-                modifier = Modifier.fillMaxWidth()
-            )
+            uiState.producto?.let { producto ->
+                TarjetaResumenPublicado(
+                    producto = producto,
+                    calificacion = rating,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
 
             Spacer(modifier = Modifier.weight(1f))
 
