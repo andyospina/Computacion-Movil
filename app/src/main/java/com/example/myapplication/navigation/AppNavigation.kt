@@ -24,6 +24,7 @@ import com.example.myapplication.ui.screens.Register.RegisterScreen
 import com.example.myapplication.ui.screens.ReviewPublished.ReviewPublishedScreen
 import com.example.myapplication.ui.screens.Reviews.ReviewsListScreen
 import com.example.myapplication.ui.screens.Search.SearchScreen
+import com.example.myapplication.ui.screens.Splash.SplashScreen
 import com.example.myapplication.ui.screens.WriteReview.WriteReviewHubScreen
 
 private val topLevelRoutes = bottomNavItems.map { it.route }.toSet()
@@ -58,9 +59,24 @@ fun AppNavigation(
 
         NavHost(
             navController = navController,
-            startDestination = Routes.Login.route,
+            startDestination = Routes.Splash.route,
             modifier = Modifier.padding(paddingValues)
         ) {
+
+            composable(Routes.Splash.route) {
+                SplashScreen(
+                    onNavigateToHome = {
+                        navController.navigate(Routes.Home.route) {
+                            popUpTo(Routes.Splash.route) { inclusive = true }
+                        }
+                    },
+                    onNavigateToStart = {
+                        navController.navigate(Routes.Login.route) {
+                            popUpTo(Routes.Splash.route) { inclusive = true }
+                        }
+                    }
+                )
+            }
 
             composable(Routes.Login.route) {
                 LoginScreen(
@@ -118,7 +134,12 @@ fun AppNavigation(
             composable(Routes.Profile.route) {
                 ProfileScreen(
                     modoOscuro = modoOscuro,
-                    onModoOscuroChange = onModoOscuroChange
+                    onModoOscuroChange = onModoOscuroChange,
+                    onLoggedOut = {
+                        navController.navigate(Routes.Login.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
                 )
             }
 

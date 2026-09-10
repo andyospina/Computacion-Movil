@@ -27,7 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.R
 import com.example.myapplication.ui.components.AppLogo
 import com.example.myapplication.ui.screens.Login.componentes.BotonIniciarSesion
@@ -40,7 +40,7 @@ import com.example.myapplication.ui.theme.Ink
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
-    viewModel: LoginViewModel = viewModel(),
+    viewModel: LoginViewModel = hiltViewModel(),
     onIniciarSesionClick: () -> Unit,
     onRegistrateClick: () -> Unit
 ) {
@@ -150,7 +150,7 @@ fun LoginContent(
 
             BotonIniciarSesion(
                 modifier = Modifier.fillMaxWidth(),
-                habilitado = uiState.email.isNotBlank() && uiState.password.isNotBlank(),
+                habilitado = uiState.email.isNotBlank() && uiState.password.isNotBlank() && !uiState.isLoading,
                 onClick = onLoginClick
             )
 

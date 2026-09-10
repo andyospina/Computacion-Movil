@@ -2,15 +2,23 @@ package com.example.myapplication.ui.screens.Register
 
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.myapplication.R
+import com.example.myapplication.data.repository.AuthRepository
+import com.example.myapplication.data.repository.toAuthErrorMessageRes
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-private const val EMAIL_YA_REGISTRADO = "admin@admin.com"
 private const val LONGITUD_MINIMA_PASSWORD = 6
 
-class RegisterViewModel : ViewModel() {
+@HiltViewModel
+class RegisterViewModel @Inject constructor(
+    private val authRepository: AuthRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RegisterState())
     val uiState = _uiState.asStateFlow()
@@ -43,12 +51,25 @@ class RegisterViewModel : ViewModel() {
                 showError(R.string.error_password_too_short)
             }
 
-            state.email.equals(EMAIL_YA_REGISTRADO, ignoreCase = true) -> {
-                showError(R.string.error_email_already_registered)
-            }
+            else -> signUp(state.email, state.password)
+        }
+    }
 
-            else -> {
-                _uiState.update { it.copy(showError = false, navigate = true) }
+    private fun signUp(email: String, password: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, showError = false) }
+
+            try {
+                authRepository.signUp(email, password)
+                _uiState.update { it.copy(isLoading = false, navigate = true) }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        showError = true,
+                        errorMessageRes = e.toAuthErrorMessageRes()
+                    )
+                }
             }
         }
     }

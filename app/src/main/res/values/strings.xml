@@ -51,6 +51,14 @@
     <string name="error_all_fields_required">Todos los campos son obligatorios</string>
     <string name="error_password_too_short">La contraseña debe tener al menos 6 caracteres</string>
     <string name="error_email_already_registered">Este correo ya está en uso</string>
+    <string name="error_invalid_credentials">Correo o contraseña incorrectos</string>
+    <string name="error_user_not_found">No existe una cuenta con este correo</string>
+    <string name="error_invalid_email">El correo electrónico no es válido</string>
+    <string name="error_network">Sin conexión a internet. Intenta de nuevo</string>
+    <string name="error_authentication_failed">No se pudo completar la operación. Intenta de nuevo</string>
+
+    <!-- Profile -->
+    <string name="profile_logout_button">Cerrar sesión</string>
 
     <!-- Search -->
     <string name="search_recent_title">Búsquedas recientes</string>

@@ -20,11 +20,13 @@ import com.example.myapplication.ui.theme.Ink
 @Composable
 fun BotonRegistrarse(
     modifier: Modifier = Modifier,
+    habilitado: Boolean = true,
     onClick: () -> Unit
 ) {
     Button(
         onClick = onClick,
         modifier = modifier.height(52.dp),
+        enabled = habilitado,
         colors = ButtonDefaults.buttonColors(
             containerColor = ElectricLime,
             contentColor = Ink

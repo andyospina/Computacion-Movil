@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -20,29 +22,39 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.R
 import com.example.myapplication.data.LocalProductProvider
 import com.example.myapplication.ui.screens.Profile.componentes.EncabezadoPerfil
 import com.example.myapplication.ui.screens.Profile.componentes.EstadisticasPerfil
 import com.example.myapplication.ui.screens.Profile.componentes.SelectorTema
 import com.example.myapplication.ui.screens.Profile.componentes.TarjetaMiResena
+import com.example.myapplication.ui.theme.GraySecondary
 import com.example.myapplication.ui.theme.Ink
 
 @Composable
 fun ProfileScreen(
     modifier: Modifier = Modifier,
-    viewModel: ProfileViewModel = viewModel(),
+    viewModel: ProfileViewModel = hiltViewModel(),
     modoOscuro: Boolean,
-    onModoOscuroChange: (Boolean) -> Unit
+    onModoOscuroChange: (Boolean) -> Unit,
+    onLoggedOut: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(uiState.loggedOut) {
+        if (uiState.loggedOut) {
+            onLoggedOut()
+            viewModel.onLoggedOut()
+        }
+    }
 
     ProfileContent(
         modifier = modifier,
         uiState = uiState,
         modoOscuro = modoOscuro,
-        onModoOscuroChange = onModoOscuroChange
+        onModoOscuroChange = onModoOscuroChange,
+        onLogoutClick = viewModel::logoutButtonPress
     )
 }
 
@@ -51,7 +63,8 @@ fun ProfileContent(
     modifier: Modifier = Modifier,
     uiState: ProfileState,
     modoOscuro: Boolean,
-    onModoOscuroChange: (Boolean) -> Unit
+    onModoOscuroChange: (Boolean) -> Unit,
+    onLogoutClick: () -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxSize()
@@ -68,12 +81,28 @@ fun ProfileContent(
                     user = user,
                     modifier = Modifier.fillMaxWidth()
                 )
+
+                if (uiState.email.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(text = uiState.email, color = GraySecondary)
+                }
             }
 
             Column(modifier = Modifier.padding(vertical = 16.dp)) {
                 EstadisticasPerfil(user = user, modifier = Modifier.fillMaxWidth())
             }
         }
+
+        OutlinedButton(
+            onClick = onLogoutClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+        ) {
+            Text(text = stringResource(R.string.profile_logout_button))
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         SelectorTema(
             modoOscuro = modoOscuro,
@@ -112,6 +141,7 @@ fun ProfileScreenPreview() {
     ProfileContent(
         uiState = ProfileState(),
         modoOscuro = false,
-        onModoOscuroChange = {}
+        onModoOscuroChange = {},
+        onLogoutClick = {}
     )
 }
