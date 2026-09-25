@@ -1,6 +1,13 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.dagger)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.google.ksp)
+    //Messaging
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
+
 }
 
 android {
@@ -57,4 +64,17 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+    //Hilt
+    implementation(libs.dagger.hilt)
+    implementation(libs.hilt.compose.navigation)
+    ksp(libs.dagger.kapt)
+
+    //Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.analytics)
+    implementation("com.google.firebase:firebase-storage-ktx")
+    implementation(libs.kotlinx.coroutines.play.services)
 }

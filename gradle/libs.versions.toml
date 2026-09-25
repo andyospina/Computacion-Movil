@@ -12,6 +12,12 @@ cameraCore = "1.6.1"
 benchmarkTraceprocessor = "1.4.1"
 navigationCompose = "2.9.3"
 materialIconsExtended = "1.7.8"
+googleServices = "4.4.2"
+googleKotlinKsp = "2.3.12"
+firebaseCrashlytics = "3.0.2"
+firebaseBom = "33.7.0"
+dagger = "2.60.1"
+coroutinesPlayServices = "1.11.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -35,7 +41,24 @@ androidx-benchmark-traceprocessor = { group = "androidx.benchmark", name = "benc
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "materialIconsExtended" }
 
+dagger-hilt = { module = "com.google.dagger:hilt-android", version.ref = "dagger" }
+dagger-kapt = { module = 'com.google.dagger:hilt-android-compiler', version.ref = "dagger" }
+hilt-compose-navigation = { module = "androidx.hilt:hilt-navigation-compose", version = "1.2.0" }
+
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-auth = { module = "com.google.firebase:firebase-auth" }
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
+firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
+kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "coroutinesPlayServices" }
+
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
+dagger = { id = "com.google.dagger.hilt.android", version.ref = "dagger" }
+google-ksp = { id = "com.google.devtools.ksp", version.ref = "googleKotlinKsp" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }

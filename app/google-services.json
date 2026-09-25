@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "166929656921",
+    "project_id": "reviewlab-b60be",
+    "storage_bucket": "reviewlab-b60be.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:166929656921:android:f48163f5454fd7d0f0d548",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDp4sY609BjJVpM2qBZUBQsdMAo5rDQEU8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

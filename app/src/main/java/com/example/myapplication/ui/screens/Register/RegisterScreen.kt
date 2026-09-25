@@ -25,7 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.R
 import com.example.myapplication.ui.components.AppLogo
 import com.example.myapplication.ui.screens.Login.componentes.CampoContrasena
@@ -39,7 +39,7 @@ import com.example.myapplication.ui.theme.Ink
 @Composable
 fun RegisterScreen(
     modifier: Modifier = Modifier,
-    viewModel: RegisterViewModel = viewModel(),
+    viewModel: RegisterViewModel = hiltViewModel(),
     onRegistroExitoso: () -> Unit,
     onIniciarSesionClick: () -> Unit
 ) {
@@ -150,6 +150,7 @@ fun RegisterContent(
 
             BotonRegistrarse(
                 modifier = Modifier.fillMaxWidth(),
+                habilitado = !uiState.isLoading,
                 onClick = onRegistrarseClick
             )
 

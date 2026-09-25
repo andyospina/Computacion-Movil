@@ -8,3 +8,4 @@ val Ink = Color(0xFF101012)
 val Paper = Color(0xFFF4F4F2)
 val GraySecondary = Color(0xFF8A8A90)
 val BorderColor = Color(0xFFC9C9C6)
+//materialtheme.colorscheme.borde

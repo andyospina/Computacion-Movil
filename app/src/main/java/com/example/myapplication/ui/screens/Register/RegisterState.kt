@@ -10,5 +10,6 @@ data class RegisterState(
     val showPassword: Boolean = false,
     @param:StringRes val errorMessageRes: Int = R.string.error_all_fields_required,
     val showError: Boolean = false,
+    val isLoading: Boolean = false,
     val navigate: Boolean = false
 )

@@ -5,5 +5,7 @@ import com.example.myapplication.data.User
 
 data class ProfileState(
     val user: User? = null,
-    val misResenas: List<Review> = emptyList()
+    val misResenas: List<Review> = emptyList(),
+    val email: String = "",
+    val loggedOut: Boolean = false
 )
