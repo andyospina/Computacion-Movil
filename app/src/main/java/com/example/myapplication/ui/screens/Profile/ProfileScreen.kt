@@ -1,5 +1,8 @@
 package com.example.myapplication.ui.screens.Profile
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,6 +46,12 @@ fun ProfileScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    // Photo Picker del sistema: no requiere permisos de almacenamiento
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = viewModel::onImageSelected
+    )
+
     LaunchedEffect(uiState.loggedOut) {
         if (uiState.loggedOut) {
             onLoggedOut()
@@ -54,6 +64,11 @@ fun ProfileScreen(
         uiState = uiState,
         modoOscuro = modoOscuro,
         onModoOscuroChange = onModoOscuroChange,
+        onSelectImageClick = {
+            photoPickerLauncher.launch(
+                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+            )
+        },
         onLogoutClick = viewModel::logoutButtonPress
     )
 }
@@ -64,6 +79,7 @@ fun ProfileContent(
     uiState: ProfileState,
     modoOscuro: Boolean,
     onModoOscuroChange: (Boolean) -> Unit,
+    onSelectImageClick: () -> Unit,
     onLogoutClick: () -> Unit
 ) {
     Column(
@@ -79,6 +95,7 @@ fun ProfileContent(
             ) {
                 EncabezadoPerfil(
                     user = user,
+                    profileImageUrl = uiState.profileImageUrl,
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -92,6 +109,31 @@ fun ProfileContent(
                 EstadisticasPerfil(user = user, modifier = Modifier.fillMaxWidth())
             }
         }
+
+        OutlinedButton(
+            onClick = onSelectImageClick,
+            enabled = !uiState.isLoading,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+        ) {
+            Text(
+                text = stringResource(
+                    if (uiState.isLoading) R.string.profile_uploading_image
+                    else R.string.profile_select_image_button
+                )
+            )
+        }
+
+        uiState.errorMessageRes?.let { mensajeRes ->
+            Text(
+                text = stringResource(mensajeRes),
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedButton(
             onClick = onLogoutClick,
@@ -142,6 +184,7 @@ fun ProfileScreenPreview() {
         uiState = ProfileState(),
         modoOscuro = false,
         onModoOscuroChange = {},
+        onSelectImageClick = {},
         onLogoutClick = {}
     )
 }

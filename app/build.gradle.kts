@@ -75,6 +75,10 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.analytics)
-    implementation("com.google.firebase:firebase-storage-ktx")
+    implementation(libs.firebase.storage)
     implementation(libs.kotlinx.coroutines.play.services)
+
+    //Coil
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 }

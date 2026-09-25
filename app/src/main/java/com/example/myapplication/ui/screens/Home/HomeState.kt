@@ -4,5 +4,6 @@ import com.example.myapplication.data.Product
 
 data class HomeState(
     val categoriaSeleccionada: String = "Todo",
-    val productos: List<Product> = emptyList()
+    val productos: List<Product> = emptyList(),
+    val profileImageUrl: String? = null
 )

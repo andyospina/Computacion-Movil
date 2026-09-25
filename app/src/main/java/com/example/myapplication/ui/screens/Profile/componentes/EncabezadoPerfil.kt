@@ -16,21 +16,20 @@ import androidx.compose.ui.unit.sp
 import com.example.myapplication.R
 import com.example.myapplication.data.LocalUserProvider
 import com.example.myapplication.data.User
-import com.example.myapplication.ui.components.InitialsAvatar
+import com.example.myapplication.ui.components.ProfileAsyncImage
 import com.example.myapplication.ui.theme.GraySecondary
 
 @Composable
 fun EncabezadoPerfil(
     user: User,
+    profileImageUrl: String?,
     modifier: Modifier = Modifier
 ) {
-
-
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        InitialsAvatar(initials = user.initials, size = 64.dp)
+        ProfileAsyncImage(profileImage = profileImageUrl, size = 64.dp)
 
         Column(modifier = Modifier.padding(start = 16.dp)) {
             Text(text = user.name, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
@@ -44,6 +43,7 @@ fun EncabezadoPerfil(
 fun EncabezadoPerfilPreview() {
     EncabezadoPerfil(
         user = LocalUserProvider.currentUser,
+        profileImageUrl = null,
         modifier = Modifier.padding(16.dp)
     )
 }

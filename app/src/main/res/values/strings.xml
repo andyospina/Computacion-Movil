@@ -19,6 +19,7 @@
     <string name="content_description_clear">Limpiar</string>
     <string name="content_description_more_options">Más opciones</string>
     <string name="content_description_notifications">Notificaciones</string>
+    <string name="content_description_profile_image">Foto de perfil</string>
     <string name="divider_or">"  o  "</string>
     <string name="label_email">Correo:</string>
     <string name="label_password">Contraseña:</string>
@@ -57,8 +58,16 @@
     <string name="error_network">Sin conexión a internet. Intenta de nuevo</string>
     <string name="error_authentication_failed">No se pudo completar la operación. Intenta de nuevo</string>
 
+    <!-- Errores de imágenes -->
+    <string name="error_not_authenticated">Debes iniciar sesión para cambiar tu foto</string>
+    <string name="error_storage_not_authorized">No tienes permiso para subir esta imagen</string>
+    <string name="error_storage_quota_exceeded">Se superó el límite de almacenamiento</string>
+    <string name="error_image_upload_failed">No se pudo subir la imagen. Intenta de nuevo</string>
+
     <!-- Profile -->
     <string name="profile_logout_button">Cerrar sesión</string>
+    <string name="profile_select_image_button">Seleccionar imagen</string>
+    <string name="profile_uploading_image">Subiendo imagen…</string>
 
     <!-- Search -->
     <string name="search_recent_title">Búsquedas recientes</string>

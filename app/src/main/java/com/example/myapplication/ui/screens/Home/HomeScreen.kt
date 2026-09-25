@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -22,11 +23,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.R
-import com.example.myapplication.data.LocalUserProvider
 import com.example.myapplication.ui.components.BarraSuperior
-import com.example.myapplication.ui.components.InitialsAvatar
+import com.example.myapplication.ui.components.ProfileAsyncImage
 import com.example.myapplication.ui.components.TopBarNavigation
 import com.example.myapplication.ui.theme.Ink
 import com.example.myapplication.ui.screens.Home.componentes.BarraBusquedaProductos
@@ -36,13 +36,16 @@ import com.example.myapplication.ui.screens.Home.componentes.ListaProductosTende
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = viewModel(),
+    viewModel: HomeViewModel = hiltViewModel(),
     onSearchBarClick: () -> Unit,
     onProductoClick: (String) -> Unit,
     onAvatarClick: () -> Unit,
     onNotificationsClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    // Se refresca al volver a la pantalla por si la foto cambió en Perfil
+    LaunchedEffect(Unit) { viewModel.getProfileImage() }
 
     HomeContent(
         modifier = modifier,
@@ -82,8 +85,9 @@ fun HomeContent(
 
                     Spacer(modifier = Modifier.width(12.dp))
 
-                    InitialsAvatar(
-                        initials = LocalUserProvider.currentUser.initials,
+                    ProfileAsyncImage(
+                        profileImage = uiState.profileImageUrl,
+                        size = 36.dp,
                         modifier = Modifier.clickable { onAvatarClick() }
                     )
                 }

@@ -9,14 +9,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.data.LocalUserProvider
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.ui.components.AppLogo
 import com.example.myapplication.ui.components.BarraSuperior
-import com.example.myapplication.ui.components.InitialsAvatar
+import com.example.myapplication.ui.components.ProfileAsyncImage
 import com.example.myapplication.ui.components.TopBarNavigation
 import com.example.myapplication.ui.screens.WriteReview.componentes.BotonEscribirResena
 import com.example.myapplication.ui.screens.WriteReview.componentes.DescripcionInicio
@@ -25,12 +28,18 @@ import com.example.myapplication.ui.screens.WriteReview.componentes.TituloInicio
 @Composable
 fun WriteReviewHubScreen(
     modifier: Modifier = Modifier,
+    viewModel: WriteReviewHubViewModel = hiltViewModel(),
     onEscribirResenaClick: () -> Unit,
     onAvatarClick: () -> Unit
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    // Se refresca al volver a la pantalla por si la foto cambió en Perfil
+    LaunchedEffect(Unit) { viewModel.getProfileImage() }
+
     WriteReviewHubContent(
         modifier = modifier,
-        initialesUsuario = LocalUserProvider.currentUser.initials,
+        profileImageUrl = uiState.profileImageUrl,
         onEscribirResenaClick = onEscribirResenaClick,
         onAvatarClick = onAvatarClick
     )
@@ -39,7 +48,7 @@ fun WriteReviewHubScreen(
 @Composable
 fun WriteReviewHubContent(
     modifier: Modifier = Modifier,
-    initialesUsuario: String,
+    profileImageUrl: String?,
     onEscribirResenaClick: () -> Unit,
     onAvatarClick: () -> Unit
 ) {
@@ -50,8 +59,9 @@ fun WriteReviewHubContent(
         BarraSuperior(
             navigation = TopBarNavigation.MENU,
             trailingContent = {
-                InitialsAvatar(
-                    initials = initialesUsuario,
+                ProfileAsyncImage(
+                    profileImage = profileImageUrl,
+                    size = 36.dp,
                     modifier = Modifier.clickable { onAvatarClick() }
                 )
             }
@@ -91,7 +101,7 @@ fun WriteReviewHubContent(
 @Composable
 fun WriteReviewHubScreenPreview() {
     WriteReviewHubContent(
-        initialesUsuario = "EM",
+        profileImageUrl = null,
         onEscribirResenaClick = {},
         onAvatarClick = {}
     )

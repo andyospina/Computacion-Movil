@@ -1,7 +1,9 @@
 package com.example.myapplication.data.datasource
 
+import android.net.Uri
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.userProfileChangeRequest
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -18,6 +20,15 @@ class AuthRemoteDataSource @Inject constructor(
 
     suspend fun signUp(email: String, password: String) {
         auth.createUserWithEmailAndPassword(email, password).await()
+    }
+
+    suspend fun reloadUser() {
+        auth.currentUser?.reload()?.await()
+    }
+
+    suspend fun updatePhotoUrl(photoUrl: String) {
+        val user = auth.currentUser ?: error("No hay usuario autenticado")
+        user.updateProfile(userProfileChangeRequest { photoUri = Uri.parse(photoUrl) }).await()
     }
 
     fun signOut() {

@@ -3,8 +3,8 @@ package com.example.myapplication.ui.screens.Login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.R
+import com.example.myapplication.data.Result
 import com.example.myapplication.data.repository.AuthRepository
-import com.example.myapplication.data.repository.toAuthErrorMessageRes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -45,15 +45,13 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, showError = false) }
 
-            try {
-                authRepository.signIn(state.email, state.password)
-                _uiState.update { it.copy(isLoading = false, navigate = true) }
-            } catch (e: Exception) {
-                _uiState.update {
+            when (val result = authRepository.signIn(state.email, state.password)) {
+                is Result.Success -> _uiState.update { it.copy(isLoading = false, navigate = true) }
+                is Result.Failure -> _uiState.update {
                     it.copy(
                         isLoading = false,
                         showError = true,
-                        errorMessageRes = e.toAuthErrorMessageRes()
+                        errorMessageRes = result.messageRes
                     )
                 }
             }
