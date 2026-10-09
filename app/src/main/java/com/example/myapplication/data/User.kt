@@ -6,5 +6,6 @@ data class User(
     val memberSinceYear: Int,
     val reviewCount: Int,
     val usefulVotes: Int,
-    val averageRating: Double
+    val averageRating: Double,
+    val profileImage: String? = null
 )

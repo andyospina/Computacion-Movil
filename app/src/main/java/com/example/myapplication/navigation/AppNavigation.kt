@@ -12,7 +12,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.myapplication.data.LocalProductProvider
 import com.example.myapplication.ui.components.AppBottomNavBar
 import com.example.myapplication.ui.screens.Home.HomeScreen
 import com.example.myapplication.ui.screens.Login.LoginScreen
@@ -25,6 +24,7 @@ import com.example.myapplication.ui.screens.ReviewPublished.ReviewPublishedScree
 import com.example.myapplication.ui.screens.Reviews.ReviewsListScreen
 import com.example.myapplication.ui.screens.Search.SearchScreen
 import com.example.myapplication.ui.screens.Splash.SplashScreen
+import com.example.myapplication.ui.screens.UserProfile.UserProfileScreen
 import com.example.myapplication.ui.screens.WriteReview.WriteReviewHubScreen
 
 private val topLevelRoutes = bottomNavItems.map { it.route }.toSet()
@@ -135,6 +135,9 @@ fun AppNavigation(
                 ProfileScreen(
                     modoOscuro = modoOscuro,
                     onModoOscuroChange = onModoOscuroChange,
+                    onEditResena = { productId, reviewId ->
+                        navController.navigate(Routes.NewReview.createRoute(productId, reviewId))
+                    },
                     onLoggedOut = {
                         navController.navigate(Routes.Login.route) {
                             popUpTo(0) { inclusive = true }
@@ -153,8 +156,7 @@ fun AppNavigation(
                 route = Routes.ProductDetail.route,
                 arguments = listOf(navArgument(Routes.ProductDetail.ARG_PRODUCT_ID) { type = NavType.StringType })
             ) { backStack ->
-                val productId = backStack.arguments?.getString(Routes.ProductDetail.ARG_PRODUCT_ID)
-                    ?: LocalProductProvider.DEFAULT_PRODUCT_ID
+                val productId = backStack.arguments?.getString(Routes.ProductDetail.ARG_PRODUCT_ID).orEmpty()
 
                 ProductDetailScreen(
                     productId = productId,
@@ -164,6 +166,9 @@ fun AppNavigation(
                     },
                     onVerTodasResenasClick = { id ->
                         navController.navigate(Routes.ReviewsList.createRoute(id))
+                    },
+                    onUserClick = { userId ->
+                        navController.navigate(Routes.UserProfile.createRoute(userId))
                     }
                 )
             }
@@ -172,11 +177,25 @@ fun AppNavigation(
                 route = Routes.ReviewsList.route,
                 arguments = listOf(navArgument(Routes.ReviewsList.ARG_PRODUCT_ID) { type = NavType.StringType })
             ) { backStack ->
-                val productId = backStack.arguments?.getString(Routes.ReviewsList.ARG_PRODUCT_ID)
-                    ?: LocalProductProvider.DEFAULT_PRODUCT_ID
+                val productId = backStack.arguments?.getString(Routes.ReviewsList.ARG_PRODUCT_ID).orEmpty()
 
                 ReviewsListScreen(
                     productId = productId,
+                    onBackClick = { navController.popBackStack() },
+                    onUserClick = { userId ->
+                        navController.navigate(Routes.UserProfile.createRoute(userId))
+                    }
+                )
+            }
+
+            composable(
+                route = Routes.UserProfile.route,
+                arguments = listOf(navArgument(Routes.UserProfile.ARG_USER_ID) { type = NavType.StringType })
+            ) { backStack ->
+                val userId = backStack.arguments?.getString(Routes.UserProfile.ARG_USER_ID).orEmpty()
+
+                UserProfileScreen(
+                    userId = userId,
                     onBackClick = { navController.popBackStack() }
                 )
             }
@@ -187,17 +206,29 @@ fun AppNavigation(
                     navArgument(Routes.NewReview.ARG_PRODUCT_ID) {
                         type = NavType.StringType
                         defaultValue = ""
+                    },
+                    navArgument(Routes.NewReview.ARG_REVIEW_ID) {
+                        type = NavType.StringType
+                        defaultValue = ""
                     }
                 )
             ) { backStack ->
-                val productId = backStack.arguments?.getString(Routes.NewReview.ARG_PRODUCT_ID)
-                    ?.ifBlank { LocalProductProvider.DEFAULT_PRODUCT_ID }
-                    ?: LocalProductProvider.DEFAULT_PRODUCT_ID
+                val productId = backStack.arguments?.getString(Routes.NewReview.ARG_PRODUCT_ID).orEmpty()
+                val reviewId = backStack.arguments?.getString(Routes.NewReview.ARG_REVIEW_ID).orEmpty()
 
                 NewReviewScreen(
-                    onPublicar = { puntuacion, _, _, _ ->
-                        navController.navigate(Routes.ReviewPublished.createRoute(productId, puntuacion)) {
-                            popUpTo(Routes.NewReview.route) { inclusive = true }
+                    productId = productId,
+                    reviewId = reviewId,
+                    onPublicar = { publishedProductId, puntuacion, esEdicion ->
+                        if (esEdicion) {
+                            // Al editar se vuelve al perfil, donde está la lista de reseñas
+                            navController.popBackStack()
+                        } else {
+                            navController.navigate(
+                                Routes.ReviewPublished.createRoute(publishedProductId, puntuacion)
+                            ) {
+                                popUpTo(Routes.NewReview.route) { inclusive = true }
+                            }
                         }
                     },
                     onCancelar = { navController.popBackStack() }
@@ -211,8 +242,7 @@ fun AppNavigation(
                     navArgument(Routes.ReviewPublished.ARG_RATING) { type = NavType.IntType }
                 )
             ) { backStack ->
-                val productId = backStack.arguments?.getString(Routes.ReviewPublished.ARG_PRODUCT_ID)
-                    ?: LocalProductProvider.DEFAULT_PRODUCT_ID
+                val productId = backStack.arguments?.getString(Routes.ReviewPublished.ARG_PRODUCT_ID).orEmpty()
                 val rating = backStack.arguments?.getInt(Routes.ReviewPublished.ARG_RATING) ?: 0
 
                 ReviewPublishedScreen(

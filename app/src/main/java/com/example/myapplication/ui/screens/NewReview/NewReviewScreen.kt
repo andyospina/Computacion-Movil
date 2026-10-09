@@ -4,6 +4,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -12,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.R
 import com.example.myapplication.ui.components.BarraSuperior
 import com.example.myapplication.ui.components.TopBarNavigation
@@ -20,21 +23,26 @@ import com.example.myapplication.ui.screens.NewReview.componentes.ContenidoNueva
 
 @Composable
 fun NewReviewScreen(
+    productId: String,
+    reviewId: String,
     modifier: Modifier = Modifier,
-    viewModel: NewReviewViewModel = viewModel(),
+    viewModel: NewReviewViewModel = hiltViewModel(),
     onPublicar: (
+        productId: String,
         puntuacion: Int,
-        titulo: String,
-        resena: String,
-        usuario: String
+        esEdicion: Boolean
     ) -> Unit,
     onCancelar: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    LaunchedEffect(productId, reviewId) {
+        viewModel.inicializar(productId, reviewId)
+    }
+
     LaunchedEffect(uiState.publicado) {
         if (uiState.publicado) {
-            onPublicar(uiState.puntuacion, uiState.titulo, uiState.resena, uiState.usuario)
+            onPublicar(uiState.productId, uiState.puntuacion, uiState.esEdicion)
             viewModel.onPublicado()
         }
     }
@@ -69,7 +77,9 @@ fun NewReviewContent(
     ) {
 
         BarraSuperior(
-            title = stringResource(R.string.new_review_title),
+            title = stringResource(
+                if (uiState.esEdicion) R.string.new_review_edit_title else R.string.new_review_title
+            ),
             navigation = TopBarNavigation.BACK,
             onNavigationClick = onCancelar
         )
@@ -87,6 +97,7 @@ fun NewReviewContent(
                 resena = uiState.resena,
                 usuario = uiState.usuario,
                 correo = uiState.correo,
+                enabled = !uiState.isLoading,
                 onPuntuacionChange = onPuntuacionChange,
                 onTituloChange = onTituloChange,
                 onResenaChange = onResenaChange,
@@ -95,6 +106,18 @@ fun NewReviewContent(
                 onPublicar = onPublicarClick,
                 onCancelar = onCancelar
             )
+
+            if (uiState.isLoading) {
+                CircularProgressIndicator(modifier = Modifier.padding(top = 16.dp))
+            }
+
+            uiState.errorMessageRes?.let { mensajeRes ->
+                Text(
+                    text = stringResource(mensajeRes),
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = 12.dp)
+                )
+            }
         }
     }
 }

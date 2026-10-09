@@ -1,0 +1,57 @@
+package com.example.myapplication.ui.components
+
+import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import com.example.myapplication.R
+
+/** Muestra el indicador de carga, el error con "Reintentar", o el contenido cuando todo salió bien. */
+@Composable
+fun CargaOError(
+    isLoading: Boolean,
+    @StringRes errorMessageRes: Int?,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    when {
+        isLoading -> Column(
+            modifier = modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            CircularProgressIndicator()
+        }
+
+        errorMessageRes != null -> Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = stringResource(errorMessageRes),
+                color = MaterialTheme.colorScheme.error,
+                textAlign = TextAlign.Center
+            )
+            OutlinedButton(onClick = onRetry, modifier = Modifier.padding(top = 12.dp)) {
+                Text(text = stringResource(R.string.action_retry))
+            }
+        }
+
+        else -> content()
+    }
+}

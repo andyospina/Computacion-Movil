@@ -9,7 +9,11 @@ data class ProfileState(
     val misResenas: List<Review> = emptyList(),
     val email: String = "",
     val profileImageUrl: String? = null,
+    // Subida de la foto de perfil
     val isLoading: Boolean = false,
     @param:StringRes val errorMessageRes: Int? = null,
+    // Carga del perfil y las reseñas desde el backend
+    val isLoadingData: Boolean = false,
+    @param:StringRes val dataErrorRes: Int? = null,
     val loggedOut: Boolean = false
 )

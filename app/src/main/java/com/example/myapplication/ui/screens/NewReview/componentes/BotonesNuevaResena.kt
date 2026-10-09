@@ -22,7 +22,8 @@ import com.example.myapplication.R
 fun BotonesNuevaResena(
     modifier: Modifier = Modifier,
     onPublicar: () -> Unit,
-    onCancelar: () -> Unit
+    onCancelar: () -> Unit,
+    enabled: Boolean = true
 ) {
 
     Row(
@@ -40,6 +41,7 @@ fun BotonesNuevaResena(
 
         Button(
             onClick = onPublicar,
+            enabled = enabled,
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFFD5FF00)
             ),

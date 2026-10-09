@@ -19,9 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.R
 import com.example.myapplication.ui.components.BarraSuperior
+import com.example.myapplication.ui.components.CargaOError
 import com.example.myapplication.ui.components.TopBarNavigation
 import com.example.myapplication.ui.screens.ProductDetail.componentes.BotonesAccionProducto
 import com.example.myapplication.ui.screens.ProductDetail.componentes.FotoProducto
@@ -33,10 +34,11 @@ import com.example.myapplication.ui.theme.GraySecondary
 fun ProductDetailScreen(
     productId: String,
     modifier: Modifier = Modifier,
-    viewModel: ProductDetailViewModel = viewModel(),
+    viewModel: ProductDetailViewModel = hiltViewModel(),
     onBackClick: () -> Unit,
     onEscribirResenaClick: (String) -> Unit,
-    onVerTodasResenasClick: (String) -> Unit
+    onVerTodasResenasClick: (String) -> Unit,
+    onUserClick: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -47,9 +49,11 @@ fun ProductDetailScreen(
     ProductDetailContent(
         modifier = modifier,
         uiState = uiState,
+        onRetry = viewModel::reintentar,
         onBackClick = onBackClick,
         onEscribirResenaClick = { onEscribirResenaClick(productId) },
-        onVerTodasResenasClick = { onVerTodasResenasClick(productId) }
+        onVerTodasResenasClick = { onVerTodasResenasClick(productId) },
+        onUserClick = onUserClick
     )
 }
 
@@ -57,9 +61,11 @@ fun ProductDetailScreen(
 fun ProductDetailContent(
     modifier: Modifier = Modifier,
     uiState: ProductDetailState,
+    onRetry: () -> Unit,
     onBackClick: () -> Unit,
     onEscribirResenaClick: () -> Unit,
-    onVerTodasResenasClick: () -> Unit
+    onVerTodasResenasClick: () -> Unit,
+    onUserClick: (String) -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxSize()
@@ -78,34 +84,41 @@ fun ProductDetailContent(
             }
         )
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+        CargaOError(
+            isLoading = uiState.isLoading,
+            errorMessageRes = uiState.errorMessageRes,
+            onRetry = onRetry
         ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+            ) {
 
-            FotoProducto()
+                FotoProducto()
 
-            Column(modifier = Modifier.padding(20.dp)) {
+                Column(modifier = Modifier.padding(20.dp)) {
 
-                uiState.producto?.let { producto ->
-                    InfoProducto(producto = producto)
+                    uiState.producto?.let { producto ->
+                        InfoProducto(producto = producto)
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
 
-                    BotonesAccionProducto(
-                        modifier = Modifier.fillMaxWidth(),
-                        onEscribirResenaClick = onEscribirResenaClick,
-                        onGuardarClick = {}
-                    )
+                        BotonesAccionProducto(
+                            modifier = Modifier.fillMaxWidth(),
+                            onEscribirResenaClick = onEscribirResenaClick,
+                            onGuardarClick = {}
+                        )
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(24.dp))
 
-                    ResenasDestacadas(
-                        resenas = uiState.resenasDestacadas,
-                        onVerTodasClick = onVerTodasResenasClick,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                        ResenasDestacadas(
+                            resenas = uiState.resenasDestacadas,
+                            onVerTodasClick = onVerTodasResenasClick,
+                            onAuthorClick = onUserClick,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
             }
         }
@@ -117,8 +130,10 @@ fun ProductDetailContent(
 fun ProductDetailScreenPreview() {
     ProductDetailContent(
         uiState = ProductDetailState(),
+        onRetry = {},
         onBackClick = {},
         onEscribirResenaClick = {},
-        onVerTodasResenasClick = {}
+        onVerTodasResenasClick = {},
+        onUserClick = {}
     )
 }

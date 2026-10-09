@@ -24,7 +24,8 @@ fun ContenidoNuevaResena(
     onUsuarioChange: (String) -> Unit,
     onCorreoChange: (String) -> Unit,
     onPublicar: () -> Unit,
-    onCancelar: () -> Unit
+    onCancelar: () -> Unit,
+    enabled: Boolean = true
 ) {
 
     Column(
@@ -33,6 +34,7 @@ fun ContenidoNuevaResena(
 
         BotonesNuevaResena(
             modifier = Modifier.fillMaxWidth(),
+            enabled = enabled,
             onPublicar = onPublicar,
             onCancelar = onCancelar
         )

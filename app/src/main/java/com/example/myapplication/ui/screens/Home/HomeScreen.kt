@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.R
 import com.example.myapplication.ui.components.BarraSuperior
+import com.example.myapplication.ui.components.CargaOError
 import com.example.myapplication.ui.components.ProfileAsyncImage
 import com.example.myapplication.ui.components.TopBarNavigation
 import com.example.myapplication.ui.theme.Ink
@@ -51,6 +52,7 @@ fun HomeScreen(
         modifier = modifier,
         uiState = uiState,
         onCategoriaChange = viewModel::updateCategoria,
+        onRetry = viewModel::getProductos,
         onSearchBarClick = onSearchBarClick,
         onProductoClick = onProductoClick,
         onAvatarClick = onAvatarClick,
@@ -63,6 +65,7 @@ fun HomeContent(
     modifier: Modifier = Modifier,
     uiState: HomeState,
     onCategoriaChange: (String) -> Unit,
+    onRetry: () -> Unit,
     onSearchBarClick: () -> Unit,
     onProductoClick: (String) -> Unit,
     onAvatarClick: () -> Unit,
@@ -122,11 +125,17 @@ fun HomeContent(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            ListaProductosTendencia(
-                productos = uiState.productos,
-                onProductoClick = onProductoClick,
-                modifier = Modifier.fillMaxSize()
-            )
+            CargaOError(
+                isLoading = uiState.isLoading,
+                errorMessageRes = uiState.errorMessageRes,
+                onRetry = onRetry
+            ) {
+                ListaProductosTendencia(
+                    productos = uiState.productos,
+                    onProductoClick = onProductoClick,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         }
     }
 }
@@ -137,6 +146,7 @@ fun HomeScreenPreview() {
     HomeContent(
         uiState = HomeState(),
         onCategoriaChange = {},
+        onRetry = {},
         onSearchBarClick = {},
         onProductoClick = {},
         onAvatarClick = {},

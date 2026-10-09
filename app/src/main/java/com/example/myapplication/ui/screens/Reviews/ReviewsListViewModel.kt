@@ -1,34 +1,64 @@
 package com.example.myapplication.ui.screens.Reviews
 
 import androidx.lifecycle.ViewModel
-import com.example.myapplication.data.LocalProductProvider
-import com.example.myapplication.data.LocalReviewProvider
+import androidx.lifecycle.viewModelScope
+import com.example.myapplication.data.Result
+import com.example.myapplication.data.repository.ProductRepository
+import com.example.myapplication.data.repository.ReviewRepository
 import com.example.myapplication.ui.screens.Reviews.componentes.OrdenResenas
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 private const val PAGE_SIZE = 4
 
-class ReviewsListViewModel : ViewModel() {
+@HiltViewModel
+class ReviewsListViewModel @Inject constructor(
+    private val productRepository: ProductRepository,
+    private val reviewRepository: ReviewRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ReviewsListState())
     val uiState = _uiState.asStateFlow()
 
     fun getResenas(productId: String) {
-        if (_uiState.value.productId == productId) return
+        val state = _uiState.value
+        if (state.productId == productId && state.producto != null) return
+        cargar(productId)
+    }
 
-        val todasLasResenas = LocalReviewProvider.forProduct(productId)
+    fun reintentar() = cargar(_uiState.value.productId)
 
-        _uiState.update {
-            it.copy(
-                productId = productId,
-                producto = LocalProductProvider.findById(productId),
-                todasLasResenas = todasLasResenas,
-                resenasFiltradas = todasLasResenas,
-                cantidadVisible = PAGE_SIZE
-            )
+    private fun cargar(productId: String) {
+        _uiState.update { it.copy(productId = productId, isLoading = true, errorMessageRes = null) }
+
+        viewModelScope.launch {
+            val producto = when (val result = productRepository.getProductById(productId)) {
+                is Result.Success -> result.data
+                is Result.Failure -> return@launch falla(result.messageRes)
+            }
+            val resenas = when (val result = reviewRepository.getReviewsByProduct(productId)) {
+                is Result.Success -> result.data
+                is Result.Failure -> return@launch falla(result.messageRes)
+            }
+
+            _uiState.update {
+                it.copy(
+                    producto = producto,
+                    todasLasResenas = resenas,
+                    isLoading = false,
+                    errorMessageRes = null
+                )
+            }
+            aplicarFiltros()
         }
+    }
+
+    private fun falla(messageRes: Int) {
+        _uiState.update { it.copy(isLoading = false, errorMessageRes = messageRes) }
     }
 
     fun updateOrden(orden: OrdenResenas) {

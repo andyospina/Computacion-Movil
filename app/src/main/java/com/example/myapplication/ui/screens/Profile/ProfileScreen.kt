@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.R
-import com.example.myapplication.data.LocalProductProvider
+import com.example.myapplication.ui.components.CargaOError
 import com.example.myapplication.ui.screens.Profile.componentes.EncabezadoPerfil
 import com.example.myapplication.ui.screens.Profile.componentes.EstadisticasPerfil
 import com.example.myapplication.ui.screens.Profile.componentes.SelectorTema
@@ -42,9 +42,13 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel(),
     modoOscuro: Boolean,
     onModoOscuroChange: (Boolean) -> Unit,
+    onEditResena: (productId: String, reviewId: String) -> Unit,
     onLoggedOut: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    // Se refresca al volver a la pantalla (p. ej. tras editar una reseña)
+    LaunchedEffect(Unit) { viewModel.getPerfil() }
 
     // Photo Picker del sistema: no requiere permisos de almacenamiento
     val photoPickerLauncher = rememberLauncherForActivityResult(
@@ -69,7 +73,10 @@ fun ProfileScreen(
                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
             )
         },
-        onLogoutClick = viewModel::logoutButtonPress
+        onLogoutClick = viewModel::logoutButtonPress,
+        onRetry = viewModel::getPerfil,
+        onEditResena = onEditResena,
+        onDeleteResena = viewModel::deleteResena
     )
 }
 
@@ -80,7 +87,10 @@ fun ProfileContent(
     modoOscuro: Boolean,
     onModoOscuroChange: (Boolean) -> Unit,
     onSelectImageClick: () -> Unit,
-    onLogoutClick: () -> Unit
+    onLogoutClick: () -> Unit,
+    onRetry: () -> Unit,
+    onEditResena: (productId: String, reviewId: String) -> Unit,
+    onDeleteResena: (reviewId: String) -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxSize()
@@ -163,15 +173,25 @@ fun ProfileContent(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+        CargaOError(
+            isLoading = uiState.isLoadingData,
+            errorMessageRes = uiState.dataErrorRes,
+            onRetry = onRetry
         ) {
-            items(uiState.misResenas, key = { it.id }) { resena ->
-                val producto = LocalProductProvider.findById(resena.productId)
-                TarjetaMiResena(resena = resena, nombreProducto = producto.name)
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(uiState.misResenas, key = { it.id }) { resena ->
+                    TarjetaMiResena(
+                        resena = resena,
+                        nombreProducto = resena.productName,
+                        onEditClick = { onEditResena(resena.productId, resena.id) },
+                        onDeleteClick = { onDeleteResena(resena.id) }
+                    )
+                }
             }
         }
     }
@@ -185,6 +205,9 @@ fun ProfileScreenPreview() {
         modoOscuro = false,
         onModoOscuroChange = {},
         onSelectImageClick = {},
-        onLogoutClick = {}
+        onLogoutClick = {},
+        onRetry = {},
+        onEditResena = { _, _ -> },
+        onDeleteResena = {}
     )
 }

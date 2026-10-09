@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.R
 import com.example.myapplication.ui.components.BarraSuperior
 import com.example.myapplication.ui.components.TopBarNavigation
@@ -35,7 +35,7 @@ fun ReviewPublishedScreen(
     productId: String,
     rating: Int,
     modifier: Modifier = Modifier,
-    viewModel: ReviewPublishedViewModel = viewModel(),
+    viewModel: ReviewPublishedViewModel = hiltViewModel(),
     onCloseClick: () -> Unit,
     onVerMiResenaClick: () -> Unit,
     onVolverInicioClick: () -> Unit

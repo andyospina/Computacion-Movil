@@ -22,9 +22,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.R
 import com.example.myapplication.ui.components.BarraSuperior
+import com.example.myapplication.ui.components.CargaOError
 import com.example.myapplication.ui.components.TopBarNavigation
 import com.example.myapplication.ui.screens.Reviews.componentes.EncabezadoResenas
 import com.example.myapplication.ui.screens.Reviews.componentes.FiltrosResenas
@@ -36,8 +37,9 @@ import com.example.myapplication.ui.theme.GraySecondary
 fun ReviewsListScreen(
     productId: String,
     modifier: Modifier = Modifier,
-    viewModel: ReviewsListViewModel = viewModel(),
-    onBackClick: () -> Unit
+    viewModel: ReviewsListViewModel = hiltViewModel(),
+    onBackClick: () -> Unit,
+    onUserClick: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -48,10 +50,12 @@ fun ReviewsListScreen(
     ReviewsListContent(
         modifier = modifier,
         uiState = uiState,
+        onRetry = viewModel::reintentar,
         onOrdenChange = viewModel::updateOrden,
         onConFotosChange = viewModel::updateConFotos,
         onCargarMasClick = viewModel::cargarMas,
-        onBackClick = onBackClick
+        onBackClick = onBackClick,
+        onUserClick = onUserClick
     )
 }
 
@@ -59,10 +63,12 @@ fun ReviewsListScreen(
 fun ReviewsListContent(
     modifier: Modifier = Modifier,
     uiState: ReviewsListState,
+    onRetry: () -> Unit,
     onOrdenChange: (OrdenResenas) -> Unit,
     onConFotosChange: (Boolean) -> Unit,
     onCargarMasClick: () -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onUserClick: (String) -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxSize()
@@ -80,41 +86,47 @@ fun ReviewsListContent(
             }
         )
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 20.dp, vertical = 16.dp)
+        CargaOError(
+            isLoading = uiState.isLoading,
+            errorMessageRes = uiState.errorMessageRes,
+            onRetry = onRetry
         ) {
-
-            uiState.producto?.let { producto ->
-                EncabezadoResenas(producto = producto, modifier = Modifier.fillMaxWidth())
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
-            FiltrosResenas(
-                orden = uiState.orden,
-                conFotos = uiState.conFotos,
-                onOrdenChange = onOrdenChange,
-                onConFotosChange = onConFotosChange
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            LazyColumn(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 20.dp, vertical = 16.dp)
             ) {
-                items(uiState.resenasFiltradas.take(uiState.cantidadVisible), key = { it.id }) { resena ->
-                    TarjetaResena(resena = resena)
+
+                uiState.producto?.let { producto ->
+                    EncabezadoResenas(producto = producto, modifier = Modifier.fillMaxWidth())
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                if (uiState.cantidadVisible < uiState.resenasFiltradas.size) {
-                    item {
-                        OutlinedButton(
-                            onClick = onCargarMasClick,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(text = stringResource(R.string.reviews_load_more))
+                FiltrosResenas(
+                    orden = uiState.orden,
+                    conFotos = uiState.conFotos,
+                    onOrdenChange = onOrdenChange,
+                    onConFotosChange = onConFotosChange
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(uiState.resenasFiltradas.take(uiState.cantidadVisible), key = { it.id }) { resena ->
+                        TarjetaResena(resena = resena, onAuthorClick = { onUserClick(resena.userId) })
+                    }
+
+                    if (uiState.cantidadVisible < uiState.resenasFiltradas.size) {
+                        item {
+                            OutlinedButton(
+                                onClick = onCargarMasClick,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(text = stringResource(R.string.reviews_load_more))
+                            }
                         }
                     }
                 }
@@ -128,9 +140,11 @@ fun ReviewsListContent(
 fun ReviewsListScreenPreview() {
     ReviewsListContent(
         uiState = ReviewsListState(),
+        onRetry = {},
         onOrdenChange = {},
         onConFotosChange = {},
         onCargarMasClick = {},
-        onBackClick = {}
+        onBackClick = {},
+        onUserClick = {}
     )
 }

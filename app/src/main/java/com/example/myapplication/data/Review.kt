@@ -17,5 +17,7 @@ data class Review(
     val usefulCount: Int,
     val recommended: Boolean,
     val hasPhoto: Boolean = false,
-    val status: ReviewStatus = ReviewStatus.PUBLISHED
+    val status: ReviewStatus = ReviewStatus.PUBLISHED,
+    val userId: String = "",
+    val productName: String = ""
 )

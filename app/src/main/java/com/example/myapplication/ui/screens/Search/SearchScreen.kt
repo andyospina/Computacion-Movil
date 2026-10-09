@@ -17,9 +17,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.R
 import com.example.myapplication.ui.components.BarraSuperior
+import com.example.myapplication.ui.components.CargaOError
 import com.example.myapplication.ui.components.ProductListItem
 import com.example.myapplication.ui.components.TopBarNavigation
 import com.example.myapplication.ui.screens.Search.componentes.BusquedasRecientes
@@ -29,7 +30,7 @@ import com.example.myapplication.ui.theme.GraySecondary
 @Composable
 fun SearchScreen(
     modifier: Modifier = Modifier,
-    viewModel: SearchViewModel = viewModel(),
+    viewModel: SearchViewModel = hiltViewModel(),
     onBackClick: () -> Unit,
     onProductoClick: (String) -> Unit
 ) {
@@ -39,6 +40,7 @@ fun SearchScreen(
         modifier = modifier,
         uiState = uiState,
         onQueryChange = viewModel::updateQuery,
+        onRetry = viewModel::getProductos,
         onBackClick = onBackClick,
         onProductoClick = onProductoClick
     )
@@ -49,6 +51,7 @@ fun SearchContent(
     modifier: Modifier = Modifier,
     uiState: SearchState,
     onQueryChange: (String) -> Unit,
+    onRetry: () -> Unit,
     onBackClick: () -> Unit,
     onProductoClick: (String) -> Unit
 ) {
@@ -80,25 +83,31 @@ fun SearchContent(
                     onBusquedaClick = onQueryChange
                 )
             } else {
-                Text(
-                    text = stringResource(
-                        R.string.search_results_count,
-                        uiState.resultados.size,
-                        uiState.query
-                    ),
-                    color = GraySecondary
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                LazyColumn(
-                    verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
+                CargaOError(
+                    isLoading = uiState.isLoading,
+                    errorMessageRes = uiState.errorMessageRes,
+                    onRetry = onRetry
                 ) {
-                    items(uiState.resultados, key = { it.id }) { producto ->
-                        ProductListItem(
-                            product = producto,
-                            onClick = { onProductoClick(producto.id) }
-                        )
+                    Text(
+                        text = stringResource(
+                            R.string.search_results_count,
+                            uiState.resultados.size,
+                            uiState.query
+                        ),
+                        color = GraySecondary
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    LazyColumn(
+                        verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(uiState.resultados, key = { it.id }) { producto ->
+                            ProductListItem(
+                                product = producto,
+                                onClick = { onProductoClick(producto.id) }
+                            )
+                        }
                     }
                 }
             }
@@ -112,6 +121,7 @@ fun SearchScreenPreview() {
     SearchContent(
         uiState = SearchState(),
         onQueryChange = {},
+        onRetry = {},
         onBackClick = {},
         onProductoClick = {}
     )

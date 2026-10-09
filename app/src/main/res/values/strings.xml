@@ -58,6 +58,18 @@
     <string name="error_network">Sin conexión a internet. Intenta de nuevo</string>
     <string name="error_authentication_failed">No se pudo completar la operación. Intenta de nuevo</string>
 
+    <!-- Errores del backend -->
+    <string name="error_api_unreachable">No se pudo conectar con el servidor. Revisa que esté encendido e intenta de nuevo</string>
+    <string name="error_api_server">El servidor tuvo un problema. Intenta de nuevo más tarde</string>
+    <string name="error_api_not_found">No se encontró lo que buscas</string>
+    <string name="error_api_bad_request">Los datos enviados no son válidos</string>
+    <string name="error_api_unexpected">Ocurrió un error inesperado. Intenta de nuevo</string>
+    <string name="action_retry">Reintentar</string>
+    <string name="action_edit">Editar</string>
+    <string name="action_delete">Eliminar</string>
+    <string name="new_review_edit_title">Editar reseña</string>
+    <string name="new_review_missing_fields">Elige una puntuación y completa el título y la reseña</string>
+
     <!-- Errores de imágenes -->
     <string name="error_not_authenticated">Debes iniciar sesión para cambiar tu foto</string>
     <string name="error_storage_not_authorized">No tienes permiso para subir esta imagen</string>
@@ -119,6 +131,7 @@
     <string name="notifications_mark_all_read">Marcar leídas</string>
 
     <!-- Profile -->
+    <string name="user_profile_reviews_title">Reseñas publicadas</string>
     <string name="profile_my_reviews_title">Mis reseñas</string>
     <string name="profile_dark_mode">Modo oscuro</string>
     <string name="profile_stat_reviews">Reseñas</string>
@@ -128,8 +141,10 @@
 
     <string-array name="categorias">
         <item>Todo</item>
-        <item>Tecnología</item>
-        <item>Belleza</item>
+        <item>Electrónica</item>
         <item>Hogar</item>
+        <item>Deportes</item>
+        <item>Libros</item>
+        <item>Moda</item>
     </string-array>
 </resources>

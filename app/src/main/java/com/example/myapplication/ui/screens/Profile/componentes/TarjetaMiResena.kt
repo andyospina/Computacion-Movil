@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -28,7 +29,9 @@ import com.example.myapplication.ui.theme.GraySecondary
 fun TarjetaMiResena(
     resena: Review,
     nombreProducto: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onEditClick: (() -> Unit)? = null,
+    onDeleteClick: (() -> Unit)? = null
 ) {
     val esBorrador = resena.status == ReviewStatus.DRAFT
 
@@ -65,6 +68,21 @@ fun TarjetaMiResena(
                 fontWeight = FontWeight.Bold,
                 color = if (esBorrador) GraySecondary else DeepLime
             )
+        }
+
+        // Editar y eliminar solo aparecen en las reseñas propias
+        if (onEditClick != null || onDeleteClick != null) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                onEditClick?.let {
+                    TextButton(onClick = it) { Text(text = stringResource(R.string.action_edit)) }
+                }
+                onDeleteClick?.let {
+                    TextButton(onClick = it) { Text(text = stringResource(R.string.action_delete)) }
+                }
+            }
         }
     }
 }

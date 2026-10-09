@@ -1,6 +1,7 @@
 package com.example.myapplication.ui.screens.Reviews.componentes
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -32,7 +33,8 @@ import com.example.myapplication.ui.theme.GraySecondary
 @Composable
 fun TarjetaResena(
     resena: Review,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onAuthorClick: (() -> Unit)? = null
 ) {
     Column(
         modifier = modifier
@@ -41,7 +43,11 @@ fun TarjetaResena(
             .padding(16.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text = resena.author, fontWeight = FontWeight.Bold)
+            Text(
+                text = resena.author,
+                fontWeight = FontWeight.Bold,
+                modifier = if (onAuthorClick != null) Modifier.clickable { onAuthorClick() } else Modifier
+            )
 
             if (resena.verifiedBuyer) {
                 Spacer(modifier = Modifier.width(6.dp))

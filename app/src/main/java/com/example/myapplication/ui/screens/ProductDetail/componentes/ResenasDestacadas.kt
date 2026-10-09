@@ -30,7 +30,8 @@ import com.example.myapplication.ui.theme.GraySecondary
 fun ResenasDestacadas(
     resenas: List<Review>,
     onVerTodasClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onAuthorClick: (userId: String) -> Unit = {}
 ) {
     Column(modifier = modifier) {
         Row(
@@ -56,7 +57,11 @@ fun ResenasDestacadas(
                     .padding(16.dp)
             ) {
                 Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                    Text(text = resena.author, fontWeight = FontWeight.Bold)
+                    Text(
+                        text = resena.author,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.clickable { onAuthorClick(resena.userId) }
+                    )
                     StarRatingDisplay(rating = resena.rating, fontSize = 14.sp)
                 }
 
