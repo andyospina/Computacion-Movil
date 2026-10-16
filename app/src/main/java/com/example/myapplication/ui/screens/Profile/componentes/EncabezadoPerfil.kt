@@ -33,7 +33,18 @@ fun EncabezadoPerfil(
 
         Column(modifier = Modifier.padding(start = 16.dp)) {
             Text(text = user.name, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-            Text(text = stringResource(R.string.profile_member_since, user.memberSinceYear), color = GraySecondary)
+            if (user.username.isNotBlank()) {
+                Text(text = "@${user.username}", color = GraySecondary)
+            }
+            if (user.country.isNotBlank()) {
+                Text(text = user.country, color = GraySecondary)
+            }
+            if (user.memberSinceYear > 0) {
+                Text(text = stringResource(R.string.profile_member_since, user.memberSinceYear), color = GraySecondary)
+            }
+            if (user.bio.isNotBlank()) {
+                Text(text = user.bio, color = Color.White, modifier = Modifier.padding(top = 4.dp))
+            }
         }
     }
 }

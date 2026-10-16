@@ -6,6 +6,10 @@ import com.example.myapplication.R
 data class RegisterState(
     val email: String = "",
     val cellphone: String = "",
+    val name: String = "",
+    val username: String = "",
+    val country: String = "",
+    val bio: String = "",
     val password: String = "",
     val showPassword: Boolean = false,
     @param:StringRes val errorMessageRes: Int = R.string.error_all_fields_required,

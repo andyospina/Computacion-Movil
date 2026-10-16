@@ -27,7 +27,6 @@ class HomeViewModel @Inject constructor(
     private var todosLosProductos: List<Product> = emptyList()
 
     init {
-        getProductos()
         getProfileImage()
     }
 
@@ -41,8 +40,10 @@ class HomeViewModel @Inject constructor(
         _uiState.update { it.copy(profileImageUrl = authRepository.currentUser?.photoUrl?.toString()) }
     }
 
+    // Se llama al entrar a la pantalla y al volver a ella (p. ej. tras publicar o borrar una reseña).
+    // Con datos ya cargados se refresca sin indicador de carga y un fallo no oculta lo que ya se ve.
     fun getProductos() {
-        _uiState.update { it.copy(isLoading = true, errorMessageRes = null) }
+        _uiState.update { it.copy(isLoading = todosLosProductos.isEmpty(), errorMessageRes = null) }
 
         viewModelScope.launch {
             when (val result = productRepository.getProducts()) {
@@ -57,7 +58,10 @@ class HomeViewModel @Inject constructor(
                     }
                 }
                 is Result.Failure -> _uiState.update {
-                    it.copy(isLoading = false, errorMessageRes = result.messageRes)
+                    it.copy(
+                        isLoading = false,
+                        errorMessageRes = if (todosLosProductos.isEmpty()) result.messageRes else null
+                    )
                 }
             }
         }

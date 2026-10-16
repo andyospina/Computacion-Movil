@@ -1,0 +1,58 @@
+rules_version = '2';
+
+// Reglas de ReviewLab. Despliegue: Firebase Console > Firestore > Reglas (pegar este archivo)
+// o `firebase deploy --only firestore:rules`. NO usar modo de prueba (allow read, write: if true).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    // users/{uid}: cualquier usuario autenticado puede ver perfiles; solo el dueño escribe el suyo.
+    match /users/{userId} {
+      allow read: if signedIn();
+      allow create: if isOwner(userId)
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.username is string
+        && request.resource.data.username.size() > 0;
+      allow update: if isOwner(userId)
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.username == resource.data.username
+        && request.resource.data.email == resource.data.email;
+      allow delete: if false;
+    }
+
+    // products/{id}: solo lectura desde la app. Los datos semilla se cargan con el Admin SDK
+    // o desde la consola, que ignoran estas reglas.
+    match /products/{productId} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    // reviews/{id}: lectura para autenticados; solo el autor crea, edita o borra la suya.
+    match /reviews/{reviewId} {
+      allow read: if signedIn();
+      allow create: if isOwner(request.resource.data.userId)
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && request.resource.data.title is string
+        && request.resource.data.body is string
+        && request.resource.data.productId is string;
+      allow update: if isOwner(resource.data.userId)
+        && request.resource.data.userId == resource.data.userId
+        && request.resource.data.productId == resource.data.productId
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5;
+      allow delete: if isOwner(resource.data.userId);
+    }
+  }
+}

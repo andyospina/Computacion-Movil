@@ -3,8 +3,8 @@ package com.example.myapplication.ui.screens.NewReview
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.R
-import com.example.myapplication.data.ApiConfig
 import com.example.myapplication.data.Result
+import com.example.myapplication.data.identity.CurrentUserIdProvider
 import com.example.myapplication.data.repository.ProductRepository
 import com.example.myapplication.data.repository.ReviewRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,7 +19,8 @@ private val PUNTUACIONES = 1..5
 @HiltViewModel
 class NewReviewViewModel @Inject constructor(
     private val productRepository: ProductRepository,
-    private val reviewRepository: ReviewRepository
+    private val reviewRepository: ReviewRepository,
+    private val currentUserId: CurrentUserIdProvider
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(NewReviewState())
@@ -110,6 +111,12 @@ class NewReviewViewModel @Inject constructor(
             return
         }
 
+        val userId = currentUserId.currentUserId()
+        if (userId == null && state.reviewId == null) {
+            _uiState.update { it.copy(errorMessageRes = R.string.error_not_authenticated_review) }
+            return
+        }
+
         _uiState.update { it.copy(isLoading = true, errorMessageRes = null) }
 
         viewModelScope.launch {
@@ -118,7 +125,7 @@ class NewReviewViewModel @Inject constructor(
             } else {
                 reviewRepository.createReview(
                     productId = state.productId,
-                    userId = ApiConfig.TEMP_CURRENT_USER_ID,
+                    userId = userId.orEmpty(),
                     rating = state.puntuacion,
                     title = state.titulo,
                     body = state.resena

@@ -1,0 +1,8 @@
+{
+  "name": "seed-firestore",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Datos de prueba para ReviewLab en Firestore",
+  "scripts": { "seed": "node seed.js" },
+  "dependencies": { "firebase-admin": "^13.0.0" }
+}

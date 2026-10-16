@@ -14,3 +14,8 @@
 .cxx
 local.properties
 /.idea/markdown.xml
+
+# Seed de Firestore: nunca subir dependencias ni claves de servicio
+tools/seed-firestore/node_modules
+*service-account*.json
+*serviceAccount*.json

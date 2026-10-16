@@ -31,6 +31,11 @@ class AuthRemoteDataSource @Inject constructor(
         user.updateProfile(userProfileChangeRequest { photoUri = Uri.parse(photoUrl) }).await()
     }
 
+    /** Revierte un registro cuyo perfil no pudo guardarse, para poder reintentar con el mismo correo. */
+    suspend fun deleteCurrentUser() {
+        auth.currentUser?.delete()?.await()
+    }
+
     fun signOut() {
         auth.signOut()
     }

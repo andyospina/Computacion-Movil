@@ -1,7 +1,10 @@
 package com.example.myapplication.data.datasource.impl
 
+import com.example.myapplication.data.ApiConfig
 import com.example.myapplication.data.datasource.ReviewRemoteDataSource
 import com.example.myapplication.data.dto.CreateReviewDto
+import com.example.myapplication.data.dto.NewReviewDto
+import com.example.myapplication.data.dto.ReviewData
 import com.example.myapplication.data.dto.ReviewDto
 import com.example.myapplication.data.dto.UpdateReviewDto
 import com.example.myapplication.data.services.ReviewRetrofitService
@@ -11,14 +14,36 @@ class ReviewRetrofitDataSource @Inject constructor(
     private val service: ReviewRetrofitService
 ) : ReviewRemoteDataSource {
 
-    override suspend fun getReviews(): List<ReviewDto> = service.getReviews()
+    // El backend no filtra GET /reviews por producto ni por usuario: se filtra aquí.
+    override suspend fun getReviewsByProduct(productId: String): List<ReviewData> =
+        service.getReviews().filter { it.productId.toString() == productId }.newestFirst()
 
-    override suspend fun getReviewById(id: String): ReviewDto = service.getReviewById(id)
+    override suspend fun getReviewsByUser(userId: String): List<ReviewData> =
+        service.getReviews().filter { it.userId.toString() == userId }.newestFirst()
 
-    override suspend fun createReview(review: CreateReviewDto): ReviewDto = service.createReview(review)
+    override suspend fun getReviewById(id: String): ReviewData = service.getReviewById(id)
 
-    override suspend fun updateReview(id: String, review: UpdateReviewDto): ReviewDto =
+    // El backend ya conoce al autor por su id numérico; los datos desnormalizados no se envían.
+    override suspend fun createReview(review: NewReviewDto) {
+        service.createReview(
+            CreateReviewDto(
+                rating = review.rating,
+                title = review.title,
+                body = review.body,
+                recommended = review.recommended,
+                userId = review.userId.toIntOrNull() ?: ApiConfig.TEMP_CURRENT_USER_ID.toInt(),
+                productId = review.productId.toInt()
+            )
+        )
+    }
+
+    override suspend fun updateReview(id: String, review: UpdateReviewDto) {
         service.updateReview(id, review)
+    }
 
     override suspend fun deleteReview(id: String) = service.deleteReview(id)
+
+    // createdAt es ISO-8601 en UTC, así que el orden alfabético es el cronológico
+    private fun List<ReviewDto>.newestFirst() =
+        sortedWith(compareByDescending<ReviewDto> { it.createdAt.orEmpty() }.thenByDescending { it.id })
 }

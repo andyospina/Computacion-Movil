@@ -46,7 +46,10 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     // Se refresca al volver a la pantalla por si la foto cambió en Perfil
-    LaunchedEffect(Unit) { viewModel.getProfileImage() }
+    LaunchedEffect(Unit) {
+        viewModel.getProfileImage()
+        viewModel.getProductos()
+    }
 
     HomeContent(
         modifier = modifier,

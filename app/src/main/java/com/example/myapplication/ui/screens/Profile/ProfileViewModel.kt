@@ -3,10 +3,11 @@ package com.example.myapplication.ui.screens.Profile
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myapplication.data.ApiConfig
+import com.example.myapplication.R
 import com.example.myapplication.data.Result
 import com.example.myapplication.data.Review
 import com.example.myapplication.data.User
+import com.example.myapplication.data.identity.CurrentUserIdProvider
 import com.example.myapplication.data.repository.AuthRepository
 import com.example.myapplication.data.repository.ReviewRepository
 import com.example.myapplication.data.repository.StorageRepository
@@ -23,7 +24,8 @@ class ProfileViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val storageRepository: StorageRepository,
     private val userRepository: UserRepository,
-    private val reviewRepository: ReviewRepository
+    private val reviewRepository: ReviewRepository,
+    private val currentUserId: CurrentUserIdProvider
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -45,12 +47,19 @@ class ProfileViewModel @Inject constructor(
             it.copy(isLoadingData = it.user == null, dataErrorRes = null)
         }
 
+        // El perfil propio se consulta con el id de la sesión actual, nunca con un id fijo
+        val uid = currentUserId.currentUserId()
+        if (uid == null) {
+            falla(R.string.error_not_authenticated_profile)
+            return
+        }
+
         viewModelScope.launch {
-            val usuario = when (val result = userRepository.getUserById(ApiConfig.TEMP_CURRENT_USER_ID)) {
+            val usuario = when (val result = userRepository.getUserById(uid)) {
                 is Result.Success -> result.data
                 is Result.Failure -> return@launch falla(result.messageRes)
             }
-            val resenas = when (val result = reviewRepository.getReviewsByUser(ApiConfig.TEMP_CURRENT_USER_ID)) {
+            val resenas = when (val result = reviewRepository.getReviewsByUser(uid)) {
                 is Result.Success -> result.data
                 is Result.Failure -> return@launch falla(result.messageRes)
             }
@@ -64,6 +73,39 @@ class ProfileViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    fun updateProfile(name: String, country: String, bio: String) {
+        if (name.isBlank()) {
+            _uiState.update { it.copy(profileSaveErrorRes = R.string.error_name_required) }
+            return
+        }
+        val uid = currentUserId.currentUserId() ?: return
+        _uiState.update { it.copy(isSavingProfile = true, profileSaveErrorRes = null) }
+
+        viewModelScope.launch {
+            when (val result = userRepository.updateUser(uid, name, country, bio)) {
+                // Se actualiza la copia local solo después de confirmar el guardado
+                is Result.Success -> _uiState.update {
+                    it.copy(
+                        user = it.user?.copy(name = name.trim(), country = country.trim(), bio = bio.trim()),
+                        isSavingProfile = false,
+                        profileSaved = true
+                    )
+                }
+                is Result.Failure -> _uiState.update {
+                    it.copy(isSavingProfile = false, profileSaveErrorRes = result.messageRes)
+                }
+            }
+        }
+    }
+
+    fun onProfileSaved() {
+        _uiState.update { it.copy(profileSaved = false) }
+    }
+
+    fun onEditDismissed() {
+        _uiState.update { it.copy(profileSaveErrorRes = null) }
     }
 
     fun deleteResena(reviewId: String) {
@@ -114,8 +156,17 @@ class ProfileViewModel @Inject constructor(
 
         viewModelScope.launch {
             when (val result = storageRepository.uploadProfileImage(imageUri)) {
-                is Result.Success -> _uiState.update {
-                    it.copy(profileImageUrl = result.data, isLoading = false)
+                is Result.Success -> {
+                    _uiState.update { it.copy(profileImageUrl = result.data) }
+                    // Copia la URL al documento del usuario para que otros vean su foto
+                    val uid = currentUserId.currentUserId()
+                    val sync = if (uid == null) null else userRepository.updateProfileImage(uid, result.data)
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessageRes = (sync as? Result.Failure)?.messageRes
+                        )
+                    }
                 }
                 is Result.Failure -> _uiState.update {
                     it.copy(

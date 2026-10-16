@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,6 +34,7 @@ import com.example.myapplication.ui.screens.Login.componentes.CampoContrasena
 import com.example.myapplication.ui.screens.Register.componentes.BotonRegistrarse
 import com.example.myapplication.ui.screens.Register.componentes.CampoCelular
 import com.example.myapplication.ui.screens.Register.componentes.CampoCorreoRegistro
+import com.example.myapplication.ui.screens.Register.componentes.CampoRegistro
 import com.example.myapplication.ui.theme.DeepLime
 import com.example.myapplication.ui.theme.GraySecondary
 import com.example.myapplication.ui.theme.Ink
@@ -55,6 +58,10 @@ fun RegisterScreen(
     RegisterContent(
         modifier = modifier,
         uiState = uiState,
+        onNombreChange = viewModel::updateName,
+        onUsuarioChange = viewModel::updateUsername,
+        onPaisChange = viewModel::updateCountry,
+        onBioChange = viewModel::updateBio,
         onCorreoChange = viewModel::updateEmail,
         onCelularChange = viewModel::updateCellphone,
         onContrasenaChange = viewModel::updatePassword,
@@ -68,6 +75,10 @@ fun RegisterScreen(
 fun RegisterContent(
     modifier: Modifier = Modifier,
     uiState: RegisterState,
+    onNombreChange: (String) -> Unit,
+    onUsuarioChange: (String) -> Unit,
+    onPaisChange: (String) -> Unit,
+    onBioChange: (String) -> Unit,
     onCorreoChange: (String) -> Unit,
     onCelularChange: (String) -> Unit,
     onContrasenaChange: (String) -> Unit,
@@ -76,7 +87,9 @@ fun RegisterContent(
     onIniciarSesionClick: () -> Unit
 ) {
     Column(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
     ) {
 
         Column(
@@ -108,10 +121,28 @@ fun RegisterContent(
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(24.dp),
             verticalArrangement = Arrangement.Top
         ) {
+
+            CampoRegistro(
+                modifier = Modifier.fillMaxWidth(),
+                etiqueta = R.string.label_name,
+                valor = uiState.name,
+                onValorChange = onNombreChange
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            CampoRegistro(
+                modifier = Modifier.fillMaxWidth(),
+                etiqueta = R.string.label_username,
+                valor = uiState.username,
+                onValorChange = onUsuarioChange
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             CampoCorreoRegistro(
                 modifier = Modifier.fillMaxWidth(),
@@ -135,6 +166,25 @@ fun RegisterContent(
                 visible = uiState.showPassword,
                 onContrasenaChange = onContrasenaChange,
                 onVisibleChange = onVisibleChange
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            CampoRegistro(
+                modifier = Modifier.fillMaxWidth(),
+                etiqueta = R.string.label_country_optional,
+                valor = uiState.country,
+                onValorChange = onPaisChange
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            CampoRegistro(
+                modifier = Modifier.fillMaxWidth(),
+                etiqueta = R.string.label_bio_optional,
+                valor = uiState.bio,
+                onValorChange = onBioChange,
+                singleLine = false
             )
 
             if (uiState.showError) {
@@ -177,6 +227,10 @@ fun RegisterContent(
 fun RegisterScreenPreview() {
     RegisterContent(
         uiState = RegisterState(),
+        onNombreChange = {},
+        onUsuarioChange = {},
+        onPaisChange = {},
+        onBioChange = {},
         onCorreoChange = {},
         onCelularChange = {},
         onContrasenaChange = {},

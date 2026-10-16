@@ -7,5 +7,8 @@ data class User(
     val reviewCount: Int,
     val usefulVotes: Int,
     val averageRating: Double,
-    val profileImage: String? = null
+    val profileImage: String? = null,
+    val username: String = "",
+    val bio: String = "",
+    val country: String = ""
 )

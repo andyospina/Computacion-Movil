@@ -22,3 +22,7 @@ fun String?.toDisplayDate(): String {
 }
 
 fun String?.toYear(): Int = this?.take(4)?.toIntOrNull() ?: 0
+
+/** Fecha de un documento de Firestore -> "Oct 2, 2026" (cadena vacía si todavía no tiene fecha). */
+fun Date?.toDisplayDate(): String =
+    this?.let { SimpleDateFormat("MMM d, yyyy", Locale.getDefault()).format(it) }.orEmpty()

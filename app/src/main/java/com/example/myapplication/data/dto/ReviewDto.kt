@@ -17,7 +17,25 @@ data class ReviewDto(
     val createdAt: String? = null,
     val user: ReviewAuthorDto? = null,
     val product: ReviewProductDto? = null
-)
+) : ReviewData {
+
+    override fun toReview(): Review = Review(
+        id = id.toString(),
+        productId = productId.toString(),
+        author = user?.let { it.name.ifBlank { it.username } }.orEmpty(),
+        verifiedBuyer = false,
+        rating = rating,
+        title = title,
+        body = body,
+        date = createdAt.toDisplayDate(),
+        usefulCount = 0,
+        recommended = recommended,
+        hasPhoto = false,
+        status = ReviewStatus.PUBLISHED,
+        userId = userId.toString(),
+        productName = product?.name.orEmpty()
+    )
+}
 
 @Serializable
 data class ReviewAuthorDto(
@@ -50,21 +68,4 @@ data class UpdateReviewDto(
     val title: String,
     val body: String,
     val recommended: Boolean
-)
-
-fun ReviewDto.toReview(): Review = Review(
-    id = id.toString(),
-    productId = productId.toString(),
-    author = user?.let { it.name.ifBlank { it.username } }.orEmpty(),
-    verifiedBuyer = false,
-    rating = rating,
-    title = title,
-    body = body,
-    date = createdAt.toDisplayDate(),
-    usefulCount = 0,
-    recommended = recommended,
-    hasPhoto = false,
-    status = ReviewStatus.PUBLISHED,
-    userId = userId.toString(),
-    productName = product?.name.orEmpty()
 )

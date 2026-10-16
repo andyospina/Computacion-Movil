@@ -2,10 +2,15 @@ package com.example.myapplication
 
 import com.example.myapplication.data.dto.ProductDto
 import com.example.myapplication.data.dto.ReviewDto
+import com.example.myapplication.data.dto.FirestoreAuthorDto
+import com.example.myapplication.data.dto.FirestoreProductData
+import com.example.myapplication.data.dto.FirestoreProductDto
+import com.example.myapplication.data.dto.FirestoreReviewDto
+import com.example.myapplication.data.dto.FirestoreUserDto
+import com.example.myapplication.data.dto.NewReviewDto
+import com.example.myapplication.data.dto.RegisterUserDto
 import com.example.myapplication.data.dto.UserProfileDto
-import com.example.myapplication.data.dto.toProduct
-import com.example.myapplication.data.dto.toReview
-import com.example.myapplication.data.dto.toUser
+import com.example.myapplication.data.dto.toFirestoreDto
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -76,5 +81,103 @@ class DtoMappingTest {
         assertEquals("Guadalupe Barrows-Herman", user.name)
         assertEquals("GB", user.initials)
         assertEquals(2026, user.memberSinceYear)
+    }
+
+    @Test
+    fun firestoreUser_mapsAllFields() {
+        val user = FirestoreUserDto(
+            id = "uid123", username = "ada", name = "Ada Lovelace", email = "a@x.com",
+            country = "UK", bio = "Matemática", profileImage = "https://x/y"
+        ).toUser()
+
+        assertEquals("Ada Lovelace", user.name)
+        assertEquals("AL", user.initials)
+        assertEquals("ada", user.username)
+        assertEquals("UK", user.country)
+        assertEquals("Matemática", user.bio)
+        assertEquals("https://x/y", user.profileImage)
+    }
+
+    @Test
+    fun firestoreUser_withoutOptionalFields_usesDefaults() {
+        val user = FirestoreUserDto(username = "bob", name = "Bob").toUser()
+
+        assertEquals("", user.bio)
+        assertEquals("", user.country)
+        assertEquals(0, user.memberSinceYear)
+        assertEquals(null, user.profileImage)
+    }
+
+    @Test
+    fun registerUser_isTrimmedForFirestore() {
+        val dto = RegisterUserDto(
+            username = " ada ", name = " Ada ", email = " a@x.com ", country = "", bio = ""
+        ).toFirestoreDto()
+
+        assertEquals("ada", dto.username)
+        assertEquals("Ada", dto.name)
+        assertEquals("a@x.com", dto.email)
+        assertEquals("", dto.country)
+    }
+
+    @Test
+    fun firestoreReview_mapsDenormalizedAuthorAndKeepsDocumentId() {
+        val review = FirestoreReviewDto(
+            id = "abc", userId = "uid1", productId = "p1", productName = "Audífonos", rating = 4,
+            title = "t", body = "b", user = FirestoreAuthorDto(name = "Ada", username = "ada")
+        ).toReview()
+
+        assertEquals("abc", review.id)
+        assertEquals("uid1", review.userId)
+        assertEquals("p1", review.productId)
+        assertEquals("Ada", review.author)
+        assertEquals("Audífonos", review.productName)
+        assertEquals("", review.date)
+    }
+
+    @Test
+    fun firestoreReview_authorFallsBackToUsername() {
+        val review = FirestoreReviewDto(user = FirestoreAuthorDto(username = "ada")).toReview()
+        assertEquals("ada", review.author)
+    }
+
+    @Test
+    fun firestoreProduct_computesStatsFromItsReviews() {
+        val product = FirestoreProductData(
+            FirestoreProductDto(id = "p1", name = "X", category = "Hogar"),
+            listOf(
+                FirestoreReviewDto(rating = 5, recommended = true),
+                FirestoreReviewDto(rating = 4, recommended = true),
+                FirestoreReviewDto(rating = 1, recommended = false),
+                FirestoreReviewDto(rating = 2, recommended = false)
+            )
+        ).toProduct()
+
+        assertEquals("p1", product.id)
+        assertEquals(3.0, product.rating, 0.0)
+        assertEquals(4, product.reviewCount)
+        assertEquals(50, product.recommendPercent)
+        assertEquals(5 to 0.25f, product.ratingBreakdown.first())
+    }
+
+    @Test
+    fun firestoreProduct_withoutReviewsHasZeroStats() {
+        val product = FirestoreProductData(FirestoreProductDto(id = "p2", name = "Y"), emptyList()).toProduct()
+        assertEquals(0.0, product.rating, 0.0)
+        assertEquals(0, product.reviewCount)
+    }
+
+    @Test
+    fun newReview_copiesAuthorIntoFirestoreDocument() {
+        val dto = NewReviewDto(
+            productId = "p1", productName = "X", userId = "uid1", authorName = "Ada",
+            authorUsername = "ada", authorImage = null, rating = 5, title = "t", body = "b",
+            recommended = true
+        ).toFirestoreDto()
+
+        assertEquals("uid1", dto.userId)
+        assertEquals("Ada", dto.user.name)
+        assertEquals("ada", dto.user.username)
+        assertEquals("X", dto.productName)
     }
 }

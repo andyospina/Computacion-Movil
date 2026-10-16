@@ -20,6 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -29,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.R
 import com.example.myapplication.ui.components.CargaOError
+import com.example.myapplication.ui.screens.Profile.componentes.DialogoEditarPerfil
 import com.example.myapplication.ui.screens.Profile.componentes.EncabezadoPerfil
 import com.example.myapplication.ui.screens.Profile.componentes.EstadisticasPerfil
 import com.example.myapplication.ui.screens.Profile.componentes.SelectorTema
@@ -74,6 +78,9 @@ fun ProfileScreen(
             )
         },
         onLogoutClick = viewModel::logoutButtonPress,
+        onSaveProfile = viewModel::updateProfile,
+        onProfileSaved = viewModel::onProfileSaved,
+        onEditDismissed = viewModel::onEditDismissed,
         onRetry = viewModel::getPerfil,
         onEditResena = onEditResena,
         onDeleteResena = viewModel::deleteResena
@@ -88,10 +95,37 @@ fun ProfileContent(
     onModoOscuroChange: (Boolean) -> Unit,
     onSelectImageClick: () -> Unit,
     onLogoutClick: () -> Unit,
+    onSaveProfile: (name: String, country: String, bio: String) -> Unit,
+    onProfileSaved: () -> Unit,
+    onEditDismissed: () -> Unit,
     onRetry: () -> Unit,
     onEditResena: (productId: String, reviewId: String) -> Unit,
     onDeleteResena: (reviewId: String) -> Unit
 ) {
+    var mostrarEdicion by remember { mutableStateOf(false) }
+
+    LaunchedEffect(uiState.profileSaved) {
+        if (uiState.profileSaved) {
+            mostrarEdicion = false
+            onProfileSaved()
+        }
+    }
+
+    if (mostrarEdicion) {
+        uiState.user?.let { user ->
+            DialogoEditarPerfil(
+                user = user,
+                isSaving = uiState.isSavingProfile,
+                errorRes = uiState.profileSaveErrorRes,
+                onGuardar = onSaveProfile,
+                onDismiss = {
+                    mostrarEdicion = false
+                    onEditDismissed()
+                }
+            )
+        }
+    }
+
     Column(
         modifier = modifier.fillMaxSize()
     ) {
@@ -119,6 +153,18 @@ fun ProfileContent(
                 EstadisticasPerfil(user = user, modifier = Modifier.fillMaxWidth())
             }
         }
+
+        OutlinedButton(
+            onClick = { mostrarEdicion = true },
+            enabled = uiState.user != null,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+        ) {
+            Text(text = stringResource(R.string.profile_edit_button))
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedButton(
             onClick = onSelectImageClick,
@@ -206,6 +252,9 @@ fun ProfileScreenPreview() {
         onModoOscuroChange = {},
         onSelectImageClick = {},
         onLogoutClick = {},
+        onSaveProfile = { _, _, _ -> },
+        onProfileSaved = {},
+        onEditDismissed = {},
         onRetry = {},
         onEditResena = { _, _ -> },
         onDeleteResena = {}

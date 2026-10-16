@@ -23,16 +23,15 @@ class ProductDetailViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ProductDetailState())
     val uiState = _uiState.asStateFlow()
 
-    fun getProducto(productId: String) {
-        val state = _uiState.value
-        if (state.productId == productId && state.producto != null) return
-        cargar(productId)
-    }
+    // Se llama al entrar y al volver (p. ej. tras escribir una reseña): refresca sin parpadeo.
+    fun getProducto(productId: String) = cargar(productId)
 
     fun reintentar() = cargar(_uiState.value.productId)
 
     private fun cargar(productId: String) {
-        _uiState.update { it.copy(productId = productId, isLoading = true, errorMessageRes = null) }
+        _uiState.update {
+            it.copy(productId = productId, isLoading = it.producto == null, errorMessageRes = null)
+        }
 
         viewModelScope.launch {
             val producto = when (val result = productRepository.getProductById(productId)) {
@@ -56,6 +55,9 @@ class ProductDetailViewModel @Inject constructor(
     }
 
     private fun falla(messageRes: Int) {
-        _uiState.update { it.copy(isLoading = false, errorMessageRes = messageRes) }
+        // Si ya había datos de una carga anterior se conservan en pantalla
+        _uiState.update {
+            it.copy(isLoading = false, errorMessageRes = if (it.producto == null) messageRes else null)
+        }
     }
 }

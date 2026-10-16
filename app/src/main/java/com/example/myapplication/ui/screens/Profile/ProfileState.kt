@@ -15,5 +15,9 @@ data class ProfileState(
     // Carga del perfil y las reseñas desde el backend
     val isLoadingData: Boolean = false,
     @param:StringRes val dataErrorRes: Int? = null,
+    // Edición de los datos del perfil
+    val isSavingProfile: Boolean = false,
+    @param:StringRes val profileSaveErrorRes: Int? = null,
+    val profileSaved: Boolean = false,
     val loggedOut: Boolean = false
 )

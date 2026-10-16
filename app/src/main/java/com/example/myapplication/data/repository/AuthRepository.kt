@@ -27,6 +27,10 @@ class AuthRepository @Inject constructor(
         remoteDataSource.currentUser?.photoUrl?.toString()
     }
 
+    suspend fun deleteCurrentUser(): Result<Unit> = runCatchingAuth {
+        remoteDataSource.deleteCurrentUser()
+    }
+
     fun signOut() {
         remoteDataSource.signOut()
     }
