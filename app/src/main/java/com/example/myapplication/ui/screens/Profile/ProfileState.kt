@@ -1,11 +1,14 @@
 package com.example.myapplication.ui.screens.Profile
 
 import androidx.annotation.StringRes
+import com.example.myapplication.data.FollowStats
 import com.example.myapplication.data.Review
 import com.example.myapplication.data.User
 
 data class ProfileState(
+    val userId: String = "",
     val user: User? = null,
+    val followStats: FollowStats = FollowStats(),
     val misResenas: List<Review> = emptyList(),
     val email: String = "",
     val profileImageUrl: String? = null,

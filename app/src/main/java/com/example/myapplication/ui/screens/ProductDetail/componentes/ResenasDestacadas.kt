@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import com.example.myapplication.R
 import com.example.myapplication.data.LocalReviewProvider
 import com.example.myapplication.data.Review
+import com.example.myapplication.ui.components.BotonLike
 import com.example.myapplication.ui.components.StarRatingDisplay
 import com.example.myapplication.ui.theme.BorderColor
 import com.example.myapplication.ui.theme.DeepLime
@@ -31,7 +32,8 @@ fun ResenasDestacadas(
     resenas: List<Review>,
     onVerTodasClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onAuthorClick: (userId: String) -> Unit = {}
+    onAuthorClick: (userId: String) -> Unit = {},
+    onLikeClick: ((Review) -> Unit)? = null
 ) {
     Column(modifier = modifier) {
         Row(
@@ -68,6 +70,14 @@ fun ResenasDestacadas(
                 Spacer(modifier = Modifier.height(6.dp))
 
                 Text(text = resena.body, color = GraySecondary, fontSize = 13.sp)
+
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                    BotonLike(
+                        likesCount = resena.likesCount,
+                        likedByMe = resena.likedByMe,
+                        onClick = onLikeClick?.let { { it(resena) } }
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(12.dp))

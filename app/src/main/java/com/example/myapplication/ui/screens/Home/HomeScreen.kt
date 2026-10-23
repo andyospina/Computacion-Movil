@@ -28,6 +28,7 @@ import com.example.myapplication.R
 import com.example.myapplication.ui.components.BarraSuperior
 import com.example.myapplication.ui.components.CargaOError
 import com.example.myapplication.ui.components.ProfileAsyncImage
+import com.example.myapplication.ui.components.SolicitarPermisoNotificaciones
 import com.example.myapplication.ui.components.TopBarNavigation
 import com.example.myapplication.ui.theme.Ink
 import com.example.myapplication.ui.screens.Home.componentes.BarraBusquedaProductos
@@ -44,6 +45,9 @@ fun HomeScreen(
     onNotificationsClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    // Primera pantalla con sesión iniciada: aquí se pide el permiso de notificaciones
+    SolicitarPermisoNotificaciones()
 
     // Se refresca al volver a la pantalla por si la foto cambió en Perfil
     LaunchedEffect(Unit) {

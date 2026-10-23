@@ -7,6 +7,9 @@ import com.example.myapplication.data.NotFoundException
 import com.example.myapplication.data.Result
 import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
 import kotlinx.serialization.SerializationException
 import retrofit2.HttpException
 import java.io.IOException
@@ -22,6 +25,8 @@ fun Throwable.toApiErrorMessageRes(): Int = when (this) {
         else -> R.string.error_api_unexpected
     }
     is NotFoundException -> R.string.error_api_not_found
+    is NotAuthenticatedException -> R.string.error_session_required
+    is UnsupportedOperationException -> R.string.error_not_supported_backend
     is FirebaseFirestoreException -> when (code) {
         FirebaseFirestoreException.Code.PERMISSION_DENIED,
         FirebaseFirestoreException.Code.UNAUTHENTICATED -> R.string.error_permission_denied
@@ -47,3 +52,14 @@ suspend fun <T> runCatchingApi(block: suspend () -> T): Result<T> {
         Result.Failure(e, e.toApiErrorMessageRes())
     }
 }
+
+/**
+ * Versión para datos en tiempo real: cada emisión es un Success y un error del listener se emite como
+ * Failure (y termina el flujo; la pantalla puede volver a suscribirse con "Reintentar").
+ */
+fun <T> Flow<T>.asResult(): Flow<Result<T>> =
+    map<T, Result<T>> { Result.Success(it) }
+        .catch { e ->
+            Log.w(TAG, "Escucha fallida (${e.javaClass.simpleName}): ${e.message}")
+            emit(Result.Failure(e, e.toApiErrorMessageRes()))
+        }

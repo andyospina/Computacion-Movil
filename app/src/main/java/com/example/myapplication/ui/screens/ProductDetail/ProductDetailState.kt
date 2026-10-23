@@ -9,5 +9,7 @@ data class ProductDetailState(
     val producto: Product? = null,
     val resenasDestacadas: List<Review> = emptyList(),
     val isLoading: Boolean = false,
-    @param:StringRes val errorMessageRes: Int? = null
+    @param:StringRes val errorMessageRes: Int? = null,
+    // Falla puntual (p. ej. un like) que no debe ocultar la pantalla
+    @param:StringRes val actionErrorRes: Int? = null
 )

@@ -20,6 +20,7 @@ import com.example.myapplication.R
 import com.example.myapplication.data.LocalReviewProvider
 import com.example.myapplication.data.Review
 import com.example.myapplication.data.ReviewStatus
+import com.example.myapplication.ui.components.BotonLike
 import com.example.myapplication.ui.components.StarRatingDisplay
 import com.example.myapplication.ui.theme.BorderColor
 import com.example.myapplication.ui.theme.DeepLime
@@ -31,7 +32,8 @@ fun TarjetaMiResena(
     nombreProducto: String,
     modifier: Modifier = Modifier,
     onEditClick: (() -> Unit)? = null,
-    onDeleteClick: (() -> Unit)? = null
+    onDeleteClick: (() -> Unit)? = null,
+    onLikeClick: (() -> Unit)? = null
 ) {
     val esBorrador = resena.status == ReviewStatus.DRAFT
 
@@ -62,6 +64,7 @@ fun TarjetaMiResena(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(text = resena.date, fontSize = 12.sp, color = GraySecondary)
+            BotonLike(likesCount = resena.likesCount, likedByMe = resena.likedByMe, onClick = onLikeClick)
             Text(
                 text = stringResource(if (esBorrador) R.string.status_draft else R.string.status_published),
                 fontSize = 12.sp,

@@ -19,5 +19,8 @@ data class Review(
     val hasPhoto: Boolean = false,
     val status: ReviewStatus = ReviewStatus.PUBLISHED,
     val userId: String = "",
-    val productName: String = ""
+    val productName: String = "",
+    val likesCount: Int = 0,
+    // Si el usuario de la sesión actual ya le dio like (para pintar el corazón lleno o vacío)
+    val likedByMe: Boolean = false
 )

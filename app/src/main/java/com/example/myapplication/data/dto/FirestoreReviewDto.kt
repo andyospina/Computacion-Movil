@@ -17,7 +17,11 @@ data class FirestoreAuthorDto(
     val profileImage: String? = null
 )
 
-/** Documento `reviews/{id}`. Valores por defecto: requisito de Firestore para deserializar. */
+/**
+ * Documento `reviews/{id}`. Valores por defecto: requisito de Firestore para deserializar.
+ * `likedBy` guarda los uid de quienes dieron like: el contador es su tamaño y las reglas solo dejan
+ * que cada usuario agregue o quite su propio uid.
+ */
 data class FirestoreReviewDto(
     @DocumentId val id: String = "",
     val userId: String = "",
@@ -28,10 +32,11 @@ data class FirestoreReviewDto(
     val body: String = "",
     val recommended: Boolean = true,
     val user: FirestoreAuthorDto = FirestoreAuthorDto(),
+    val likedBy: List<String> = emptyList(),
     @ServerTimestamp val createdAt: Date? = null
 ) : ReviewData {
 
-    override fun toReview(): Review = Review(
+    override fun toReview(currentUserId: String?): Review = Review(
         id = id,
         productId = productId,
         author = user.name.ifBlank { user.username },
@@ -45,7 +50,9 @@ data class FirestoreReviewDto(
         hasPhoto = false,
         status = ReviewStatus.PUBLISHED,
         userId = userId,
-        productName = productName
+        productName = productName,
+        likesCount = likedBy.size,
+        likedByMe = currentUserId != null && currentUserId in likedBy
     )
 }
 

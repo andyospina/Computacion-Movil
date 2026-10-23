@@ -12,4 +12,7 @@ object ApiConfig {
      * Reemplazar cuando se guarde el uid de Firebase en una columna de `users`.
      */
     const val TEMP_CURRENT_USER_ID = "1"
+
+    /** Con Retrofit no hay tiempo real: las pantallas "en vivo" vuelven a consultar cada 15 s. */
+    const val POLL_INTERVAL_MS = 15_000L
 }

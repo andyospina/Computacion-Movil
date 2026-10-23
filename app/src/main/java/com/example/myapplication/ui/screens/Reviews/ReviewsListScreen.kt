@@ -24,8 +24,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.R
+import com.example.myapplication.data.Review
 import com.example.myapplication.ui.components.BarraSuperior
 import com.example.myapplication.ui.components.CargaOError
+import com.example.myapplication.ui.components.MensajeErrorAccion
 import com.example.myapplication.ui.components.TopBarNavigation
 import com.example.myapplication.ui.screens.Reviews.componentes.EncabezadoResenas
 import com.example.myapplication.ui.screens.Reviews.componentes.FiltrosResenas
@@ -47,6 +49,8 @@ fun ReviewsListScreen(
         viewModel.getResenas(productId)
     }
 
+    MensajeErrorAccion(messageRes = uiState.actionErrorRes, onShown = viewModel::onActionErrorShown)
+
     ReviewsListContent(
         modifier = modifier,
         uiState = uiState,
@@ -55,7 +59,8 @@ fun ReviewsListScreen(
         onConFotosChange = viewModel::updateConFotos,
         onCargarMasClick = viewModel::cargarMas,
         onBackClick = onBackClick,
-        onUserClick = onUserClick
+        onUserClick = onUserClick,
+        onLikeClick = viewModel::toggleLike
     )
 }
 
@@ -68,7 +73,8 @@ fun ReviewsListContent(
     onConFotosChange: (Boolean) -> Unit,
     onCargarMasClick: () -> Unit,
     onBackClick: () -> Unit,
-    onUserClick: (String) -> Unit
+    onUserClick: (String) -> Unit,
+    onLikeClick: (Review) -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxSize()
@@ -116,7 +122,11 @@ fun ReviewsListContent(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(uiState.resenasFiltradas.take(uiState.cantidadVisible), key = { it.id }) { resena ->
-                        TarjetaResena(resena = resena, onAuthorClick = { onUserClick(resena.userId) })
+                        TarjetaResena(
+                            resena = resena,
+                            onAuthorClick = { onUserClick(resena.userId) },
+                            onLikeClick = { onLikeClick(resena) }
+                        )
                     }
 
                     if (uiState.cantidadVisible < uiState.resenasFiltradas.size) {
@@ -145,6 +155,7 @@ fun ReviewsListScreenPreview() {
         onConFotosChange = {},
         onCargarMasClick = {},
         onBackClick = {},
-        onUserClick = {}
+        onUserClick = {},
+        onLikeClick = {}
     )
 }

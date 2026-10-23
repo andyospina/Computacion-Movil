@@ -10,6 +10,14 @@ sealed class Routes(val route: String) {
     object WriteReviewHub : Routes("write_review_hub")
     object Profile : Routes("profile")
     object Notifications : Routes("notifications")
+    object Feed : Routes("feed")
+
+    // tab = "followers" o "following": la pestaña que se abre primero
+    object FollowList : Routes("follow_list/{userId}?tab={tab}") {
+        const val ARG_USER_ID = "userId"
+        const val ARG_TAB = "tab"
+        fun createRoute(userId: String, tab: String) = "follow_list/$userId?tab=$tab"
+    }
 
     object UserProfile : Routes("user_profile/{userId}") {
         const val ARG_USER_ID = "userId"

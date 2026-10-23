@@ -25,16 +25,23 @@ import androidx.compose.ui.unit.sp
 import com.example.myapplication.R
 import com.example.myapplication.data.LocalReviewProvider
 import com.example.myapplication.data.Review
+import com.example.myapplication.ui.components.BotonLike
 import com.example.myapplication.ui.components.StarRatingDisplay
 import com.example.myapplication.ui.theme.BorderColor
 import com.example.myapplication.ui.theme.DeepLime
 import com.example.myapplication.ui.theme.GraySecondary
 
+/**
+ * Tarjeta de una reseña. Con [onProductClick] muestra además el nombre del producto (feed
+ * «Siguiendo»), y con [onLikeClick] el corazón permite dar o quitar like.
+ */
 @Composable
 fun TarjetaResena(
     resena: Review,
     modifier: Modifier = Modifier,
-    onAuthorClick: (() -> Unit)? = null
+    onAuthorClick: (() -> Unit)? = null,
+    onLikeClick: (() -> Unit)? = null,
+    onProductClick: (() -> Unit)? = null
 ) {
     Column(
         modifier = modifier
@@ -42,6 +49,18 @@ fun TarjetaResena(
             .border(width = 1.dp, color = BorderColor, shape = RoundedCornerShape(8.dp))
             .padding(16.dp)
     ) {
+        if (onProductClick != null && resena.productName.isNotBlank()) {
+            Text(
+                text = resena.productName,
+                color = DeepLime,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .clickable { onProductClick() }
+                    .padding(bottom = 6.dp)
+            )
+        }
+
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = resena.author,
@@ -75,13 +94,8 @@ fun TarjetaResena(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Row {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Text(text = resena.date, fontSize = 12.sp, color = GraySecondary)
-            Text(
-                text = stringResource(R.string.reviews_useful_count, resena.usefulCount),
-                fontSize = 12.sp,
-                color = GraySecondary
-            )
             if (resena.recommended) {
                 Text(
                     text = stringResource(R.string.reviews_recommended_label),
@@ -90,6 +104,10 @@ fun TarjetaResena(
                     fontWeight = FontWeight.Bold
                 )
             }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            BotonLike(likesCount = resena.likesCount, likedByMe = resena.likedByMe, onClick = onLikeClick)
         }
     }
 }
@@ -98,7 +116,9 @@ fun TarjetaResena(
 @Composable
 fun TarjetaResenaPreview() {
     TarjetaResena(
-        resena = LocalReviewProvider.reviews.first(),
-        modifier = Modifier.padding(16.dp)
+        resena = LocalReviewProvider.reviews.first().copy(likesCount = 3, likedByMe = true),
+        modifier = Modifier.padding(16.dp),
+        onLikeClick = {},
+        onProductClick = {}
     )
 }

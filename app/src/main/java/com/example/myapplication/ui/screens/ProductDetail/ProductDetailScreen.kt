@@ -21,8 +21,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.R
+import com.example.myapplication.data.Review
 import com.example.myapplication.ui.components.BarraSuperior
 import com.example.myapplication.ui.components.CargaOError
+import com.example.myapplication.ui.components.MensajeErrorAccion
 import com.example.myapplication.ui.components.TopBarNavigation
 import com.example.myapplication.ui.screens.ProductDetail.componentes.BotonesAccionProducto
 import com.example.myapplication.ui.screens.ProductDetail.componentes.FotoProducto
@@ -46,6 +48,8 @@ fun ProductDetailScreen(
         viewModel.getProducto(productId)
     }
 
+    MensajeErrorAccion(messageRes = uiState.actionErrorRes, onShown = viewModel::onActionErrorShown)
+
     ProductDetailContent(
         modifier = modifier,
         uiState = uiState,
@@ -53,7 +57,8 @@ fun ProductDetailScreen(
         onBackClick = onBackClick,
         onEscribirResenaClick = { onEscribirResenaClick(productId) },
         onVerTodasResenasClick = { onVerTodasResenasClick(productId) },
-        onUserClick = onUserClick
+        onUserClick = onUserClick,
+        onLikeClick = viewModel::toggleLike
     )
 }
 
@@ -65,7 +70,8 @@ fun ProductDetailContent(
     onBackClick: () -> Unit,
     onEscribirResenaClick: () -> Unit,
     onVerTodasResenasClick: () -> Unit,
-    onUserClick: (String) -> Unit
+    onUserClick: (String) -> Unit,
+    onLikeClick: (Review) -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxSize()
@@ -116,6 +122,7 @@ fun ProductDetailContent(
                             resenas = uiState.resenasDestacadas,
                             onVerTodasClick = onVerTodasResenasClick,
                             onAuthorClick = onUserClick,
+                            onLikeClick = onLikeClick,
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
@@ -134,6 +141,7 @@ fun ProductDetailScreenPreview() {
         onBackClick = {},
         onEscribirResenaClick = {},
         onVerTodasResenasClick = {},
-        onUserClick = {}
+        onUserClick = {},
+        onLikeClick = {}
     )
 }

@@ -35,6 +35,7 @@ import com.example.myapplication.ui.components.CargaOError
 import com.example.myapplication.ui.screens.Profile.componentes.DialogoEditarPerfil
 import com.example.myapplication.ui.screens.Profile.componentes.EncabezadoPerfil
 import com.example.myapplication.ui.screens.Profile.componentes.EstadisticasPerfil
+import com.example.myapplication.ui.screens.Profile.componentes.EstadisticasSeguidores
 import com.example.myapplication.ui.screens.Profile.componentes.SelectorTema
 import com.example.myapplication.ui.screens.Profile.componentes.TarjetaMiResena
 import com.example.myapplication.ui.theme.GraySecondary
@@ -47,6 +48,8 @@ fun ProfileScreen(
     modoOscuro: Boolean,
     onModoOscuroChange: (Boolean) -> Unit,
     onEditResena: (productId: String, reviewId: String) -> Unit,
+    onFollowersClick: (userId: String) -> Unit,
+    onFollowingClick: (userId: String) -> Unit,
     onLoggedOut: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -83,7 +86,9 @@ fun ProfileScreen(
         onEditDismissed = viewModel::onEditDismissed,
         onRetry = viewModel::getPerfil,
         onEditResena = onEditResena,
-        onDeleteResena = viewModel::deleteResena
+        onDeleteResena = viewModel::deleteResena,
+        onFollowersClick = { onFollowersClick(uiState.userId) },
+        onFollowingClick = { onFollowingClick(uiState.userId) }
     )
 }
 
@@ -100,7 +105,9 @@ fun ProfileContent(
     onEditDismissed: () -> Unit,
     onRetry: () -> Unit,
     onEditResena: (productId: String, reviewId: String) -> Unit,
-    onDeleteResena: (reviewId: String) -> Unit
+    onDeleteResena: (reviewId: String) -> Unit,
+    onFollowersClick: () -> Unit,
+    onFollowingClick: () -> Unit
 ) {
     var mostrarEdicion by remember { mutableStateOf(false) }
 
@@ -147,6 +154,15 @@ fun ProfileContent(
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(text = uiState.email, color = GraySecondary)
                 }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                EstadisticasSeguidores(
+                    followersCount = uiState.followStats.followersCount,
+                    followingCount = uiState.followStats.followingCount,
+                    onFollowersClick = onFollowersClick,
+                    onFollowingClick = onFollowingClick
+                )
             }
 
             Column(modifier = Modifier.padding(vertical = 16.dp)) {
@@ -257,6 +273,8 @@ fun ProfileScreenPreview() {
         onEditDismissed = {},
         onRetry = {},
         onEditResena = { _, _ -> },
-        onDeleteResena = {}
+        onDeleteResena = {},
+        onFollowersClick = {},
+        onFollowingClick = {}
     )
 }

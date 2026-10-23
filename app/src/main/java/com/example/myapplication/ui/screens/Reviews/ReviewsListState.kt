@@ -14,5 +14,6 @@ data class ReviewsListState(
     val conFotos: Boolean = false,
     val cantidadVisible: Int = 4,
     val isLoading: Boolean = false,
-    @param:StringRes val errorMessageRes: Int? = null
+    @param:StringRes val errorMessageRes: Int? = null,
+    @param:StringRes val actionErrorRes: Int? = null
 )

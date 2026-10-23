@@ -7,8 +7,13 @@ import com.example.myapplication.data.dto.NewReviewDto
 import com.example.myapplication.data.dto.ReviewData
 import com.example.myapplication.data.dto.UpdateReviewDto
 import com.example.myapplication.data.dto.toFirestoreDto
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import java.util.Date
 import javax.inject.Inject
@@ -55,9 +60,34 @@ class ReviewFirestoreDataSource @Inject constructor(
         reviews.document(id).delete().await()
     }
 
+    override fun observeReviewsByProduct(productId: String): Flow<List<ReviewData>> =
+        reviews.whereEqualTo("productId", productId).observe()
+            .map { it.toObjects(FirestoreReviewDto::class.java).newestFirst() }
+
+    // whereIn admite hasta 30 valores: con más usuarios se escucha una consulta por grupo y se unen.
+    override fun observeReviewsByUsers(userIds: List<String>): Flow<List<ReviewData>> {
+        val ids = userIds.distinct()
+        if (ids.isEmpty()) return flowOf(emptyList())
+        val flows = ids.chunked(WHERE_IN_LIMIT).map { chunk ->
+            reviews.whereIn("userId", chunk).observe().map { it.toObjects(FirestoreReviewDto::class.java) }
+        }
+        return combine(flows) { parts -> parts.flatMap { it }.newestFirst() }
+    }
+
+    // arrayUnion / arrayRemove son atómicos: dos likes simultáneos no se pisan.
+    override suspend fun likeReview(reviewId: String, userId: String) {
+        reviews.document(reviewId).update("likedBy", FieldValue.arrayUnion(userId)).await()
+    }
+
+    override suspend fun unlikeReview(reviewId: String, userId: String) {
+        reviews.document(reviewId).update("likedBy", FieldValue.arrayRemove(userId)).await()
+    }
+
+    private suspend fun query(query: Query): List<ReviewData> =
+        query.get().await().toObjects(FirestoreReviewDto::class.java).newestFirst()
+
     // Se ordena en el cliente: combinar where + orderBy exigiría un índice compuesto en Firestore.
     // Una reseña recién creada todavía no tiene createdAt resuelto y va primero.
-    private suspend fun query(query: Query): List<ReviewData> =
-        query.get().await().toObjects(FirestoreReviewDto::class.java)
-            .sortedByDescending { it.createdAt ?: Date(Long.MAX_VALUE) }
+    private fun List<FirestoreReviewDto>.newestFirst() =
+        sortedByDescending { it.createdAt ?: Date(Long.MAX_VALUE) }
 }

@@ -17,5 +17,13 @@ local.properties
 
 # Seed de Firestore: nunca subir dependencias ni claves de servicio
 tools/seed-firestore/node_modules
+
+# Cloud Functions
+functions/node_modules
+.firebase/
+firebase-debug.log
+firestore-debug.log
 *service-account*.json
 *serviceAccount*.json
+*firebase-adminsdk*.json
+tools/emulator-tests/node_modules

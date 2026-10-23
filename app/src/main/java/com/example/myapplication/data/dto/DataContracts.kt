@@ -1,5 +1,6 @@
 package com.example.myapplication.data.dto
 
+import com.example.myapplication.data.AppNotification
 import com.example.myapplication.data.Product
 import com.example.myapplication.data.Review
 
@@ -10,7 +11,13 @@ interface ProductData {
 
 /** Abstracción común de las respuestas de reseña de cada backend (Retrofit, Firestore). */
 interface ReviewData {
-    fun toReview(): Review
+    /** [currentUserId] permite saber si el usuario de la sesión ya le dio like a la reseña. */
+    fun toReview(currentUserId: String? = null): Review
+}
+
+/** Abstracción común de las notificaciones de la bandeja de cada backend. */
+interface NotificationData {
+    fun toNotification(): AppNotification
 }
 
 /** Datos de una reseña nueva, comunes a los dos backends. El autor se desnormaliza en la reseña. */

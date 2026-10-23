@@ -13,6 +13,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.myapplication.ui.components.AppBottomNavBar
+import com.example.myapplication.ui.screens.Feed.FeedScreen
+import com.example.myapplication.ui.screens.FollowList.FollowListScreen
+import com.example.myapplication.ui.screens.FollowList.FollowTab
 import com.example.myapplication.ui.screens.Home.HomeScreen
 import com.example.myapplication.ui.screens.Login.LoginScreen
 import com.example.myapplication.ui.screens.NewReview.NewReviewScreen
@@ -138,6 +141,12 @@ fun AppNavigation(
                     onEditResena = { productId, reviewId ->
                         navController.navigate(Routes.NewReview.createRoute(productId, reviewId))
                     },
+                    onFollowersClick = { userId ->
+                        navController.navigate(Routes.FollowList.createRoute(userId, FollowTab.SEGUIDORES.routeValue))
+                    },
+                    onFollowingClick = { userId ->
+                        navController.navigate(Routes.FollowList.createRoute(userId, FollowTab.SIGUIENDO.routeValue))
+                    },
                     onLoggedOut = {
                         navController.navigate(Routes.Login.route) {
                             popUpTo(0) { inclusive = true }
@@ -148,7 +157,45 @@ fun AppNavigation(
 
             composable(Routes.Notifications.route) {
                 NotificationsScreen(
-                    onBackClick = { navController.popBackStack() }
+                    onBackClick = { navController.popBackStack() },
+                    onProductoClick = { productId ->
+                        navController.navigate(Routes.ProductDetail.createRoute(productId))
+                    },
+                    onUserClick = { userId ->
+                        navController.navigate(Routes.UserProfile.createRoute(userId))
+                    }
+                )
+            }
+
+            composable(Routes.Feed.route) {
+                FeedScreen(
+                    onUserClick = { userId ->
+                        navController.navigate(Routes.UserProfile.createRoute(userId))
+                    },
+                    onProductoClick = { productId ->
+                        navController.navigate(Routes.ProductDetail.createRoute(productId))
+                    }
+                )
+            }
+
+            composable(
+                route = Routes.FollowList.route,
+                arguments = listOf(
+                    navArgument(Routes.FollowList.ARG_USER_ID) { type = NavType.StringType },
+                    navArgument(Routes.FollowList.ARG_TAB) {
+                        type = NavType.StringType
+                        defaultValue = FollowTab.SEGUIDORES.routeValue
+                    }
+                )
+            ) { backStack ->
+                val userId = backStack.arguments?.getString(Routes.FollowList.ARG_USER_ID).orEmpty()
+                val tab = FollowTab.fromRoute(backStack.arguments?.getString(Routes.FollowList.ARG_TAB))
+
+                FollowListScreen(
+                    userId = userId,
+                    tabInicial = tab,
+                    onBackClick = { navController.popBackStack() },
+                    onUserClick = { id -> navController.navigate(Routes.UserProfile.createRoute(id)) }
                 )
             }
 
@@ -196,7 +243,13 @@ fun AppNavigation(
 
                 UserProfileScreen(
                     userId = userId,
-                    onBackClick = { navController.popBackStack() }
+                    onBackClick = { navController.popBackStack() },
+                    onFollowersClick = { id ->
+                        navController.navigate(Routes.FollowList.createRoute(id, FollowTab.SEGUIDORES.routeValue))
+                    },
+                    onFollowingClick = { id ->
+                        navController.navigate(Routes.FollowList.createRoute(id, FollowTab.SIGUIENDO.routeValue))
+                    }
                 )
             }
 

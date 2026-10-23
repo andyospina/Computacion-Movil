@@ -1,7 +1,11 @@
 rules_version = '2';
 
-// Reglas de ReviewLab. Despliegue: Firebase Console > Firestore > Reglas (pegar este archivo)
-// o `firebase deploy --only firestore:rules`. NO usar modo de prueba (allow read, write: if true).
+// Reglas de ReviewLab. Despliegue: `firebase deploy --only firestore:rules` (o pegar este archivo en
+// Firebase Console > Firestore > Reglas). NO usar modo de prueba (allow read, write: if true).
+//
+// No hay una regla general `match /{document=**}`: las reglas `allow` se combinan con OR, así que una
+// regla amplia anularía todas las restricciones de abajo. Lo que no aparece aquí queda denegado.
+// Las Cloud Functions usan el Admin SDK y no pasan por estas reglas.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -13,20 +17,45 @@ service cloud.firestore {
       return signedIn() && request.auth.uid == uid;
     }
 
+    // Campos que cambian en esta escritura
+    function changedKeys() {
+      return request.resource.data.diff(resource.data).affectedKeys();
+    }
+
     // users/{uid}: cualquier usuario autenticado puede ver perfiles; solo el dueño escribe el suyo.
     match /users/{userId} {
       allow read: if signedIn();
       allow create: if isOwner(userId)
         && request.resource.data.name is string
         && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 80
         && request.resource.data.username is string
-        && request.resource.data.username.size() > 0;
+        && request.resource.data.username.size() > 0
+        && request.resource.data.username.size() <= 30;
       allow update: if isOwner(userId)
+        && changedKeys().hasOnly(['name', 'country', 'bio', 'profileImage'])
         && request.resource.data.name is string
         && request.resource.data.name.size() > 0
-        && request.resource.data.username == resource.data.username
-        && request.resource.data.email == resource.data.email;
+        && request.resource.data.name.size() <= 80
+        && request.resource.data.get('bio', '').size() <= 300;
       allow delete: if false;
+
+      // Tokens FCM: privados. Solo el dueño los registra o borra; nadie más puede leerlos.
+      match /fcmTokens/{token} {
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+          && request.resource.data.token == token
+          && request.resource.data.keys().hasOnly(['token', 'platform', 'updatedAt']);
+      }
+
+      // Bandeja de notificaciones: la escriben las Cloud Functions. El dueño solo lee y marca `read`.
+      match /notifications/{notificationId} {
+        allow read: if isOwner(userId);
+        allow update: if isOwner(userId)
+          && changedKeys().hasOnly(['read'])
+          && request.resource.data.read is bool;
+        allow create, delete: if false;
+      }
     }
 
     // products/{id}: solo lectura desde la app. Los datos semilla se cargan con el Admin SDK
@@ -38,21 +67,63 @@ service cloud.firestore {
 
     // reviews/{id}: lectura para autenticados; solo el autor crea, edita o borra la suya.
     match /reviews/{reviewId} {
+
+      function validContent() {
+        return request.resource.data.rating is int
+          && request.resource.data.rating >= 1
+          && request.resource.data.rating <= 5
+          && request.resource.data.title is string
+          && request.resource.data.title.size() > 0
+          && request.resource.data.title.size() <= 120
+          && request.resource.data.body is string
+          && request.resource.data.body.size() <= 2000;
+      }
+
+      // Like / unlike: solo cambia `likedBy` y solo en el uid de quien escribe (agregarse una vez o
+      // quitarse). Nadie puede quitar el like de otro, inflar el contador ni duplicar su uid.
+      function isOwnLikeToggle() {
+        let before = resource.data.get('likedBy', []);
+        let after = request.resource.data.get('likedBy', []);
+        let me = request.auth.uid;
+        return changedKeys().hasOnly(['likedBy'])
+          && after is list
+          && after.toSet().size() == after.size()
+          && (
+            (!(me in before) && after.size() == before.size() + 1
+              && after.toSet().difference(before.toSet()) == [me].toSet())
+            || ((me in before) && after.size() == before.size() - 1
+              && before.toSet().difference(after.toSet()) == [me].toSet())
+          );
+      }
+
       allow read: if signedIn();
       allow create: if isOwner(request.resource.data.userId)
-        && request.resource.data.rating is int
-        && request.resource.data.rating >= 1
-        && request.resource.data.rating <= 5
-        && request.resource.data.title is string
-        && request.resource.data.body is string
-        && request.resource.data.productId is string;
+        && validContent()
+        && request.resource.data.productId is string
+        && exists(/databases/$(database)/documents/products/$(request.resource.data.productId))
+        && request.resource.data.get('likedBy', []).size() == 0;
+      // El autor edita el contenido, pero no el autor, el producto ni los likes.
       allow update: if isOwner(resource.data.userId)
-        && request.resource.data.userId == resource.data.userId
-        && request.resource.data.productId == resource.data.productId
-        && request.resource.data.rating is int
-        && request.resource.data.rating >= 1
-        && request.resource.data.rating <= 5;
+        && changedKeys().hasOnly(['rating', 'title', 'body', 'recommended'])
+        && validContent();
+      allow update: if signedIn() && isOwnLikeToggle();
       allow delete: if isOwner(resource.data.userId);
+    }
+
+    // follows/{followerId_followedId}: un documento por relación «followerId sigue a followedId».
+    match /follows/{followId} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.followerId == request.auth.uid
+        && request.resource.data.followedId is string
+        && request.resource.data.followedId != request.auth.uid
+        && followId == request.auth.uid + '_' + request.resource.data.followedId
+        && request.resource.data.keys().hasOnly(['followerId', 'followedId', 'createdAt'])
+        && request.resource.data.createdAt == request.time
+        && exists(/databases/$(database)/documents/users/$(request.resource.data.followedId));
+      // Solo quien sigue puede dejar de seguir; la relación no se edita.
+      allow delete: if signedIn() && resource.data.followerId == request.auth.uid;
+      allow update: if false;
     }
   }
 }

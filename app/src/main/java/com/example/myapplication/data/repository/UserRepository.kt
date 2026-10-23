@@ -15,6 +15,13 @@ class UserRepository @Inject constructor(
         remoteDataSource.getUserById(id).toUser()
     }
 
+    /** Usuarios en el mismo orden de [ids] (p. ej. lista de seguidores). */
+    suspend fun getUsersByIds(ids: List<String>): Result<List<User>> = runCatchingApi {
+        if (ids.isEmpty()) return@runCatchingApi emptyList()
+        val users = remoteDataSource.getUsersByIds(ids).map { it.toUser() }.associateBy { it.id }
+        ids.mapNotNull { users[it] }
+    }
+
     suspend fun registerUser(
         userId: String,
         username: String,

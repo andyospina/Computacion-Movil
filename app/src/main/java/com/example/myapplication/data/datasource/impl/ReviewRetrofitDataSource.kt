@@ -8,6 +8,7 @@ import com.example.myapplication.data.dto.ReviewData
 import com.example.myapplication.data.dto.ReviewDto
 import com.example.myapplication.data.dto.UpdateReviewDto
 import com.example.myapplication.data.services.ReviewRetrofitService
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class ReviewRetrofitDataSource @Inject constructor(
@@ -42,6 +43,20 @@ class ReviewRetrofitDataSource @Inject constructor(
     }
 
     override suspend fun deleteReview(id: String) = service.deleteReview(id)
+
+    override fun observeReviewsByProduct(productId: String): Flow<List<ReviewData>> =
+        pollingFlow { getReviewsByProduct(productId) }
+
+    override fun observeReviewsByUsers(userIds: List<String>): Flow<List<ReviewData>> =
+        pollingFlow { service.getReviews().filter { it.userId.toString() in userIds }.newestFirst() }
+
+    override suspend fun likeReview(reviewId: String, userId: String) {
+        throw UnsupportedOperationException("El backend Express no tiene likes")
+    }
+
+    override suspend fun unlikeReview(reviewId: String, userId: String) {
+        throw UnsupportedOperationException("El backend Express no tiene likes")
+    }
 
     // createdAt es ISO-8601 en UTC, así que el orden alfabético es el cronológico
     private fun List<ReviewDto>.newestFirst() =

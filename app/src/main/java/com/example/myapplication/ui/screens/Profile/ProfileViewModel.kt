@@ -5,14 +5,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.R
 import com.example.myapplication.data.Result
-import com.example.myapplication.data.Review
-import com.example.myapplication.data.User
 import com.example.myapplication.data.identity.CurrentUserIdProvider
 import com.example.myapplication.data.repository.AuthRepository
+import com.example.myapplication.data.repository.FollowRepository
+import com.example.myapplication.data.repository.NotificationRepository
 import com.example.myapplication.data.repository.ReviewRepository
 import com.example.myapplication.data.repository.StorageRepository
 import com.example.myapplication.data.repository.UserRepository
+import com.example.myapplication.data.withReviewStats
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -25,6 +27,8 @@ class ProfileViewModel @Inject constructor(
     private val storageRepository: StorageRepository,
     private val userRepository: UserRepository,
     private val reviewRepository: ReviewRepository,
+    private val followRepository: FollowRepository,
+    private val notificationRepository: NotificationRepository,
     private val currentUserId: CurrentUserIdProvider
 ) : ViewModel() {
 
@@ -35,6 +39,8 @@ class ProfileViewModel @Inject constructor(
         )
     )
     val uiState = _uiState.asStateFlow()
+
+    private var seguidoresJob: Job? = null
 
     init {
         getProfileImage()
@@ -53,6 +59,8 @@ class ProfileViewModel @Inject constructor(
             falla(R.string.error_not_authenticated_profile)
             return
         }
+        _uiState.update { it.copy(userId = uid) }
+        observarSeguidores(uid)
 
         viewModelScope.launch {
             val usuario = when (val result = userRepository.getUserById(uid)) {
@@ -66,7 +74,7 @@ class ProfileViewModel @Inject constructor(
 
             _uiState.update {
                 it.copy(
-                    user = usuario.conEstadisticas(resenas),
+                    user = usuario.withReviewStats(resenas),
                     misResenas = resenas,
                     isLoadingData = false,
                     dataErrorRes = null
@@ -116,7 +124,7 @@ class ProfileViewModel @Inject constructor(
                 // Se quita de la lista local sin volver a pedirla al backend
                 is Result.Success -> _uiState.update { state ->
                     val resenas = state.misResenas.filter { it.id != reviewId }
-                    state.copy(misResenas = resenas, user = state.user?.conEstadisticas(resenas))
+                    state.copy(misResenas = resenas, user = state.user?.withReviewStats(resenas))
                 }
                 is Result.Failure -> _uiState.update { it.copy(errorMessageRes = result.messageRes) }
             }
@@ -127,11 +135,15 @@ class ProfileViewModel @Inject constructor(
         _uiState.update { it.copy(isLoadingData = false, dataErrorRes = messageRes) }
     }
 
-    private fun User.conEstadisticas(resenas: List<Review>): User = copy(
-        reviewCount = resenas.size,
-        averageRating = if (resenas.isEmpty()) 0.0
-        else Math.round(resenas.map { it.rating }.average() * 10) / 10.0
-    )
+    // Contadores de seguidores y seguidos en tiempo real
+    private fun observarSeguidores(uid: String) {
+        if (seguidoresJob?.isActive == true) return
+        seguidoresJob = viewModelScope.launch {
+            followRepository.observeFollowStats(uid).collect { result ->
+                if (result is Result.Success) _uiState.update { it.copy(followStats = result.data) }
+            }
+        }
+    }
 
     // Refresca la photoUrl desde Firebase por si se cambió desde otro dispositivo.
     // Si falla (p. ej. sin conexión) se conserva la URL en caché.
@@ -179,9 +191,14 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    // Primero se borra el token FCM (requiere la sesión activa) para que este dispositivo no reciba
+    // notificaciones de esta cuenta; si falla igual se cierra la sesión.
     fun logoutButtonPress() {
-        authRepository.signOut()
-        _uiState.update { it.copy(loggedOut = true) }
+        viewModelScope.launch {
+            notificationRepository.unregisterDevice()
+            authRepository.signOut()
+            _uiState.update { it.copy(loggedOut = true) }
+        }
     }
 
     fun onLoggedOut() {

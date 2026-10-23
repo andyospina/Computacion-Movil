@@ -1,10 +1,12 @@
 package com.example.myapplication.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.RateReview
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.RateReview
@@ -30,6 +32,12 @@ val bottomNavItems = listOf(
         label = "Buscar",
         selectedIcon = Icons.Filled.Search,
         unselectedIcon = Icons.Outlined.Search
+    ),
+    BottomNavItem(
+        route = Routes.Feed.route,
+        label = "Siguiendo",
+        selectedIcon = Icons.Filled.Group,
+        unselectedIcon = Icons.Outlined.Group
     ),
     BottomNavItem(
         route = Routes.WriteReviewHub.route,

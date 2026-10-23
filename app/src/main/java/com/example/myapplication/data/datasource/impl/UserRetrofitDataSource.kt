@@ -14,6 +14,10 @@ class UserRetrofitDataSource @Inject constructor(
 
     override suspend fun getUserById(id: String): UserDto = service.getUserById(id)
 
+    // El backend no consulta varios usuarios a la vez: una petición por id.
+    override suspend fun getUsersByIds(ids: List<String>): List<UserDto> =
+        ids.distinct().map { service.getUserById(it) }
+
     /**
      * No soportado: `POST /users` del backend exige una contraseña y asigna un id numérico propio,
      * pero el registro lo hace Firebase Authentication y la contraseña no debe guardarse aparte.

@@ -7,6 +7,9 @@ import com.example.myapplication.data.dto.UserDto
 interface UserRemoteDataSource {
     suspend fun getUserById(id: String): UserDto
 
+    /** Usuarios con esos ids; los que no existen se omiten. */
+    suspend fun getUsersByIds(ids: List<String>): List<UserDto>
+
     /** Guarda los datos adicionales de un usuario ya creado en Firebase Authentication. */
     suspend fun registerUser(userId: String, user: RegisterUserDto)
 

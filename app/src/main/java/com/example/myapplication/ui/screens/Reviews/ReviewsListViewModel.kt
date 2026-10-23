@@ -3,10 +3,12 @@ package com.example.myapplication.ui.screens.Reviews
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.Result
+import com.example.myapplication.data.Review
 import com.example.myapplication.data.repository.ProductRepository
 import com.example.myapplication.data.repository.ReviewRepository
 import com.example.myapplication.ui.screens.Reviews.componentes.OrdenResenas
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -24,35 +26,56 @@ class ReviewsListViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ReviewsListState())
     val uiState = _uiState.asStateFlow()
 
-    // Se llama al entrar y al volver a la pantalla: refresca sin parpadeo.
-    fun getResenas(productId: String) = cargar(productId)
+    private var resenasJob: Job? = null
 
-    fun reintentar() = cargar(_uiState.value.productId)
+    // Se llama al entrar y al volver a la pantalla: refresca el producto sin parpadeo.
+    fun getResenas(productId: String) {
+        cargarProducto(productId)
+        observarResenas(productId)
+    }
 
-    private fun cargar(productId: String) {
+    fun reintentar() = getResenas(_uiState.value.productId)
+
+    fun toggleLike(resena: Review) {
+        viewModelScope.launch {
+            val result = reviewRepository.toggleLike(resena)
+            if (result is Result.Failure) _uiState.update { it.copy(actionErrorRes = result.messageRes) }
+        }
+    }
+
+    fun onActionErrorShown() {
+        _uiState.update { it.copy(actionErrorRes = null) }
+    }
+
+    private fun cargarProducto(productId: String) {
         _uiState.update {
             it.copy(productId = productId, isLoading = it.producto == null, errorMessageRes = null)
         }
 
         viewModelScope.launch {
-            val producto = when (val result = productRepository.getProductById(productId)) {
-                is Result.Success -> result.data
-                is Result.Failure -> return@launch falla(result.messageRes)
+            when (val result = productRepository.getProductById(productId)) {
+                is Result.Success -> _uiState.update {
+                    it.copy(producto = result.data, isLoading = false, errorMessageRes = null)
+                }
+                is Result.Failure -> falla(result.messageRes)
             }
-            val resenas = when (val result = reviewRepository.getReviewsByProduct(productId)) {
-                is Result.Success -> result.data
-                is Result.Failure -> return@launch falla(result.messageRes)
-            }
+        }
+    }
 
-            _uiState.update {
-                it.copy(
-                    producto = producto,
-                    todasLasResenas = resenas,
-                    isLoading = false,
-                    errorMessageRes = null
-                )
+    // Tiempo real: cada cambio (like, reseña nueva o editada) vuelve a aplicar los filtros sin
+    // perder cuántas reseñas tenía desplegadas el usuario.
+    private fun observarResenas(productId: String) {
+        if (resenasJob?.isActive == true) return
+        resenasJob = viewModelScope.launch {
+            reviewRepository.observeReviewsByProduct(productId).collect { result ->
+                when (result) {
+                    is Result.Success -> {
+                        _uiState.update { it.copy(todasLasResenas = result.data) }
+                        aplicarFiltros(reiniciarPaginacion = false)
+                    }
+                    is Result.Failure -> _uiState.update { it.copy(actionErrorRes = result.messageRes) }
+                }
             }
-            aplicarFiltros()
         }
     }
 
@@ -76,7 +99,7 @@ class ReviewsListViewModel @Inject constructor(
         _uiState.update { it.copy(cantidadVisible = it.cantidadVisible + PAGE_SIZE) }
     }
 
-    private fun aplicarFiltros() {
+    private fun aplicarFiltros(reiniciarPaginacion: Boolean = true) {
         val state = _uiState.value
 
         val filtradas = state.todasLasResenas
@@ -86,6 +109,11 @@ class ReviewsListViewModel @Inject constructor(
                 else lista
             }
 
-        _uiState.update { it.copy(resenasFiltradas = filtradas, cantidadVisible = PAGE_SIZE) }
+        _uiState.update {
+            it.copy(
+                resenasFiltradas = filtradas,
+                cantidadVisible = if (reiniciarPaginacion) PAGE_SIZE else it.cantidadVisible
+            )
+        }
     }
 }

@@ -69,6 +69,8 @@
     <string name="error_api_not_found">No se encontró lo que buscas</string>
     <string name="error_api_bad_request">Los datos enviados no son válidos</string>
     <string name="error_api_unexpected">Ocurrió un error inesperado. Intenta de nuevo</string>
+    <string name="error_session_required">Debes iniciar sesión para realizar esta acción</string>
+    <string name="error_not_supported_backend">Esta función no está disponible con el backend actual</string>
     <string name="action_retry">Reintentar</string>
     <string name="action_edit">Editar</string>
     <string name="action_delete">Eliminar</string>
@@ -100,7 +102,8 @@
     <string name="reviews_load_more">Cargar más reseñas</string>
     <string name="reviews_header_count">Reseñas (%1$d)</string>
     <string name="reviews_verified_buyer_label">" Comprador verificado"</string>
-    <string name="reviews_useful_count">" · Útil (%1$d)"</string>
+    <string name="content_description_like">Me gusta</string>
+    <string name="content_description_unlike">Quitar me gusta</string>
     <string name="reviews_recommended_label">" · Recomendado"</string>
     <string name="reviews_filter_recent">Recientes</string>
     <string name="reviews_filter_best_rated">Mejor valoradas</string>
@@ -139,13 +142,33 @@
     <!-- Notifications -->
     <string name="notifications_title">Notificaciones</string>
     <string name="notifications_mark_all_read">Marcar leídas</string>
+    <string name="notifications_like_message">%1$s le dio me gusta a tu reseña «%2$s»</string>
+    <string name="notifications_follow_message">%1$s comenzó a seguirte</string>
+    <string name="notifications_unknown_message">Tienes actividad nueva</string>
+    <string name="notifications_empty">Aún no tienes notificaciones. Aquí verás los likes a tus reseñas y tus nuevos seguidores.</string>
+    <string name="notification_channel_social">Actividad social</string>
+    <string name="notification_channel_social_description">Likes en tus reseñas y nuevos seguidores</string>
+
+    <!-- Seguidores y feed -->
+    <string name="profile_followers">Seguidores</string>
+    <string name="profile_following">Siguiendo</string>
+    <string name="action_follow">Seguir</string>
+    <string name="action_unfollow">Dejar de seguir</string>
+    <string name="follow_list_title">Conexiones</string>
+    <string name="follow_list_followers_tab">Seguidores (%1$d)</string>
+    <string name="follow_list_following_tab">Siguiendo (%1$d)</string>
+    <string name="follow_list_empty_followers">Todavía no tiene seguidores</string>
+    <string name="follow_list_empty_following">Todavía no sigue a nadie</string>
+    <string name="feed_title">Siguiendo</string>
+    <string name="feed_empty_no_following">Aún no sigues a nadie. Toca el autor de una reseña para ver su perfil y seguirlo.</string>
+    <string name="feed_empty_no_reviews">Las personas que sigues todavía no han publicado reseñas.</string>
 
     <!-- Profile -->
     <string name="user_profile_reviews_title">Reseñas publicadas</string>
     <string name="profile_my_reviews_title">Mis reseñas</string>
     <string name="profile_dark_mode">Modo oscuro</string>
     <string name="profile_stat_reviews">Reseñas</string>
-    <string name="profile_stat_useful_votes">Votos útiles</string>
+    <string name="profile_stat_useful_votes">Likes recibidos</string>
     <string name="profile_stat_average">Promedio</string>
     <string name="profile_member_since">Miembro desde %1$d</string>
 

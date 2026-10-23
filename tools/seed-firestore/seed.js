@@ -1,4 +1,4 @@
-// Carga datos de prueba en Firestore (usuarios semilla, productos y reseñas).
+// Carga datos de prueba en Firestore (usuarios semilla, productos, reseñas, likes y seguidores).
 // Usa el Admin SDK, que ignora las reglas de seguridad. Es idempotente: usa ids fijos, así que
 // ejecutarlo de nuevo sobrescribe los mismos documentos sin duplicar nada.
 //
@@ -39,6 +39,10 @@ const reviewRows = [
   ['r9', 'seed_linus', 'p_chaqueta', 1, 'No es impermeable', 'Se mojó en la primera lluvia fuerte.', '2026-09-15T12:00:00Z'],
 ];
 
+// Likes de ejemplo (uid de quienes dieron like) y relaciones [seguidor, seguido].
+const likes = { r1: ['seed_linus', 'seed_grace'], r4: ['seed_grace'], r7: ['seed_linus'] };
+const follows = [['seed_ada', 'seed_grace'], ['seed_linus', 'seed_ada'], ['seed_grace', 'seed_ada']];
+
 async function main() {
   const batch = db.batch();
   for (const [id, data] of Object.entries(users)) batch.set(db.collection('users').doc(id), data);
@@ -55,11 +59,20 @@ async function main() {
       recommended: rating >= 4,
       // Copia desnormalizada del autor (misma forma que escribe la app)
       user: { name: u.name, username: u.username, profileImage: u.profileImage },
+      likedBy: likes[id] || [],
       createdAt: ts(date),
     });
   }
+  // Mismo formato que escribe la app: follows/{seguidor_seguido}
+  for (const [followerId, followedId] of follows) {
+    batch.set(db.collection('follows').doc(`${followerId}_${followedId}`), {
+      followerId,
+      followedId,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+  }
   await batch.commit();
-  console.log(`Listo: ${Object.keys(users).length} usuarios, ${Object.keys(products).length} productos, ${reviewRows.length} reseñas.`);
+  console.log(`Listo: ${Object.keys(users).length} usuarios, ${Object.keys(products).length} productos, ${reviewRows.length} reseñas, ${follows.length} seguimientos.`);
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });

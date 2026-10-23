@@ -7,11 +7,12 @@ import com.example.myapplication.data.dto.RegisterUserDto
 import com.example.myapplication.data.dto.UpdateUserDto
 import com.example.myapplication.data.dto.UserDto
 import com.example.myapplication.data.dto.toFirestoreDto
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
-private const val USERS_COLLECTION = "users"
+internal const val USERS_COLLECTION = "users"
 
 class UserFirestoreDataSource @Inject constructor(
     private val firestore: FirebaseFirestore
@@ -23,6 +24,12 @@ class UserFirestoreDataSource @Inject constructor(
         return snapshot.toObject(FirestoreUserDto::class.java)
             ?: throw NotFoundException("users/$id no se pudo convertir")
     }
+
+    override suspend fun getUsersByIds(ids: List<String>): List<UserDto> =
+        ids.distinct().chunked(WHERE_IN_LIMIT).flatMap { chunk ->
+            firestore.collection(USERS_COLLECTION).whereIn(FieldPath.documentId(), chunk).get().await()
+                .toObjects(FirestoreUserDto::class.java)
+        }
 
     // El id del documento es el uid de Firebase Authentication: users/{uid}
     override suspend fun registerUser(userId: String, user: RegisterUserDto) {

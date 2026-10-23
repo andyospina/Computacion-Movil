@@ -19,26 +19,45 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.R
+import com.example.myapplication.data.AppNotification
+import com.example.myapplication.data.NotificationType
 import com.example.myapplication.ui.components.BarraSuperior
+import com.example.myapplication.ui.components.CargaOError
+import com.example.myapplication.ui.components.MensajeErrorAccion
 import com.example.myapplication.ui.components.TopBarNavigation
 import com.example.myapplication.ui.screens.Notifications.componentes.TarjetaNotificacion
+import com.example.myapplication.ui.theme.GraySecondary
 import com.example.myapplication.ui.theme.Ink
 
 @Composable
 fun NotificationsScreen(
     modifier: Modifier = Modifier,
-    viewModel: NotificationsViewModel = viewModel(),
-    onBackClick: () -> Unit
+    viewModel: NotificationsViewModel = hiltViewModel(),
+    onBackClick: () -> Unit,
+    onProductoClick: (String) -> Unit,
+    onUserClick: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    MensajeErrorAccion(messageRes = uiState.actionErrorRes, onShown = viewModel::onActionErrorShown)
 
     NotificationsContent(
         modifier = modifier,
         uiState = uiState,
         onMarcarTodasLeidasClick = viewModel::marcarTodasLeidas,
-        onBackClick = onBackClick
+        onRetry = viewModel::reintentar,
+        onBackClick = onBackClick,
+        // Un like lleva al producto de la reseña; un seguidor nuevo, a su perfil
+        onNotificacionClick = { notificacion ->
+            when (notificacion.type) {
+                NotificationType.LIKE ->
+                    if (notificacion.productId.isNotBlank()) onProductoClick(notificacion.productId)
+                NotificationType.FOLLOW -> onUserClick(notificacion.actorId)
+                NotificationType.UNKNOWN -> Unit
+            }
+        }
     )
 }
 
@@ -47,7 +66,9 @@ fun NotificationsContent(
     modifier: Modifier = Modifier,
     uiState: NotificationsState,
     onMarcarTodasLeidasClick: () -> Unit,
-    onBackClick: () -> Unit
+    onRetry: () -> Unit,
+    onBackClick: () -> Unit,
+    onNotificacionClick: (AppNotification) -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxSize()
@@ -76,9 +97,22 @@ fun NotificationsContent(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                items(uiState.notificaciones, key = { it.id }) { notificacion ->
-                    TarjetaNotificacion(notificacion = notificacion)
+            CargaOError(
+                isLoading = uiState.isLoading,
+                errorMessageRes = uiState.errorMessageRes,
+                onRetry = onRetry
+            ) {
+                if (uiState.notificaciones.isEmpty()) {
+                    Text(text = stringResource(R.string.notifications_empty), color = GraySecondary)
+                } else {
+                    LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        items(uiState.notificaciones, key = { it.id }) { notificacion ->
+                            TarjetaNotificacion(
+                                notificacion = notificacion,
+                                onClick = { onNotificacionClick(notificacion) }
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -89,8 +123,10 @@ fun NotificationsContent(
 @Composable
 fun NotificationsScreenPreview() {
     NotificationsContent(
-        uiState = NotificationsState(),
+        uiState = NotificationsState(isLoading = false),
         onMarcarTodasLeidasClick = {},
-        onBackClick = {}
+        onRetry = {},
+        onBackClick = {},
+        onNotificacionClick = {}
     )
 }

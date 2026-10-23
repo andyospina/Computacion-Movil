@@ -23,12 +23,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.R
+import com.example.myapplication.data.Review
 import com.example.myapplication.ui.components.BarraSuperior
 import com.example.myapplication.ui.components.CargaOError
+import com.example.myapplication.ui.components.MensajeErrorAccion
 import com.example.myapplication.ui.components.TopBarNavigation
 import com.example.myapplication.ui.screens.Profile.componentes.EncabezadoPerfil
 import com.example.myapplication.ui.screens.Profile.componentes.EstadisticasPerfil
+import com.example.myapplication.ui.screens.Profile.componentes.EstadisticasSeguidores
 import com.example.myapplication.ui.screens.Profile.componentes.TarjetaMiResena
+import com.example.myapplication.ui.screens.UserProfile.componentes.BotonSeguir
 import com.example.myapplication.ui.theme.Ink
 
 @Composable
@@ -36,17 +40,25 @@ fun UserProfileScreen(
     userId: String,
     modifier: Modifier = Modifier,
     viewModel: UserProfileViewModel = hiltViewModel(),
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onFollowersClick: (userId: String) -> Unit,
+    onFollowingClick: (userId: String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(userId) { viewModel.getPerfil(userId) }
 
+    MensajeErrorAccion(messageRes = uiState.actionErrorRes, onShown = viewModel::onActionErrorShown)
+
     UserProfileContent(
         modifier = modifier,
         uiState = uiState,
         onRetry = viewModel::reintentar,
-        onBackClick = onBackClick
+        onBackClick = onBackClick,
+        onSeguirClick = viewModel::toggleSeguir,
+        onFollowersClick = { onFollowersClick(userId) },
+        onFollowingClick = { onFollowingClick(userId) },
+        onLikeClick = viewModel::toggleLike
     )
 }
 
@@ -55,7 +67,11 @@ fun UserProfileContent(
     modifier: Modifier = Modifier,
     uiState: UserProfileState,
     onRetry: () -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onSeguirClick: () -> Unit,
+    onFollowersClick: () -> Unit,
+    onFollowingClick: () -> Unit,
+    onLikeClick: (Review) -> Unit
 ) {
     Column(modifier = modifier.fillMaxSize()) {
 
@@ -83,6 +99,25 @@ fun UserProfileContent(
                             profileImageUrl = user.profileImage,
                             modifier = Modifier.fillMaxWidth()
                         )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        EstadisticasSeguidores(
+                            followersCount = uiState.followStats.followersCount,
+                            followingCount = uiState.followStats.followingCount,
+                            onFollowersClick = onFollowersClick,
+                            onFollowingClick = onFollowingClick
+                        )
+
+                        if (!uiState.esMiPerfil) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            BotonSeguir(
+                                siguiendo = uiState.siguiendo,
+                                enabled = !uiState.isFollowLoading,
+                                onClick = onSeguirClick,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
                     }
 
                     Column(modifier = Modifier.padding(vertical = 16.dp)) {
@@ -105,7 +140,11 @@ fun UserProfileContent(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(uiState.resenas, key = { it.id }) { resena ->
-                            TarjetaMiResena(resena = resena, nombreProducto = resena.productName)
+                            TarjetaMiResena(
+                                resena = resena,
+                                nombreProducto = resena.productName,
+                                onLikeClick = { onLikeClick(resena) }
+                            )
                         }
                     }
                 }
@@ -117,5 +156,13 @@ fun UserProfileContent(
 @Preview(showBackground = true, name = "UserProfileScreen - Preview")
 @Composable
 fun UserProfileScreenPreview() {
-    UserProfileContent(uiState = UserProfileState(), onRetry = {}, onBackClick = {})
+    UserProfileContent(
+        uiState = UserProfileState(),
+        onRetry = {},
+        onBackClick = {},
+        onSeguirClick = {},
+        onFollowersClick = {},
+        onFollowingClick = {},
+        onLikeClick = {}
+    )
 }

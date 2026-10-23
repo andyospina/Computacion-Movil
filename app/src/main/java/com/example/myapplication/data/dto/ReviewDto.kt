@@ -19,7 +19,8 @@ data class ReviewDto(
     val product: ReviewProductDto? = null
 ) : ReviewData {
 
-    override fun toReview(): Review = Review(
+    // El backend Express no tiene likes: el contador queda en 0.
+    override fun toReview(currentUserId: String?): Review = Review(
         id = id.toString(),
         productId = productId.toString(),
         author = user?.let { it.name.ifBlank { it.username } }.orEmpty(),

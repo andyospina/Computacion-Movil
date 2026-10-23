@@ -31,7 +31,8 @@ data class FirestoreUserDto(
         profileImage = profileImage,
         username = username,
         bio = bio,
-        country = country
+        country = country,
+        id = id
     )
 }
 

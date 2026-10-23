@@ -1,10 +1,12 @@
 package com.example.myapplication.ui.screens.Home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.data.Product
 import com.example.myapplication.data.Result
 import com.example.myapplication.data.repository.AuthRepository
+import com.example.myapplication.data.repository.NotificationRepository
 import com.example.myapplication.data.repository.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +20,8 @@ private const val CATEGORIA_TODO = "Todo"
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val productRepository: ProductRepository
+    private val productRepository: ProductRepository,
+    private val notificationRepository: NotificationRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeState())
@@ -28,6 +31,17 @@ class HomeViewModel @Inject constructor(
 
     init {
         getProfileImage()
+        registrarDispositivo()
+    }
+
+    // Guarda el token FCM de este dispositivo en el usuario (tras iniciar sesión, registrarse o abrir
+    // la app con sesión). Si falla no se interrumpe nada: solo no llegarían notificaciones push.
+    private fun registrarDispositivo() {
+        viewModelScope.launch {
+            if (notificationRepository.registerDevice() is Result.Failure) {
+                Log.w("FCM", "No se pudo registrar el token del dispositivo")
+            }
+        }
     }
 
     fun updateCategoria(categoria: String) {

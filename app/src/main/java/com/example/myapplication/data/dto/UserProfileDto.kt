@@ -38,6 +38,7 @@ data class UserProfileDto(
         averageRating = 0.0,
         profileImage = profileImage,
         username = username,
-        bio = bio.orEmpty()
+        bio = bio.orEmpty(),
+        id = id.toString()
     )
 }
