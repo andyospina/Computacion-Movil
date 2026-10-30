@@ -50,6 +50,7 @@ fun ProfileScreen(
     onEditResena: (productId: String, reviewId: String) -> Unit,
     onFollowersClick: (userId: String) -> Unit,
     onFollowingClick: (userId: String) -> Unit,
+    onSavedClick: () -> Unit,
     onLoggedOut: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -88,7 +89,8 @@ fun ProfileScreen(
         onEditResena = onEditResena,
         onDeleteResena = viewModel::deleteResena,
         onFollowersClick = { onFollowersClick(uiState.userId) },
-        onFollowingClick = { onFollowingClick(uiState.userId) }
+        onFollowingClick = { onFollowingClick(uiState.userId) },
+        onSavedClick = onSavedClick
     )
 }
 
@@ -107,7 +109,8 @@ fun ProfileContent(
     onEditResena: (productId: String, reviewId: String) -> Unit,
     onDeleteResena: (reviewId: String) -> Unit,
     onFollowersClick: () -> Unit,
-    onFollowingClick: () -> Unit
+    onFollowingClick: () -> Unit,
+    onSavedClick: () -> Unit = {}
 ) {
     var mostrarEdicion by remember { mutableStateOf(false) }
 
@@ -178,6 +181,17 @@ fun ProfileContent(
                 .padding(horizontal = 20.dp)
         ) {
             Text(text = stringResource(R.string.profile_edit_button))
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedButton(
+            onClick = onSavedClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+        ) {
+            Text(text = stringResource(R.string.profile_saved_button))
         }
 
         Spacer(modifier = Modifier.height(8.dp))

@@ -1,0 +1,12 @@
+rules_version = '2';
+
+// SOLO para el emulador (firebase.emulator.json). Abre todo para que las pruebas de integración y el
+// seeder puedan preparar datos sin sesión. Las reglas reales siguen en firestore.rules y se prueban
+// aparte en tools/emulator-tests. NUNCA desplegar este archivo.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}

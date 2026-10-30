@@ -105,8 +105,12 @@ class ReviewsListViewModel @Inject constructor(
         val filtradas = state.todasLasResenas
             .let { lista -> if (state.conFotos) lista.filter { it.hasPhoto } else lista }
             .let { lista ->
-                if (state.orden == OrdenResenas.MEJOR_VALORADAS) lista.sortedByDescending { it.rating }
-                else lista
+                when (state.orden) {
+                    OrdenResenas.MEJOR_VALORADAS -> lista.sortedByDescending { it.rating }
+                    // sortedByDescending es estable: a igualdad de likes queda primero la más reciente
+                    OrdenResenas.MAS_LIKES -> lista.sortedByDescending { it.likesCount }
+                    OrdenResenas.RECIENTES -> lista
+                }
             }
 
         _uiState.update {

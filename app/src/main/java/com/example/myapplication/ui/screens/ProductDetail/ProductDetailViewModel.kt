@@ -6,6 +6,7 @@ import com.example.myapplication.data.Result
 import com.example.myapplication.data.Review
 import com.example.myapplication.data.repository.ProductRepository
 import com.example.myapplication.data.repository.ReviewRepository
+import com.example.myapplication.data.repository.SavedRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,18 +20,21 @@ private const val FEATURED_REVIEWS = 2
 @HiltViewModel
 class ProductDetailViewModel @Inject constructor(
     private val productRepository: ProductRepository,
-    private val reviewRepository: ReviewRepository
+    private val reviewRepository: ReviewRepository,
+    private val savedRepository: SavedRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProductDetailState())
     val uiState = _uiState.asStateFlow()
 
     private var resenasJob: Job? = null
+    private var guardadoJob: Job? = null
 
     // Se llama al entrar y al volver (p. ej. tras escribir una reseña): refresca sin parpadeo.
     fun getProducto(productId: String) {
         cargar(productId)
         observarResenas(productId)
+        observarGuardado(productId)
     }
 
     fun reintentar() = getProducto(_uiState.value.productId)
@@ -39,6 +43,16 @@ class ProductDetailViewModel @Inject constructor(
         viewModelScope.launch {
             // No hace falta actualizar la lista: el listener de reseñas emite el cambio
             val result = reviewRepository.toggleLike(resena)
+            if (result is Result.Failure) _uiState.update { it.copy(actionErrorRes = result.messageRes) }
+        }
+    }
+
+    /** El botón cambia cuando el listener confirma el guardado, así nunca miente sobre el estado real. */
+    fun toggleGuardado() {
+        val state = _uiState.value
+        if (state.productId.isBlank()) return
+        viewModelScope.launch {
+            val result = savedRepository.setSaved(state.productId, saved = !state.guardado)
             if (result is Result.Failure) _uiState.update { it.copy(actionErrorRes = result.messageRes) }
         }
     }
@@ -74,6 +88,15 @@ class ProductDetailViewModel @Inject constructor(
                     }
                     is Result.Failure -> _uiState.update { it.copy(actionErrorRes = result.messageRes) }
                 }
+            }
+        }
+    }
+
+    private fun observarGuardado(productId: String) {
+        if (guardadoJob?.isActive == true) return
+        guardadoJob = viewModelScope.launch {
+            savedRepository.observeIsSaved(productId).collect { result ->
+                if (result is Result.Success) _uiState.update { it.copy(guardado = result.data) }
             }
         }
     }

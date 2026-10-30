@@ -58,7 +58,8 @@ fun ProductDetailScreen(
         onEscribirResenaClick = { onEscribirResenaClick(productId) },
         onVerTodasResenasClick = { onVerTodasResenasClick(productId) },
         onUserClick = onUserClick,
-        onLikeClick = viewModel::toggleLike
+        onLikeClick = viewModel::toggleLike,
+        onGuardarClick = viewModel::toggleGuardado
     )
 }
 
@@ -71,7 +72,8 @@ fun ProductDetailContent(
     onEscribirResenaClick: () -> Unit,
     onVerTodasResenasClick: () -> Unit,
     onUserClick: (String) -> Unit,
-    onLikeClick: (Review) -> Unit
+    onLikeClick: (Review) -> Unit,
+    onGuardarClick: () -> Unit = {}
 ) {
     Column(
         modifier = modifier.fillMaxSize()
@@ -113,7 +115,8 @@ fun ProductDetailContent(
                         BotonesAccionProducto(
                             modifier = Modifier.fillMaxWidth(),
                             onEscribirResenaClick = onEscribirResenaClick,
-                            onGuardarClick = {}
+                            onGuardarClick = onGuardarClick,
+                            guardado = uiState.guardado
                         )
 
                         Spacer(modifier = Modifier.height(24.dp))

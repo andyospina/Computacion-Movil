@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
 import com.example.myapplication.ui.theme.BorderColor
 
-enum class OrdenResenas { RECIENTES, MEJOR_VALORADAS }
+enum class OrdenResenas { RECIENTES, MEJOR_VALORADAS, MAS_LIKES }
 
 @Composable
 fun FiltrosResenas(
@@ -46,6 +46,11 @@ fun FiltrosResenas(
                 texto = stringResource(R.string.reviews_filter_best_rated),
                 seleccionado = orden == OrdenResenas.MEJOR_VALORADAS,
                 onClick = { onOrdenChange(OrdenResenas.MEJOR_VALORADAS) }
+            )
+            FiltroTab(
+                texto = stringResource(R.string.reviews_filter_most_liked),
+                seleccionado = orden == OrdenResenas.MAS_LIKES,
+                onClick = { onOrdenChange(OrdenResenas.MAS_LIKES) }
             )
         }
 

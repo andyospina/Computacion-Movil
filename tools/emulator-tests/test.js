@@ -110,6 +110,25 @@ async function waitFor(name, fn, timeoutMs = 20000) {
     userId: 'bob', productId: 'p1', rating: 5, title: 't', body: 'b', recommended: true, likedBy: [],
   })));
 
+  console.log('\nReglas: saved');
+  await check('alice guarda un producto', () => assertSucceeds(setDoc(doc(alice, 'saved/alice_p1'), {
+    userId: 'alice', productId: 'p1', createdAt: serverTimestamp(),
+  })));
+  await check('alice no guarda a nombre de bob', () => assertFails(setDoc(doc(alice, 'saved/bob_p1'), {
+    userId: 'bob', productId: 'p1', createdAt: serverTimestamp(),
+  })));
+  await check('no se guarda un producto inexistente', () => assertFails(setDoc(doc(alice, 'saved/alice_nope'), {
+    userId: 'alice', productId: 'nope', createdAt: serverTimestamp(),
+  })));
+  await check('el id debe ser uid_producto', () => assertFails(setDoc(doc(alice, 'saved/cualquiera'), {
+    userId: 'alice', productId: 'p1', createdAt: serverTimestamp(),
+  })));
+  await check('bob no lee los guardados de alice', () => assertFails(getDoc(doc(bob, 'saved/alice_p1'))));
+  await check('bob no consulta los guardados de alice', () => assertFails(getDocs(query(collection(bob, 'saved'), where('userId', '==', 'alice')))));
+  await check('alice consulta los suyos', () => assertSucceeds(getDocs(query(collection(alice, 'saved'), where('userId', '==', 'alice')))));
+  await check('bob no quita el guardado de alice', () => assertFails(deleteDoc(doc(bob, 'saved/alice_p1'))));
+  await check('alice quita su guardado', () => assertSucceeds(deleteDoc(doc(alice, 'saved/alice_p1'))));
+
   console.log('\nReglas: follows');
   await check('alice sigue a bob', () => assertSucceeds(setDoc(doc(alice, 'follows/alice_bob'), {
     followerId: 'alice', followedId: 'bob', createdAt: serverTimestamp(),

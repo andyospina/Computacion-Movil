@@ -4,11 +4,13 @@ import com.example.myapplication.data.datasource.FollowRemoteDataSource
 import com.example.myapplication.data.datasource.NotificationRemoteDataSource
 import com.example.myapplication.data.datasource.ProductRemoteDataSource
 import com.example.myapplication.data.datasource.ReviewRemoteDataSource
+import com.example.myapplication.data.datasource.SavedRemoteDataSource
 import com.example.myapplication.data.datasource.UserRemoteDataSource
 import com.example.myapplication.data.datasource.impl.FollowFirestoreDataSource
 import com.example.myapplication.data.datasource.impl.NotificationFirestoreDataSource
 import com.example.myapplication.data.datasource.impl.ProductFirestoreDataSource
 import com.example.myapplication.data.datasource.impl.ReviewFirestoreDataSource
+import com.example.myapplication.data.datasource.impl.SavedFirestoreDataSource
 import com.example.myapplication.data.datasource.impl.UserFirestoreDataSource
 import com.example.myapplication.data.identity.CurrentUserIdProvider
 import com.example.myapplication.data.identity.FirebaseCurrentUserIdProvider
@@ -47,6 +49,11 @@ abstract class RemoteDataSourceModule {
     @Binds
     @Singleton
     abstract fun bindNotificationDataSource(impl: NotificationFirestoreDataSource): NotificationRemoteDataSource
+
+    // Solo Firestore: el backend Express no tiene productos guardados
+    @Binds
+    @Singleton
+    abstract fun bindSavedDataSource(impl: SavedFirestoreDataSource): SavedRemoteDataSource
 
     // Con Retrofit usar RetrofitCurrentUserIdProvider
     @Binds

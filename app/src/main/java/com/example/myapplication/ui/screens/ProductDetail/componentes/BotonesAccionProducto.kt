@@ -22,7 +22,8 @@ import com.example.myapplication.ui.theme.Ink
 fun BotonesAccionProducto(
     modifier: Modifier = Modifier,
     onEscribirResenaClick: () -> Unit,
-    onGuardarClick: () -> Unit
+    onGuardarClick: () -> Unit,
+    guardado: Boolean = false
 ) {
     Row(
         modifier = modifier,
@@ -46,7 +47,10 @@ fun BotonesAccionProducto(
                 .height(48.dp),
             shape = RoundedCornerShape(6.dp)
         ) {
-            Text(text = stringResource(R.string.action_save), fontWeight = FontWeight.Bold)
+            Text(
+                text = stringResource(if (guardado) R.string.action_saved else R.string.action_save),
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }

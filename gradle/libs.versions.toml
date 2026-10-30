@@ -21,6 +21,9 @@ coroutinesPlayServices = "1.11.0"
 coil = "3.3.0"
 retrofit = "3.0.0"
 kotlinxSerializationJson = "1.9.0"
+javafaker = "1.0.2"
+snakeyaml = "1.33"
+testRunner = "1.7.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -64,6 +67,9 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 retrofit-converter-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "retrofit" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
+javafaker = { module = "com.github.javafaker:javafaker", version.ref = "javafaker" }
+snakeyaml-android = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
+androidx-test-runner = { module = "androidx.test:runner", version.ref = "testRunner" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

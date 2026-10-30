@@ -13,6 +13,11 @@
     <!-- Comunes -->
     <string name="action_cancel">Cancelar</string>
     <string name="action_save">Guardar</string>
+    <string name="action_saved">Guardado</string>
+    <string name="saved_title">Productos guardados</string>
+    <string name="saved_empty">Aún no guardaste productos. Toca «Guardar» en la ficha de un producto para verlo aquí.</string>
+    <string name="saved_remove">Quitar</string>
+    <string name="profile_saved_button">Productos guardados</string>
     <string name="content_description_menu">Menú</string>
     <string name="content_description_back">Volver</string>
     <string name="content_description_close">Cerrar</string>
@@ -107,6 +112,7 @@
     <string name="reviews_recommended_label">" · Recomendado"</string>
     <string name="reviews_filter_recent">Recientes</string>
     <string name="reviews_filter_best_rated">Mejor valoradas</string>
+    <string name="reviews_filter_most_liked">Más gustadas</string>
     <string name="reviews_filter_with_photos">Con fotos</string>
 
     <!-- Product detail / list -->

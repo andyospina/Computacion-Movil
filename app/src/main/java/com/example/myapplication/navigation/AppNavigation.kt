@@ -25,6 +25,7 @@ import com.example.myapplication.ui.screens.Profile.ProfileScreen
 import com.example.myapplication.ui.screens.Register.RegisterScreen
 import com.example.myapplication.ui.screens.ReviewPublished.ReviewPublishedScreen
 import com.example.myapplication.ui.screens.Reviews.ReviewsListScreen
+import com.example.myapplication.ui.screens.Saved.SavedProductsScreen
 import com.example.myapplication.ui.screens.Search.SearchScreen
 import com.example.myapplication.ui.screens.Splash.SplashScreen
 import com.example.myapplication.ui.screens.UserProfile.UserProfileScreen
@@ -147,10 +148,20 @@ fun AppNavigation(
                     onFollowingClick = { userId ->
                         navController.navigate(Routes.FollowList.createRoute(userId, FollowTab.SIGUIENDO.routeValue))
                     },
+                    onSavedClick = { navController.navigate(Routes.Saved.route) },
                     onLoggedOut = {
                         navController.navigate(Routes.Login.route) {
                             popUpTo(0) { inclusive = true }
                         }
+                    }
+                )
+            }
+
+            composable(Routes.Saved.route) {
+                SavedProductsScreen(
+                    onBackClick = { navController.popBackStack() },
+                    onProductoClick = { productId ->
+                        navController.navigate(Routes.ProductDetail.createRoute(productId))
                     }
                 )
             }

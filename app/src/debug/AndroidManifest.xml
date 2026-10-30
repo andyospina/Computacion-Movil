@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Android 17+: con targetSdk 37 hablar con una IP de red local (10.0.2.2 = el computador, donde
+         corre el emulador de Firebase) exige este permiso. Solo debug; en release no se pide. -->
+    <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />
+
+    <application>
+        <!-- Herramienta de desarrollo: solo existe en debug, con su propio ícono en el launcher -->
+        <activity
+            android:name=".debugtools.SeedActivity"
+            android:exported="true"
+            android:label="Seed (debug)"
+            android:theme="@style/Theme.MyApplication">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

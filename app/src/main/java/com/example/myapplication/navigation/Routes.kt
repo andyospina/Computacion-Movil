@@ -11,6 +11,7 @@ sealed class Routes(val route: String) {
     object Profile : Routes("profile")
     object Notifications : Routes("notifications")
     object Feed : Routes("feed")
+    object Saved : Routes("saved")
 
     // tab = "followers" o "following": la pestaña que se abre primero
     object FollowList : Routes("follow_list/{userId}?tab={tab}") {

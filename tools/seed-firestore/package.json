@@ -3,6 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "description": "Datos de prueba para ReviewLab en Firestore",
-  "scripts": { "seed": "node seed.js" },
-  "dependencies": { "firebase-admin": "^13.0.0" }
+  "scripts": { "seed": "node seed.js", "seed:faker": "node seed-faker.js" },
+  "dependencies": { "@faker-js/faker": "^9.9.0", "firebase-admin": "^13.0.0" }
 }

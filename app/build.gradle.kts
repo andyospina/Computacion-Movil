@@ -27,7 +27,14 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Debug usa Firebase Emulator Suite por defecto. Para probar Firebase real en debug:
+            // ./gradlew installDebug -PuseEmulator=false
+            val useEmulator = providers.gradleProperty("useEmulator").getOrElse("true")
+            buildConfigField("boolean", "USE_FIREBASE_EMULATOR", useEmulator)
+        }
         release {
+            buildConfigField("boolean", "USE_FIREBASE_EMULATOR", "false")
             optimization {
                 enable = false
             }
@@ -39,6 +46,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -82,6 +90,14 @@ dependencies {
     //Coil
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+
+    // Datos ficticios (solo debug: el seeder y sus pruebas no viajan en release)
+    debugImplementation(libs.javafaker) { exclude(group = "org.yaml", module = "snakeyaml") }
+    // JavaFaker necesita la variante Android de SnakeYAML
+    debugImplementation("${libs.snakeyaml.android.get()}:android")
+
+    // Pruebas de integración contra Firebase Emulator Suite
+    androidTestImplementation(libs.androidx.test.runner)
 
     //Retrofit
     implementation(libs.retrofit)
