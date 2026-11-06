@@ -9,6 +9,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -23,7 +24,8 @@ fun CampoRegistro(
     @StringRes etiqueta: Int,
     valor: String,
     onValorChange: (String) -> Unit,
-    singleLine: Boolean = true
+    singleLine: Boolean = true,
+    tag: String = ""
 ) {
     Column(modifier = modifier) {
         Text(text = stringResource(etiqueta), fontWeight = FontWeight.Medium)
@@ -31,7 +33,7 @@ fun CampoRegistro(
         OutlinedTextField(
             value = valor,
             onValueChange = onValorChange,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().then(if (tag.isNotEmpty()) Modifier.testTag(tag) else Modifier),
             singleLine = singleLine,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
         )

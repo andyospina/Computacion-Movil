@@ -4,6 +4,7 @@ import com.example.myapplication.data.dto.NewReviewDto
 import com.example.myapplication.data.dto.ReviewData
 import com.example.myapplication.data.dto.UpdateReviewDto
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 /** Las listas se devuelven de la más reciente a la más antigua. */
 interface ReviewRemoteDataSource {
@@ -19,6 +20,10 @@ interface ReviewRemoteDataSource {
 
     /** Reseñas escritas por cualquiera de [userIds] (feed de usuarios seguidos, perfil de otro usuario). */
     fun observeReviewsByUsers(userIds: List<String>): Flow<List<ReviewData>>
+
+    /** Reseñas a las que [userId] les dio like (pantalla «Me gustaron»), en tiempo real. */
+    fun observeReviewsLikedBy(userId: String): Flow<List<ReviewData>> =
+        flow { throw UnsupportedOperationException("Este backend no tiene likes") }
 
     suspend fun likeReview(reviewId: String, userId: String)
     suspend fun unlikeReview(reviewId: String, userId: String)

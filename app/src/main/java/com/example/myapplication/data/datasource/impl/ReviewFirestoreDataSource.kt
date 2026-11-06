@@ -74,6 +74,11 @@ class ReviewFirestoreDataSource @Inject constructor(
         return combine(flows) { parts -> parts.flatMap { it }.newestFirst() }
     }
 
+    // whereArrayContains sobre likedBy: no necesita índice compuesto y se ordena en el cliente.
+    override fun observeReviewsLikedBy(userId: String): Flow<List<ReviewData>> =
+        reviews.whereArrayContains("likedBy", userId).observe()
+            .map { it.toObjects(FirestoreReviewDto::class.java).newestFirst() }
+
     // arrayUnion / arrayRemove son atómicos: dos likes simultáneos no se pisan.
     override suspend fun likeReview(reviewId: String, userId: String) {
         reviews.document(reviewId).update("likedBy", FieldValue.arrayUnion(userId)).await()

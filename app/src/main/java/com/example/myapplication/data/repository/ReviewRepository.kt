@@ -1,5 +1,6 @@
 package com.example.myapplication.data.repository
 
+import com.example.myapplication.R
 import com.example.myapplication.data.Result
 import com.example.myapplication.data.Review
 import com.example.myapplication.data.datasource.ProductRemoteDataSource
@@ -8,6 +9,7 @@ import com.example.myapplication.data.dto.NewReviewDto
 import com.example.myapplication.data.dto.UpdateReviewDto
 import com.example.myapplication.data.identity.CurrentUserIdProvider
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -42,6 +44,15 @@ class ReviewRepository @Inject constructor(
         remoteDataSource.observeReviewsByUsers(userIds)
             .map { list -> list.map { it.toReview(currentUserId.currentUserId()) } }
             .asResult()
+
+    /** Reseñas que le gustaron al usuario de la sesión; al quitar un like la reseña sale de la lista. */
+    fun observeMyLikedReviews(): Flow<Result<List<Review>>> {
+        val uid = currentUserId.currentUserId()
+            ?: return flowOf(Result.Failure(NotAuthenticatedException(), R.string.error_session_required))
+        return remoteDataSource.observeReviewsLikedBy(uid)
+            .map { list -> list.map { it.toReview(uid) } }
+            .asResult()
+    }
 
     /** Da like si el usuario actual aún no lo había dado, o lo quita si ya lo había dado. */
     suspend fun toggleLike(review: Review): Result<Unit> = runCatchingApi {

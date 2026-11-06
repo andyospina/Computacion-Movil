@@ -20,6 +20,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -89,6 +90,7 @@ fun RegisterContent(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .testTag("registerScreen")
             .verticalScroll(rememberScrollState())
     ) {
 
@@ -130,7 +132,8 @@ fun RegisterContent(
                 modifier = Modifier.fillMaxWidth(),
                 etiqueta = R.string.label_name,
                 valor = uiState.name,
-                onValorChange = onNombreChange
+                onValorChange = onNombreChange,
+                tag = "txtNombre"
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -139,7 +142,8 @@ fun RegisterContent(
                 modifier = Modifier.fillMaxWidth(),
                 etiqueta = R.string.label_username,
                 valor = uiState.username,
-                onValorChange = onUsuarioChange
+                onValorChange = onUsuarioChange,
+                tag = "txtUsuario"
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -174,7 +178,8 @@ fun RegisterContent(
                 modifier = Modifier.fillMaxWidth(),
                 etiqueta = R.string.label_country_optional,
                 valor = uiState.country,
-                onValorChange = onPaisChange
+                onValorChange = onPaisChange,
+                tag = "txtPais"
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -184,7 +189,8 @@ fun RegisterContent(
                 etiqueta = R.string.label_bio_optional,
                 valor = uiState.bio,
                 onValorChange = onBioChange,
-                singleLine = false
+                singleLine = false,
+                tag = "txtBio"
             )
 
             if (uiState.showError) {
@@ -192,7 +198,8 @@ fun RegisterContent(
                 Text(
                     text = stringResource(uiState.errorMessageRes),
                     color = MaterialTheme.colorScheme.error,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.testTag("errorMessage")
                 )
             }
 

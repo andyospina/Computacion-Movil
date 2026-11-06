@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -25,7 +26,8 @@ fun CampoContrasena(
     contrasena: String,
     visible: Boolean,
     onContrasenaChange: (String) -> Unit,
-    onVisibleChange: (Boolean) -> Unit
+    onVisibleChange: (Boolean) -> Unit,
+    tag: String = "txtPassword"
 ) {
     Column(modifier = modifier) {
         Text(text = stringResource(R.string.label_password), fontWeight = FontWeight.Medium)
@@ -33,7 +35,7 @@ fun CampoContrasena(
         OutlinedTextField(
             value = contrasena,
             onValueChange = onContrasenaChange,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().testTag(tag),
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),

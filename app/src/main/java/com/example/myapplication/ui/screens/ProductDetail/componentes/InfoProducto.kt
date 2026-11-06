@@ -6,6 +6,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,7 +26,8 @@ fun InfoProducto(
         Text(
             text = producto.name,
             fontSize = 24.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.testTag("productName")
         )
 
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -38,7 +40,8 @@ fun InfoProducto(
                     producto.recommendPercent
                 ),
                 color = GraySecondary,
-                fontSize = 13.sp
+                fontSize = 13.sp,
+                modifier = Modifier.testTag("productSummary")
             )
         }
     }

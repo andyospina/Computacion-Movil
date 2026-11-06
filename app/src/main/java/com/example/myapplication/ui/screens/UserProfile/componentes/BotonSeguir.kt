@@ -6,6 +6,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -23,14 +24,14 @@ fun BotonSeguir(
     modifier: Modifier = Modifier
 ) {
     if (siguiendo) {
-        OutlinedButton(onClick = onClick, enabled = enabled, modifier = modifier) {
+        OutlinedButton(onClick = onClick, enabled = enabled, modifier = modifier.testTag("btnFollow")) {
             Text(text = stringResource(R.string.action_unfollow), color = Color.White)
         }
     } else {
         Button(
             onClick = onClick,
             enabled = enabled,
-            modifier = modifier,
+            modifier = modifier.testTag("btnFollow"),
             colors = ButtonDefaults.buttonColors(containerColor = ElectricLime, contentColor = Ink)
         ) {
             Text(text = stringResource(R.string.action_follow), fontWeight = FontWeight.Bold)

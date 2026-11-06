@@ -24,6 +24,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,6 +52,7 @@ fun ProfileScreen(
     onFollowersClick: (userId: String) -> Unit,
     onFollowingClick: (userId: String) -> Unit,
     onSavedClick: () -> Unit,
+    onLikedReviewsClick: () -> Unit,
     onLoggedOut: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -90,7 +92,8 @@ fun ProfileScreen(
         onDeleteResena = viewModel::deleteResena,
         onFollowersClick = { onFollowersClick(uiState.userId) },
         onFollowingClick = { onFollowingClick(uiState.userId) },
-        onSavedClick = onSavedClick
+        onSavedClick = onSavedClick,
+        onLikedReviewsClick = onLikedReviewsClick
     )
 }
 
@@ -110,7 +113,8 @@ fun ProfileContent(
     onDeleteResena: (reviewId: String) -> Unit,
     onFollowersClick: () -> Unit,
     onFollowingClick: () -> Unit,
-    onSavedClick: () -> Unit = {}
+    onSavedClick: () -> Unit = {},
+    onLikedReviewsClick: () -> Unit = {}
 ) {
     var mostrarEdicion by remember { mutableStateOf(false) }
 
@@ -192,6 +196,18 @@ fun ProfileContent(
                 .padding(horizontal = 20.dp)
         ) {
             Text(text = stringResource(R.string.profile_saved_button))
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedButton(
+            onClick = onLikedReviewsClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+                .testTag("btnLikedReviews")
+        ) {
+            Text(text = stringResource(R.string.profile_liked_reviews_button))
         }
 
         Spacer(modifier = Modifier.height(8.dp))

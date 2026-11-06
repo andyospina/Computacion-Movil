@@ -48,6 +48,12 @@ android {
         compose = true
         buildConfig = true
     }
+    testOptions {
+        unitTests {
+            // runCatchingApi escribe en android.util.Log: en pruebas JVM debe devolver valores por defecto
+            isReturnDefaultValues = true
+        }
+    }
 }
 
 dependencies {
@@ -66,6 +72,9 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.compose.material.icons.extended)
     testImplementation(libs.junit)
+    // Pruebas unitarias con mocks (Repository y ViewModel)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -98,6 +107,7 @@ dependencies {
 
     // Pruebas de integración contra Firebase Emulator Suite
     androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
 
     //Retrofit
     implementation(libs.retrofit)

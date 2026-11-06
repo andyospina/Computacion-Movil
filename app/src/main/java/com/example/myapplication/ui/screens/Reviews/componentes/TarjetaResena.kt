@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,6 +47,7 @@ fun TarjetaResena(
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .testTag("reviewCard")
             .border(width = 1.dp, color = BorderColor, shape = RoundedCornerShape(8.dp))
             .padding(16.dp)
     ) {
@@ -65,7 +67,8 @@ fun TarjetaResena(
             Text(
                 text = resena.author,
                 fontWeight = FontWeight.Bold,
-                modifier = if (onAuthorClick != null) Modifier.clickable { onAuthorClick() } else Modifier
+                modifier = (if (onAuthorClick != null) Modifier.clickable { onAuthorClick() } else Modifier)
+                    .testTag("reviewAuthor")
             )
 
             if (resena.verifiedBuyer) {
@@ -86,7 +89,7 @@ fun TarjetaResena(
 
         Spacer(modifier = Modifier.height(6.dp))
 
-        Text(text = resena.title, fontWeight = FontWeight.Bold)
+        Text(text = resena.title, fontWeight = FontWeight.Bold, modifier = Modifier.testTag("reviewTitle"))
 
         Spacer(modifier = Modifier.height(4.dp))
 

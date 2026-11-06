@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -66,7 +67,7 @@ fun BarraSuperior(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.content_description_back),
                     tint = Ink,
-                    modifier = Modifier.clickable { onNavigationClick() }
+                    modifier = Modifier.clickable { onNavigationClick() }.testTag("btnBack")
                 )
                 Spacer(modifier = Modifier.width(12.dp))
             }

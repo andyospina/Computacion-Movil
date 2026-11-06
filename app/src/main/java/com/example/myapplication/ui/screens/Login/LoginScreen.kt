@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -75,7 +76,7 @@ fun LoginContent(
     onRegistrateClick: () -> Unit
 ) {
     Column(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize().testTag("loginScreen")
     ) {
 
         Column(
@@ -133,7 +134,8 @@ fun LoginContent(
                 Text(
                     text = stringResource(uiState.errorMessageRes),
                     color = MaterialTheme.colorScheme.error,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.testTag("errorMessage")
                 )
             }
 
@@ -184,7 +186,7 @@ fun LoginContent(
                     text = stringResource(R.string.login_register_link),
                     color = DeepLime,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.clickable { onRegistrateClick() }
+                    modifier = Modifier.clickable { onRegistrateClick() }.testTag("linkRegister")
                 )
             }
         }

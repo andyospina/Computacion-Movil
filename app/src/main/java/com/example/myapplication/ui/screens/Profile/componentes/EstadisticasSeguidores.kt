@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -32,21 +33,24 @@ fun EstadisticasSeguidores(
         Contador(
             valor = followersCount,
             etiqueta = stringResource(R.string.profile_followers),
-            onClick = onFollowersClick
+            onClick = onFollowersClick,
+            tag = "perfilSeguidores"
         )
         Contador(
             valor = followingCount,
             etiqueta = stringResource(R.string.profile_following),
-            onClick = onFollowingClick
+            onClick = onFollowingClick,
+            tag = "perfilSiguiendo"
         )
     }
 }
 
 @Composable
-private fun Contador(valor: Int, etiqueta: String, onClick: () -> Unit) {
+private fun Contador(valor: Int, etiqueta: String, onClick: () -> Unit, tag: String) {
     Row(
         modifier = Modifier
             .clickable(onClick = onClick)
+            .testTag(tag)
             .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

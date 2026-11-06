@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,7 +46,7 @@ fun ResenasDestacadas(
                 text = stringResource(R.string.product_view_all_reviews),
                 color = DeepLime,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.clickable { onVerTodasClick() }
+                modifier = Modifier.clickable { onVerTodasClick() }.testTag("linkVerTodas")
             )
         }
 
@@ -55,6 +56,7 @@ fun ResenasDestacadas(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .testTag("reviewCard")
                     .border(width = 1.dp, color = BorderColor, shape = RoundedCornerShape(8.dp))
                     .padding(16.dp)
             ) {
@@ -62,14 +64,14 @@ fun ResenasDestacadas(
                     Text(
                         text = resena.author,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.clickable { onAuthorClick(resena.userId) }
+                        modifier = Modifier.clickable { onAuthorClick(resena.userId) }.testTag("reviewAuthor")
                     )
                     StarRatingDisplay(rating = resena.rating, fontSize = 14.sp)
                 }
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                Text(text = resena.body, color = GraySecondary, fontSize = 13.sp)
+                Text(text = resena.body, color = GraySecondary, fontSize = 13.sp, modifier = Modifier.testTag("reviewBody"))
 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     BotonLike(

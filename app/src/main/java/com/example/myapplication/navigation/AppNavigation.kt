@@ -17,6 +17,7 @@ import com.example.myapplication.ui.screens.Feed.FeedScreen
 import com.example.myapplication.ui.screens.FollowList.FollowListScreen
 import com.example.myapplication.ui.screens.FollowList.FollowTab
 import com.example.myapplication.ui.screens.Home.HomeScreen
+import com.example.myapplication.ui.screens.LikedReviews.LikedReviewsScreen
 import com.example.myapplication.ui.screens.Login.LoginScreen
 import com.example.myapplication.ui.screens.NewReview.NewReviewScreen
 import com.example.myapplication.ui.screens.Notifications.NotificationsScreen
@@ -149,6 +150,7 @@ fun AppNavigation(
                         navController.navigate(Routes.FollowList.createRoute(userId, FollowTab.SIGUIENDO.routeValue))
                     },
                     onSavedClick = { navController.navigate(Routes.Saved.route) },
+                    onLikedReviewsClick = { navController.navigate(Routes.LikedReviews.route) },
                     onLoggedOut = {
                         navController.navigate(Routes.Login.route) {
                             popUpTo(0) { inclusive = true }
@@ -160,6 +162,18 @@ fun AppNavigation(
             composable(Routes.Saved.route) {
                 SavedProductsScreen(
                     onBackClick = { navController.popBackStack() },
+                    onProductoClick = { productId ->
+                        navController.navigate(Routes.ProductDetail.createRoute(productId))
+                    }
+                )
+            }
+
+            composable(Routes.LikedReviews.route) {
+                LikedReviewsScreen(
+                    onBackClick = { navController.popBackStack() },
+                    onUserClick = { userId ->
+                        navController.navigate(Routes.UserProfile.createRoute(userId))
+                    },
                     onProductoClick = { productId ->
                         navController.navigate(Routes.ProductDetail.createRoute(productId))
                     }

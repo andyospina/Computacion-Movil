@@ -16,6 +16,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -73,7 +74,7 @@ fun UserProfileContent(
     onFollowingClick: () -> Unit,
     onLikeClick: (Review) -> Unit
 ) {
-    Column(modifier = modifier.fillMaxSize()) {
+    Column(modifier = modifier.fillMaxSize().testTag("userProfileScreen")) {
 
         BarraSuperior(
             title = uiState.user?.name ?: stringResource(R.string.app_name),

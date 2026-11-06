@@ -7,6 +7,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.myapplication.navigation.bottomNavItems
 import com.example.myapplication.navigation.Routes
@@ -24,6 +25,7 @@ fun AppBottomNavBar(
             val selected = currentRoute == item.route
 
             NavigationBarItem(
+                modifier = Modifier.testTag("nav_${item.route}"),
                 selected = selected,
                 onClick = { onItemClick(item.route) },
                 icon = {

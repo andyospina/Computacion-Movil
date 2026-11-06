@@ -4,6 +4,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.data.LocalProductProvider
@@ -23,7 +24,8 @@ fun ListaProductosTendencia(
         items(productos, key = { it.id }) { producto ->
             ProductListItem(
                 product = producto,
-                onClick = { onProductoClick(producto.id) }
+                onClick = { onProductoClick(producto.id) },
+                modifier = Modifier.testTag("productItem")
             )
         }
     }
