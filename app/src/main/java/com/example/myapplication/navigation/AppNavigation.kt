@@ -26,6 +26,7 @@ import com.example.myapplication.ui.screens.ProductDetail.ProductDetailScreen
 import com.example.myapplication.ui.screens.Profile.ProfileScreen
 import com.example.myapplication.ui.screens.Register.RegisterScreen
 import com.example.myapplication.ui.screens.ReviewPublished.ReviewPublishedScreen
+import com.example.myapplication.ui.screens.ReviewDetail.ReviewDetailScreen
 import com.example.myapplication.ui.screens.Reviews.ReviewsListScreen
 import com.example.myapplication.ui.screens.Saved.SavedProductsScreen
 import com.example.myapplication.ui.screens.Search.SearchScreen
@@ -126,8 +127,24 @@ fun AppNavigation(
                     onProductoClick = { productId ->
                         navController.navigate(Routes.ProductDetail.createRoute(productId))
                     },
-                    onUserClick = { userId ->
-                        navController.navigate(Routes.UserProfile.createRoute(userId))
+                    onDetalleClick = { reviewId ->
+                        navController.navigate(Routes.ReviewDetail.createRoute(reviewId))
+                    }
+                )
+            }
+
+            composable(
+                route = Routes.ReviewDetail.route,
+                arguments = listOf(navArgument(Routes.ReviewDetail.ARG_REVIEW_ID) { type = NavType.StringType })
+            ) { backStack ->
+                val reviewId = backStack.arguments?.getString(Routes.ReviewDetail.ARG_REVIEW_ID).orEmpty()
+
+                ReviewDetailScreen(
+                    reviewId = reviewId,
+                    onBackClick = { navController.popBackStack() },
+                    onUserClick = { userId -> navController.navigate(Routes.UserProfile.createRoute(userId)) },
+                    onProductoClick = { productId ->
+                        navController.navigate(Routes.ProductDetail.createRoute(productId))
                     }
                 )
             }

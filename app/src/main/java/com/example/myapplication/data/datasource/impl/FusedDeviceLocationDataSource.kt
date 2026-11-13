@@ -4,7 +4,9 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.location.LocationManager
 import androidx.core.content.ContextCompat
+import androidx.core.location.LocationManagerCompat
 import com.example.myapplication.data.GeoLocation
 import com.example.myapplication.data.datasource.DeviceLocationDataSource
 import com.google.android.gms.location.LocationServices
@@ -25,13 +27,18 @@ class FusedDeviceLocationDataSource @Inject constructor(
     @param:ApplicationContext private val context: Context
 ) : DeviceLocationDataSource {
 
-    private val hasPermission: Boolean
-        get() = listOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
+    override fun hasPermission(): Boolean =
+        listOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION)
             .any { ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED }
+
+    override fun isLocationEnabled(): Boolean {
+        val manager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return LocationManagerCompat.isLocationEnabled(manager)
+    }
 
     @SuppressLint("MissingPermission") // se comprueba en hasPermission
     override suspend fun getCurrentLocation(): GeoLocation? {
-        if (!hasPermission) return null
+        if (!hasPermission()) return null
         val client = LocationServices.getFusedLocationProviderClient(context)
         val token = CancellationTokenSource()
         return try {

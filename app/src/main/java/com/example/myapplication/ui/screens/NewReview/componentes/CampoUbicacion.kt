@@ -11,6 +11,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,7 +24,8 @@ import com.example.myapplication.ui.theme.GraySecondary
 
 /**
  * Opción (desactivada por defecto) para publicar la reseña con la ubicación aproximada del autor.
- * Es opt-in: la ubicación es un dato personal y solo se obtiene si el usuario lo activa y concede el permiso.
+ * Es opt-in: la ubicación es un dato personal y solo se obtiene si el usuario lo activa, concede el
+ * permiso y tiene el GPS encendido. Si falta alguna de las dos cosas, la opción no se activa.
  */
 @Composable
 fun CampoUbicacion(
@@ -31,6 +33,8 @@ fun CampoUbicacion(
     permisoDenegado: Boolean,
     onIncluirUbicacionChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    gpsDesactivado: Boolean = false,
+    onAbrirAjustes: () -> Unit = {},
     enabled: Boolean = true
 ) {
     Column(modifier = modifier) {
@@ -62,11 +66,22 @@ fun CampoUbicacion(
                 modifier = Modifier.padding(top = 4.dp)
             )
         }
+        if (gpsDesactivado) {
+            Text(
+                text = stringResource(R.string.error_location_disabled),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+            TextButton(onClick = onAbrirAjustes) {
+                Text(stringResource(R.string.new_review_open_location_settings))
+            }
+        }
     }
 }
 
 @Preview(showBackground = true, name = "CampoUbicacion - Preview")
 @Composable
 fun CampoUbicacionPreview() {
-    CampoUbicacion(incluirUbicacion = true, permisoDenegado = false, onIncluirUbicacionChange = {})
+    CampoUbicacion(incluirUbicacion = false, permisoDenegado = false, gpsDesactivado = true, onIncluirUbicacionChange = {})
 }

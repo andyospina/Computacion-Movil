@@ -15,6 +15,11 @@ sealed class Routes(val route: String) {
     object LikedReviews : Routes("liked_reviews")
     object ReviewsMap : Routes("reviews_map")
 
+    object ReviewDetail : Routes("review_detail/{reviewId}") {
+        const val ARG_REVIEW_ID = "reviewId"
+        fun createRoute(reviewId: String) = "review_detail/$reviewId"
+    }
+
     // tab = "followers" o "following": la pestaña que se abre primero
     object FollowList : Routes("follow_list/{userId}?tab={tab}") {
         const val ARG_USER_ID = "userId"

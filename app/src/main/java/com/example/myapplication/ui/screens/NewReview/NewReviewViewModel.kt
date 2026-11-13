@@ -3,6 +3,9 @@ package com.example.myapplication.ui.screens.NewReview
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.R
+import com.example.myapplication.data.GeoLocation
+import com.example.myapplication.data.LocationDisabledException
+import com.example.myapplication.data.LocationPermissionDeniedException
 import com.example.myapplication.data.Result
 import com.example.myapplication.data.identity.CurrentUserIdProvider
 import com.example.myapplication.data.repository.LocationRepository
@@ -102,11 +105,22 @@ class NewReviewViewModel @Inject constructor(
 
     /** La pantalla ya resolvió el permiso: solo se activa la opción si el usuario lo concedió. */
     fun onPermisoUbicacionResultado(concedido: Boolean) {
-        _uiState.update { it.copy(incluirUbicacion = concedido, permisoUbicacionDenegado = !concedido) }
+        // Compartir la ubicación exige permiso Y GPS encendido: si falta alguno, la opción no se activa.
+        val gpsEncendido = concedido && locationRepository.isLocationEnabled()
+        _uiState.update {
+            it.copy(
+                incluirUbicacion = concedido && gpsEncendido,
+                permisoUbicacionDenegado = !concedido,
+                gpsDesactivado = concedido && !gpsEncendido,
+                errorMessageRes = null
+            )
+        }
     }
 
     fun onIncluirUbicacionDesactivado() {
-        _uiState.update { it.copy(incluirUbicacion = false, permisoUbicacionDenegado = false) }
+        _uiState.update {
+            it.copy(incluirUbicacion = false, permisoUbicacionDenegado = false, gpsDesactivado = false, errorMessageRes = null)
+        }
     }
 
     fun publicarButtonPress() {
@@ -134,8 +148,27 @@ class NewReviewViewModel @Inject constructor(
             val result = if (state.reviewId != null) {
                 reviewRepository.updateReview(state.reviewId, state.puntuacion, state.titulo, state.resena)
             } else {
-                // La ubicación es opcional: si no se obtiene (GPS apagado, sin señal) la reseña se publica igual.
-                val location = if (state.incluirUbicacion) locationRepository.getCurrentLocation() else null
+                // Si el usuario eligió compartir la ubicación y no se puede obtener (permiso retirado, GPS apagado,
+                // sin señal) NO se publica: se le explica qué falta y conserva el formulario para reintentar.
+                var location: GeoLocation? = null
+                if (state.incluirUbicacion) {
+                    when (val located = locationRepository.getCurrentLocation()) {
+                        is Result.Success -> location = located.data
+                        is Result.Failure -> {
+                            _uiState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    errorMessageRes = located.messageRes,
+                                    gpsDesactivado = located.exception is LocationDisabledException,
+                                    incluirUbicacion = located.exception !is LocationPermissionDeniedException &&
+                                        located.exception !is LocationDisabledException,
+                                    permisoUbicacionDenegado = located.exception is LocationPermissionDeniedException
+                                )
+                            }
+                            return@launch
+                        }
+                    }
+                }
                 reviewRepository.createReview(
                     productId = state.productId,
                     userId = userId.orEmpty(),

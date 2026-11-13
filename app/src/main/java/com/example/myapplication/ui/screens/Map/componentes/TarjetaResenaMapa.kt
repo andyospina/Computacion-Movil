@@ -34,7 +34,7 @@ private const val MAX_BODY_LINES = 3
 fun TarjetaResenaMapa(
     review: Review,
     onProductClick: () -> Unit,
-    onUserClick: () -> Unit,
+    onDetailClick: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -69,11 +69,11 @@ fun TarjetaResenaMapa(
             )
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 4.dp)) {
-                Button(onClick = onProductClick, modifier = Modifier.weight(1f)) {
-                    Text(stringResource(R.string.map_view_product))
+                Button(onClick = onDetailClick, modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.map_view_detail))
                 }
-                OutlinedButton(onClick = onUserClick, modifier = Modifier.weight(1f)) {
-                    Text(stringResource(R.string.map_view_author))
+                OutlinedButton(onClick = onProductClick, modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.map_view_product))
                 }
             }
         }

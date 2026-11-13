@@ -25,6 +25,14 @@
     <string name="map_just_now">Justo ahora</string>
     <string name="map_view_product">Ver producto</string>
     <string name="map_view_author">Ver autor</string>
+    <string name="map_view_detail">Ver detalle</string>
+    <string name="map_zoom_in">Acercar</string>
+    <string name="map_zoom_out">Alejar</string>
+    <string name="review_detail_title">Reseña</string>
+    <string name="new_review_open_location_settings">Abrir ajustes de ubicación</string>
+    <string name="error_location_permission">Sin permiso de ubicación no se puede compartir dónde publicaste la reseña</string>
+    <string name="error_location_disabled">El GPS está apagado. Actívalo para compartir tu ubicación o desactiva la opción.</string>
+    <string name="error_location_unavailable">No pudimos obtener tu ubicación. Revisa tu señal e inténtalo de nuevo, o desactiva la opción para publicar sin ubicación.</string>
     <string name="content_description_map">Mapa de reseñas</string>
     <string name="new_review_include_location">Incluir mi ubicación aproximada</string>
     <string name="new_review_include_location_hint">Tu reseña aparecerá en el mapa durante 24 horas</string>

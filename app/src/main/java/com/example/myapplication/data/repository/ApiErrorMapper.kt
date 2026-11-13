@@ -3,6 +3,9 @@ package com.example.myapplication.data.repository
 import android.util.Log
 import androidx.annotation.StringRes
 import com.example.myapplication.R
+import com.example.myapplication.data.LocationDisabledException
+import com.example.myapplication.data.LocationPermissionDeniedException
+import com.example.myapplication.data.LocationUnavailableException
 import com.example.myapplication.data.NotFoundException
 import com.example.myapplication.data.Result
 import com.google.firebase.firestore.FirebaseFirestoreException
@@ -26,6 +29,9 @@ fun Throwable.toApiErrorMessageRes(): Int = when (this) {
     }
     is NotFoundException -> R.string.error_api_not_found
     is NotAuthenticatedException -> R.string.error_session_required
+    is LocationPermissionDeniedException, is SecurityException -> R.string.error_location_permission
+    is LocationDisabledException -> R.string.error_location_disabled
+    is LocationUnavailableException -> R.string.error_location_unavailable
     is UnsupportedOperationException -> R.string.error_not_supported_backend
     is FirebaseFirestoreException -> when (code) {
         FirebaseFirestoreException.Code.PERMISSION_DENIED,

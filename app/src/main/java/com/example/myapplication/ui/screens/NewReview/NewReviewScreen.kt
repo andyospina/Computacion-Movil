@@ -2,7 +2,9 @@ package com.example.myapplication.ui.screens.NewReview
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
@@ -62,6 +64,9 @@ fun NewReviewScreen(
     NewReviewContent(
         modifier = modifier,
         uiState = uiState,
+        onAbrirAjustesUbicacion = {
+            context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        },
         onIncluirUbicacionChange = { activar ->
             when {
                 !activar -> viewModel.onIncluirUbicacionDesactivado()
@@ -93,7 +98,8 @@ fun NewReviewContent(
     onCorreoChange: (String) -> Unit,
     onPublicarClick: () -> Unit,
     onCancelar: () -> Unit,
-    onIncluirUbicacionChange: (Boolean) -> Unit = {}
+    onIncluirUbicacionChange: (Boolean) -> Unit = {},
+    onAbrirAjustesUbicacion: () -> Unit = {}
 ) {
     Column(
         modifier = modifier.fillMaxSize()
@@ -125,7 +131,9 @@ fun NewReviewContent(
                 mostrarUbicacion = !uiState.esEdicion,
                 incluirUbicacion = uiState.incluirUbicacion,
                 permisoUbicacionDenegado = uiState.permisoUbicacionDenegado,
+                gpsDesactivado = uiState.gpsDesactivado,
                 onIncluirUbicacionChange = onIncluirUbicacionChange,
+                onAbrirAjustesUbicacion = onAbrirAjustesUbicacion,
                 onPuntuacionChange = onPuntuacionChange,
                 onTituloChange = onTituloChange,
                 onResenaChange = onResenaChange,

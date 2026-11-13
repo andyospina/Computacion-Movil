@@ -29,7 +29,9 @@ fun ContenidoNuevaResena(
     mostrarUbicacion: Boolean = false,
     incluirUbicacion: Boolean = false,
     permisoUbicacionDenegado: Boolean = false,
-    onIncluirUbicacionChange: (Boolean) -> Unit = {}
+    gpsDesactivado: Boolean = false,
+    onIncluirUbicacionChange: (Boolean) -> Unit = {},
+    onAbrirAjustesUbicacion: () -> Unit = {}
 ) {
 
     Column(
@@ -90,6 +92,8 @@ fun ContenidoNuevaResena(
                 modifier = Modifier.fillMaxWidth(),
                 incluirUbicacion = incluirUbicacion,
                 permisoDenegado = permisoUbicacionDenegado,
+                gpsDesactivado = gpsDesactivado,
+                onAbrirAjustes = onAbrirAjustesUbicacion,
                 onIncluirUbicacionChange = onIncluirUbicacionChange,
                 enabled = enabled
             )

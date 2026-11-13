@@ -29,7 +29,7 @@ fun ReviewsMapScreen(
     viewModel: ReviewsMapViewModel = hiltViewModel(),
     onBackClick: () -> Unit,
     onProductoClick: (String) -> Unit,
-    onUserClick: (String) -> Unit
+    onDetalleClick: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -77,7 +77,7 @@ fun ReviewsMapScreen(
                     TarjetaResenaMapa(
                         review = review,
                         onProductClick = { onProductoClick(review.productId) },
-                        onUserClick = { onUserClick(review.userId) },
+                        onDetailClick = { onDetalleClick(review.id) },
                         onClose = viewModel::onSeleccionCerrada,
                         modifier = Modifier.align(Alignment.BottomCenter).padding(12.dp)
                     )
