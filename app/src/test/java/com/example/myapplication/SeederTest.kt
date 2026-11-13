@@ -59,6 +59,20 @@ class SeederTest {
     }
 
     @Test
+    fun reviews_includeRecentLocatedOnesForTheMapAndSomeThatItMustDiscard() {
+        val reviews = Seeder(seed = 11).dataset(users = 30, products = 4, reviewsPerUser = 4).reviews
+        val dayAgo = System.currentTimeMillis() - 24 * 3_600_000L
+
+        val onMap = reviews.filter { it.location != null && it.createdAt!!.time >= dayAgo }
+
+        assertTrue("debe haber reseñas que aparezcan en el mapa", onMap.isNotEmpty())
+        assertTrue("y reseñas que el mapa descarta", reviews.size > onMap.size)
+        reviews.mapNotNull { it.location }.forEach {
+            assertTrue(it.latitude in -90.0..90.0 && it.longitude in -180.0..180.0)
+        }
+    }
+
+    @Test
     fun dataset_withFixedSeed_isReproducible_exceptForIds() {
         val first = Seeder(seed = 5).dataset(users = 3, products = 2).users.map { it.name }
         val second = Seeder(seed = 5).dataset(users = 3, products = 2).users.map { it.name }

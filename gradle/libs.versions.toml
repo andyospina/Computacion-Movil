@@ -25,6 +25,8 @@ javafaker = "1.0.2"
 snakeyaml = "1.33"
 testRunner = "1.7.0"
 mockk = "1.14.5"
+osmdroid = "6.1.20"
+playServicesLocation = "21.3.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -71,6 +73,8 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 javafaker = { module = "com.github.javafaker:javafaker", version.ref = "javafaker" }
 snakeyaml-android = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "testRunner" }
+osmdroid = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroid" }
+play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutinesPlayServices" }
 

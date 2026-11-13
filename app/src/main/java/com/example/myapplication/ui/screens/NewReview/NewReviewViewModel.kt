@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.myapplication.R
 import com.example.myapplication.data.Result
 import com.example.myapplication.data.identity.CurrentUserIdProvider
+import com.example.myapplication.data.repository.LocationRepository
 import com.example.myapplication.data.repository.ProductRepository
 import com.example.myapplication.data.repository.ReviewRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +21,7 @@ private val PUNTUACIONES = 1..5
 class NewReviewViewModel @Inject constructor(
     private val productRepository: ProductRepository,
     private val reviewRepository: ReviewRepository,
+    private val locationRepository: LocationRepository,
     private val currentUserId: CurrentUserIdProvider
 ) : ViewModel() {
 
@@ -98,6 +100,15 @@ class NewReviewViewModel @Inject constructor(
         _uiState.update { it.copy(correo = value) }
     }
 
+    /** La pantalla ya resolvió el permiso: solo se activa la opción si el usuario lo concedió. */
+    fun onPermisoUbicacionResultado(concedido: Boolean) {
+        _uiState.update { it.copy(incluirUbicacion = concedido, permisoUbicacionDenegado = !concedido) }
+    }
+
+    fun onIncluirUbicacionDesactivado() {
+        _uiState.update { it.copy(incluirUbicacion = false, permisoUbicacionDenegado = false) }
+    }
+
     fun publicarButtonPress() {
         val state = _uiState.value
         if (state.isLoading) return
@@ -123,12 +134,15 @@ class NewReviewViewModel @Inject constructor(
             val result = if (state.reviewId != null) {
                 reviewRepository.updateReview(state.reviewId, state.puntuacion, state.titulo, state.resena)
             } else {
+                // La ubicación es opcional: si no se obtiene (GPS apagado, sin señal) la reseña se publica igual.
+                val location = if (state.incluirUbicacion) locationRepository.getCurrentLocation() else null
                 reviewRepository.createReview(
                     productId = state.productId,
                     userId = userId.orEmpty(),
                     rating = state.puntuacion,
                     title = state.titulo,
-                    body = state.resena
+                    body = state.resena,
+                    location = location
                 )
             }
 

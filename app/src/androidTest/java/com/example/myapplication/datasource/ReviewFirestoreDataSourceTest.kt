@@ -1,5 +1,6 @@
 package com.example.myapplication.datasource
 
+import com.example.myapplication.data.GeoLocation
 import com.example.myapplication.data.NotFoundException
 import com.example.myapplication.data.datasource.impl.ReviewFirestoreDataSource
 import com.example.myapplication.data.dto.FirestoreReviewDto
@@ -11,6 +12,8 @@ import com.example.myapplication.debugtools.Seeder
 import com.example.myapplication.support.FirestoreEmulatorTest
 import com.example.myapplication.support.expectFailure
 import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.GeoPoint
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
@@ -199,6 +202,65 @@ class ReviewFirestoreDataSourceTest : FirestoreEmulatorTest() {
         var updated = emissions.receive()
         while (updated.isEmpty()) updated = emissions.receive()
         assertEquals("En vivo", updated.single().toReview(null).title)
+        listener.cancel()
+    }
+
+    @Test
+    fun createReview_storesTheLocationAsAGeoPoint() = test {
+        dataSource.createReview(newReview("Con ubicación").copy(location = GeoLocation(4.711, -74.072)))
+        dataSource.createReview(newReview("Sin ubicación"))
+
+        val byTitle = dataSource.getReviewsByProduct(product.id).map { it.toReview(null) }.associateBy { it.title }
+        assertEquals(GeoLocation(4.711, -74.072), byTitle.getValue("Con ubicación").location)
+        assertEquals(null, byTitle.getValue("Sin ubicación").location)
+    }
+
+    @Test
+    fun observeReviewsSince_returnsOnlyTheLast24Hours_newestFirst() = test {
+        val now = System.currentTimeMillis()
+        val base = seeder.review(author, product).copy(likedBy = emptyList(), location = GeoPoint(4.7, -74.0))
+        seed(
+            SeedDataset(
+                emptyList(), emptyList(),
+                listOf(
+                    base.copy(id = "hace-1h", createdAt = Date(now - 3_600_000)),
+                    base.copy(id = "hace-5h", createdAt = Date(now - 5 * 3_600_000)),
+                    base.copy(id = "hace-30h", createdAt = Date(now - 30 * 3_600_000)),
+                    base.copy(id = "hace-3-dias", createdAt = Date(now - 3 * DAY))
+                ),
+                emptyList()
+            )
+        )
+
+        val ids = dataSource.observeReviewsSince(now - DAY, limit = 50).first().map { it.toReview(null).id }
+
+        assertEquals(listOf("hace-1h", "hace-5h"), ids)
+    }
+
+    @Test
+    fun observeReviewsSince_respectsTheLimit() = test {
+        val now = System.currentTimeMillis()
+        val base = seeder.review(author, product).copy(likedBy = emptyList())
+        seed(SeedDataset(emptyList(), emptyList(), (1..5).map { base.copy(id = "r$it", createdAt = Date(now - it * 60_000L)) }, emptyList()))
+
+        val ids = dataSource.observeReviewsSince(now - DAY, limit = 3).first().map { it.toReview(null).id }
+
+        assertEquals(listOf("r1", "r2", "r3"), ids)
+    }
+
+    @Test
+    fun observeReviewsSince_emitsWhenANewReviewIsPublished() = test {
+        val emissions = Channel<List<ReviewData>>(Channel.UNLIMITED)
+        val listener = launch {
+            dataSource.observeReviewsSince(System.currentTimeMillis() - DAY, limit = 50).collect { emissions.send(it) }
+        }
+
+        assertTrue(emissions.receive().isEmpty())
+        dataSource.createReview(newReview("Nueva en el mapa").copy(location = GeoLocation(6.2, -75.5)))
+
+        var updated = emissions.receive()
+        while (updated.isEmpty()) updated = emissions.receive()
+        assertEquals("Nueva en el mapa", updated.single().toReview(null).title)
         listener.cancel()
     }
 

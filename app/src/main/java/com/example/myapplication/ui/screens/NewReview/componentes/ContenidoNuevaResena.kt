@@ -25,7 +25,11 @@ fun ContenidoNuevaResena(
     onCorreoChange: (String) -> Unit,
     onPublicar: () -> Unit,
     onCancelar: () -> Unit,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    mostrarUbicacion: Boolean = false,
+    incluirUbicacion: Boolean = false,
+    permisoUbicacionDenegado: Boolean = false,
+    onIncluirUbicacionChange: (Boolean) -> Unit = {}
 ) {
 
     Column(
@@ -80,6 +84,20 @@ fun ContenidoNuevaResena(
         Spacer(
             modifier = Modifier.height(16.dp)
         )
+
+        if (mostrarUbicacion) {
+            CampoUbicacion(
+                modifier = Modifier.fillMaxWidth(),
+                incluirUbicacion = incluirUbicacion,
+                permisoDenegado = permisoUbicacionDenegado,
+                onIncluirUbicacionChange = onIncluirUbicacionChange,
+                enabled = enabled
+            )
+
+            Spacer(
+                modifier = Modifier.height(16.dp)
+            )
+        }
 
         CampoUsuario(
             modifier = Modifier.fillMaxWidth(),

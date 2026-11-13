@@ -1,6 +1,7 @@
 package com.example.myapplication.data.repository
 
 import com.example.myapplication.R
+import com.example.myapplication.data.GeoLocation
 import com.example.myapplication.data.Result
 import com.example.myapplication.data.Review
 import com.example.myapplication.data.datasource.ProductRemoteDataSource
@@ -67,7 +68,8 @@ class ReviewRepository @Inject constructor(
         userId: String,
         rating: Int,
         title: String,
-        body: String
+        body: String,
+        location: GeoLocation? = null
     ): Result<Unit> {
         val author = when (val result = userRepository.getUserById(userId)) {
             is Result.Success -> result.data
@@ -86,7 +88,8 @@ class ReviewRepository @Inject constructor(
                     rating = rating,
                     title = title.trim(),
                     body = body.trim(),
-                    recommended = rating >= MIN_RECOMMENDED_RATING
+                    recommended = rating >= MIN_RECOMMENDED_RATING,
+                    location = location
                 )
             )
         }

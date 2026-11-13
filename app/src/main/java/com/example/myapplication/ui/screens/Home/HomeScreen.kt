@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -43,7 +44,8 @@ fun HomeScreen(
     onSearchBarClick: () -> Unit,
     onProductoClick: (String) -> Unit,
     onAvatarClick: () -> Unit,
-    onNotificationsClick: () -> Unit
+    onNotificationsClick: () -> Unit,
+    onMapClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -64,7 +66,8 @@ fun HomeScreen(
         onSearchBarClick = onSearchBarClick,
         onProductoClick = onProductoClick,
         onAvatarClick = onAvatarClick,
-        onNotificationsClick = onNotificationsClick
+        onNotificationsClick = onNotificationsClick,
+        onMapClick = onMapClick
     )
 }
 
@@ -77,7 +80,8 @@ fun HomeContent(
     onSearchBarClick: () -> Unit,
     onProductoClick: (String) -> Unit,
     onAvatarClick: () -> Unit,
-    onNotificationsClick: () -> Unit
+    onNotificationsClick: () -> Unit,
+    onMapClick: () -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxSize().testTag("homeScreen")
@@ -87,6 +91,15 @@ fun HomeContent(
             navigation = TopBarNavigation.MENU,
             trailingContent = {
                 Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Filled.Map,
+                        contentDescription = stringResource(R.string.content_description_map),
+                        tint = Ink,
+                        modifier = Modifier.clickable { onMapClick() }
+                    )
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
                     Icon(
                         imageVector = Icons.Filled.Notifications,
                         contentDescription = stringResource(R.string.content_description_notifications),
@@ -158,6 +171,7 @@ fun HomeScreenPreview() {
         onSearchBarClick = {},
         onProductoClick = {},
         onAvatarClick = {},
-        onNotificationsClick = {}
+        onNotificationsClick = {},
+        onMapClick = {}
     )
 }

@@ -8,7 +8,7 @@ const {
 } = require('@firebase/rules-unit-testing');
 const {
   doc, setDoc, getDoc, updateDoc, deleteDoc, addDoc, collection, getDocs, query, where,
-  arrayUnion, arrayRemove, serverTimestamp, writeBatch,
+  arrayUnion, arrayRemove, serverTimestamp, writeBatch, GeoPoint,
 } = require('firebase/firestore');
 
 const REPO = process.argv[2];
@@ -102,6 +102,19 @@ async function waitFor(name, fn, timeoutMs = 20000) {
   await check('otro usuario no edita la reseña', () => assertFails(updateDoc(doc(alice, 'reviews/r1'), { title: 'x' })));
   await check('crear reseña con likes iniciales: denegado', () => assertFails(addDoc(collection(alice, 'reviews'), {
     userId: 'alice', productId: 'p1', rating: 5, title: 't', body: 'b', recommended: true, likedBy: ['alice'],
+  })));
+  await check('crear reseña con ubicación: permitido', () => assertSucceeds(addDoc(collection(alice, 'reviews'), {
+    userId: 'alice', productId: 'p1', rating: 5, title: 't', body: 'b', recommended: true, likedBy: [],
+    location: new GeoPoint(4.711, -74.072), createdAt: serverTimestamp(),
+  })));
+  await check('crear reseña con location null: permitido', () => assertSucceeds(addDoc(collection(alice, 'reviews'), {
+    userId: 'alice', productId: 'p1', rating: 5, title: 't', body: 'b', recommended: true, likedBy: [], location: null,
+  })));
+  await check('location que no es un punto: denegado', () => assertFails(addDoc(collection(alice, 'reviews'), {
+    userId: 'alice', productId: 'p1', rating: 5, title: 't', body: 'b', recommended: true, likedBy: [], location: 'Bogotá',
+  })));
+  await check('el autor no cambia la ubicación después', () => assertFails(updateDoc(doc(bob, 'reviews/r1'), {
+    location: new GeoPoint(0, 0),
   })));
   await check('crear reseña de producto inexistente: denegado', () => assertFails(addDoc(collection(alice, 'reviews'), {
     userId: 'alice', productId: 'nope', rating: 5, title: 't', body: 'b', recommended: true, likedBy: [],

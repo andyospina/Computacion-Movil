@@ -6,6 +6,9 @@
     <!-- Android 13+: mostrar notificaciones requiere este permiso, que además se pide en ejecución -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- Ubicación aproximada, opcional al publicar una reseña (se pide en ejecución y solo si el usuario lo activa) -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <application
         android:name=".BaseApplication"
         android:allowBackup="true"

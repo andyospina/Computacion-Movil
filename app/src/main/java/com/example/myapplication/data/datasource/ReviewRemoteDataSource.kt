@@ -25,6 +25,13 @@ interface ReviewRemoteDataSource {
     fun observeReviewsLikedBy(userId: String): Flow<List<ReviewData>> =
         flow { throw UnsupportedOperationException("Este backend no tiene likes") }
 
+    /**
+     * Reseñas publicadas desde [sinceMillis] (inclusive), en tiempo real y de la más reciente a la más
+     * antigua, con un máximo de [limit]. Incluye reseñas sin ubicación: filtrarlas es cosa del Repository.
+     */
+    fun observeReviewsSince(sinceMillis: Long, limit: Int): Flow<List<ReviewData>> =
+        flow { throw UnsupportedOperationException("Este backend no tiene ubicación en las reseñas") }
+
     suspend fun likeReview(reviewId: String, userId: String)
     suspend fun unlikeReview(reviewId: String, userId: String)
 }

@@ -45,6 +45,12 @@ if (target === 'emulator') {
 
 const db = admin.firestore();
 const ts = (d) => admin.firestore.Timestamp.fromDate(d);
+// Ciudades de ejemplo para ubicar reseñas (mapa de reseñas de las últimas 24 h)
+const CITIES = [[4.711, -74.072], [6.244, -75.581], [19.433, -99.133], [40.417, -3.704], [-34.604, -58.382]];
+const randomLocation = () => {
+  const [lat, lng] = faker.helpers.arrayElement(CITIES);
+  return new admin.firestore.GeoPoint(lat + (Math.random() - 0.5) / 10, lng + (Math.random() - 0.5) / 10);
+};
 const CATEGORIES = ['Electrónica', 'Hogar', 'Deportes', 'Libros', 'Moda'];
 
 const users = Array.from({ length: counts.users }, () => {
@@ -82,7 +88,9 @@ const reviews = counts.products === 0 ? [] : users.flatMap((author) =>
       recommended: rating >= 4,
       user: { name: author.name, username: author.username, profileImage: null },
       likedBy: faker.helpers.arrayElements(users.filter((u) => u.id !== author.id).map((u) => u.id), { min: 0, max: 3 }),
-      createdAt: ts(faker.date.recent({ days: 90 })),
+      // ~1 de cada 3 es de las últimas 24 h y ~4 de cada 5 tienen ubicación
+      location: faker.number.int({ min: 0, max: 4 }) === 0 ? null : randomLocation(),
+      createdAt: ts(faker.number.int({ min: 0, max: 2 }) === 0 ? faker.date.recent({ days: 0.95 }) : faker.date.recent({ days: 90 })),
     };
   }),
 );

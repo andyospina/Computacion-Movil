@@ -1,5 +1,6 @@
 package com.example.myapplication.data.di
 
+import com.example.myapplication.data.datasource.DeviceLocationDataSource
 import com.example.myapplication.data.datasource.FollowRemoteDataSource
 import com.example.myapplication.data.datasource.NotificationRemoteDataSource
 import com.example.myapplication.data.datasource.ProductRemoteDataSource
@@ -7,6 +8,7 @@ import com.example.myapplication.data.datasource.ReviewRemoteDataSource
 import com.example.myapplication.data.datasource.SavedRemoteDataSource
 import com.example.myapplication.data.datasource.UserRemoteDataSource
 import com.example.myapplication.data.datasource.impl.FollowFirestoreDataSource
+import com.example.myapplication.data.datasource.impl.FusedDeviceLocationDataSource
 import com.example.myapplication.data.datasource.impl.NotificationFirestoreDataSource
 import com.example.myapplication.data.datasource.impl.ProductFirestoreDataSource
 import com.example.myapplication.data.datasource.impl.ReviewFirestoreDataSource
@@ -54,6 +56,11 @@ abstract class RemoteDataSourceModule {
     @Binds
     @Singleton
     abstract fun bindSavedDataSource(impl: SavedFirestoreDataSource): SavedRemoteDataSource
+
+    // Ubicación del dispositivo (Fused Location Provider)
+    @Binds
+    @Singleton
+    abstract fun bindDeviceLocationDataSource(impl: FusedDeviceLocationDataSource): DeviceLocationDataSource
 
     // Con Retrofit usar RetrofitCurrentUserIdProvider
     @Binds

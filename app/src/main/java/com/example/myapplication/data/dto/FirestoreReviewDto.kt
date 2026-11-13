@@ -1,8 +1,10 @@
 package com.example.myapplication.data.dto
 
+import com.example.myapplication.data.GeoLocation
 import com.example.myapplication.data.Review
 import com.example.myapplication.data.ReviewStatus
 import com.google.firebase.firestore.DocumentId
+import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.ServerTimestamp
 import java.util.Date
 
@@ -33,6 +35,8 @@ data class FirestoreReviewDto(
     val recommended: Boolean = true,
     val user: FirestoreAuthorDto = FirestoreAuthorDto(),
     val likedBy: List<String> = emptyList(),
+    // Opcional: solo si el autor eligió compartir su ubicación aproximada al publicar
+    val location: GeoPoint? = null,
     @ServerTimestamp val createdAt: Date? = null
 ) : ReviewData {
 
@@ -52,7 +56,9 @@ data class FirestoreReviewDto(
         userId = userId,
         productName = productName,
         likesCount = likedBy.size,
-        likedByMe = currentUserId != null && currentUserId in likedBy
+        likedByMe = currentUserId != null && currentUserId in likedBy,
+        location = location?.let { GeoLocation(it.latitude, it.longitude) },
+        createdAtMillis = createdAt?.time
     )
 }
 
@@ -64,5 +70,6 @@ fun NewReviewDto.toFirestoreDto() = FirestoreReviewDto(
     title = title,
     body = body,
     recommended = recommended,
-    user = FirestoreAuthorDto(name = authorName, username = authorUsername, profileImage = authorImage)
+    user = FirestoreAuthorDto(name = authorName, username = authorUsername, profileImage = authorImage),
+    location = location?.takeIf { it.isValid }?.let { GeoPoint(it.latitude, it.longitude) }
 )

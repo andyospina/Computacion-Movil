@@ -1,6 +1,7 @@
 package com.example.myapplication.data.dto
 
 import com.example.myapplication.data.AppNotification
+import com.example.myapplication.data.GeoLocation
 import com.example.myapplication.data.Product
 import com.example.myapplication.data.Review
 
@@ -31,5 +32,6 @@ data class NewReviewDto(
     val rating: Int,
     val title: String,
     val body: String,
-    val recommended: Boolean
+    val recommended: Boolean,
+    val location: GeoLocation? = null
 )

@@ -19,6 +19,7 @@ import com.example.myapplication.ui.screens.FollowList.FollowTab
 import com.example.myapplication.ui.screens.Home.HomeScreen
 import com.example.myapplication.ui.screens.LikedReviews.LikedReviewsScreen
 import com.example.myapplication.ui.screens.Login.LoginScreen
+import com.example.myapplication.ui.screens.Map.ReviewsMapScreen
 import com.example.myapplication.ui.screens.NewReview.NewReviewScreen
 import com.example.myapplication.ui.screens.Notifications.NotificationsScreen
 import com.example.myapplication.ui.screens.ProductDetail.ProductDetailScreen
@@ -114,7 +115,20 @@ fun AppNavigation(
                         navController.navigate(Routes.ProductDetail.createRoute(productId))
                     },
                     onAvatarClick = { navController.navigate(Routes.Profile.route) },
-                    onNotificationsClick = { navController.navigate(Routes.Notifications.route) }
+                    onNotificationsClick = { navController.navigate(Routes.Notifications.route) },
+                    onMapClick = { navController.navigate(Routes.ReviewsMap.route) }
+                )
+            }
+
+            composable(Routes.ReviewsMap.route) {
+                ReviewsMapScreen(
+                    onBackClick = { navController.popBackStack() },
+                    onProductoClick = { productId ->
+                        navController.navigate(Routes.ProductDetail.createRoute(productId))
+                    },
+                    onUserClick = { userId ->
+                        navController.navigate(Routes.UserProfile.createRoute(userId))
+                    }
                 )
             }
 

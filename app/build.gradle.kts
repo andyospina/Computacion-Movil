@@ -109,6 +109,10 @@ dependencies {
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.kotlinx.coroutines.test)
 
+    // Mapa de reseñas recientes (OpenStreetMap, sin API key) y ubicación del dispositivo
+    implementation(libs.osmdroid)
+    implementation(libs.play.services.location)
+
     //Retrofit
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.kotlinx.serialization)

@@ -7,6 +7,7 @@ import com.example.myapplication.data.dto.FirestoreReviewDto
 import com.example.myapplication.data.dto.FirestoreSavedDto
 import com.example.myapplication.data.dto.FirestoreUserDto
 import com.github.javafaker.Faker
+import com.google.firebase.firestore.GeoPoint
 import java.util.Date
 import java.util.Locale
 import java.util.Random
@@ -71,8 +72,17 @@ class Seeder(seed: Long? = null) {
             recommended = rating >= MIN_RECOMMENDED_RATING,
             user = FirestoreAuthorDto(name = author.name, username = author.username, profileImage = author.profileImage),
             likedBy = likers.filter { it.id != author.id }.map { it.id }.distinct(),
-            createdAt = pastDate(daysBack = 90)
+            // ~1 de cada 3 reseñas es de las últimas 24 h y ~4 de cada 5 tienen ubicación: así el mapa
+            // de reseñas recientes tiene datos y también hay casos que debe descartar.
+            location = if (random.nextInt(5) != 0) location() else null,
+            createdAt = if (random.nextInt(3) == 0) recentDate(withinHours = 23) else pastDate(daysBack = 90)
         )
+    }
+
+    /** Un punto cerca de alguna de las ciudades de ejemplo (±0,05° ≈ 5 km). */
+    fun location(): GeoPoint {
+        val (lat, lng) = CITIES[random.nextInt(CITIES.size)]
+        return GeoPoint(lat + (random.nextDouble() - 0.5) / 10, lng + (random.nextDouble() - 0.5) / 10)
     }
 
     /**
@@ -118,11 +128,22 @@ class Seeder(seed: Long? = null) {
 
     private fun <T> sample(list: List<T>, count: Int): List<T> = list.shuffled(random).take(count)
 
+    private fun recentDate(withinHours: Int) =
+        Date(System.currentTimeMillis() - (1 + random.nextInt(withinHours * 60)) * MINUTE_MS)
+
     private fun pastDate(daysBack: Int) = Date(System.currentTimeMillis() - random.nextInt(daysBack * 24) * HOUR_MS)
 
     private companion object {
         val CATEGORIES = listOf("Electrónica", "Hogar", "Deportes", "Libros", "Moda")
         const val HOUR_MS = 3_600_000L
+        const val MINUTE_MS = 60_000L
+        val CITIES = listOf(
+            4.711 to -74.072, // Bogotá
+            6.244 to -75.581, // Medellín
+            19.433 to -99.133, // Ciudad de México
+            40.417 to -3.704, // Madrid
+            -34.604 to -58.382 // Buenos Aires
+        )
         const val MIN_RECOMMENDED_RATING = 4
         const val MAX_LIKERS = 4
         const val MAX_USERNAME = 30

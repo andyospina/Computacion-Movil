@@ -12,6 +12,8 @@ data class NewReviewState(
     val productId: String = "",
     val reviewId: String? = null,
     val isLoading: Boolean = false,
+    val incluirUbicacion: Boolean = false,
+    val permisoUbicacionDenegado: Boolean = false,
     @param:StringRes val errorMessageRes: Int? = null
 ) {
     val esEdicion: Boolean get() = reviewId != null

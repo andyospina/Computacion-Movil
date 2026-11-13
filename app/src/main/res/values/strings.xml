@@ -14,6 +14,21 @@
     <string name="action_cancel">Cancelar</string>
     <string name="action_save">Guardar</string>
     <string name="action_saved">Guardado</string>
+    <!-- Mapa de reseñas recientes -->
+    <string name="map_title">Reseñas cerca de ti</string>
+    <string name="map_empty">No hay reseñas con ubicación en las últimas 24 horas</string>
+    <plurals name="map_reviews_count">
+        <item quantity="one">%d reseña en las últimas 24 h</item>
+        <item quantity="other">%d reseñas en las últimas 24 h</item>
+    </plurals>
+    <string name="map_review_meta">Por %1$s · %2$s · %3$d me gusta</string>
+    <string name="map_just_now">Justo ahora</string>
+    <string name="map_view_product">Ver producto</string>
+    <string name="map_view_author">Ver autor</string>
+    <string name="content_description_map">Mapa de reseñas</string>
+    <string name="new_review_include_location">Incluir mi ubicación aproximada</string>
+    <string name="new_review_include_location_hint">Tu reseña aparecerá en el mapa durante 24 horas</string>
+    <string name="new_review_location_denied">Sin permiso de ubicación no se puede mostrar la reseña en el mapa</string>
     <string name="saved_title">Productos guardados</string>
     <string name="saved_empty">Aún no guardaste productos. Toca «Guardar» en la ficha de un producto para verlo aquí.</string>
     <string name="saved_remove">Quitar</string>

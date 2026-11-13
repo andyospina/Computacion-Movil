@@ -7,6 +7,7 @@ import com.example.myapplication.data.dto.NewReviewDto
 import com.example.myapplication.data.dto.ReviewData
 import com.example.myapplication.data.dto.UpdateReviewDto
 import com.example.myapplication.data.dto.toFirestoreDto
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -78,6 +79,15 @@ class ReviewFirestoreDataSource @Inject constructor(
     override fun observeReviewsLikedBy(userId: String): Flow<List<ReviewData>> =
         reviews.whereArrayContains("likedBy", userId).observe()
             .map { it.toObjects(FirestoreReviewDto::class.java).newestFirst() }
+
+    // Un solo rango sobre createdAt (campo único): no necesita índice compuesto. Se ordena y limita en el
+    // servidor para no descargar más de lo que el mapa puede mostrar.
+    override fun observeReviewsSince(sinceMillis: Long, limit: Int): Flow<List<ReviewData>> =
+        reviews.whereGreaterThanOrEqualTo("createdAt", Timestamp(Date(sinceMillis)))
+            .orderBy("createdAt", Query.Direction.DESCENDING)
+            .limit(limit.toLong())
+            .observe()
+            .map { it.toObjects(FirestoreReviewDto::class.java) }
 
     // arrayUnion / arrayRemove son atómicos: dos likes simultáneos no se pisan.
     override suspend fun likeReview(reviewId: String, userId: String) {

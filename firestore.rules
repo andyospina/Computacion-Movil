@@ -96,9 +96,16 @@ service cloud.firestore {
           );
       }
 
+      // Ubicación opcional (mapa de reseñas recientes): ausente, null o un punto geográfico.
+      function validLocation() {
+        let loc = request.resource.data.get('location', null);
+        return loc == null || loc is latlng;
+      }
+
       allow read: if signedIn();
       allow create: if isOwner(request.resource.data.userId)
         && validContent()
+        && validLocation()
         && request.resource.data.productId is string
         && exists(/databases/$(database)/documents/products/$(request.resource.data.productId))
         && request.resource.data.get('likedBy', []).size() == 0;

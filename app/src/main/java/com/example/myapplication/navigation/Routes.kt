@@ -13,6 +13,7 @@ sealed class Routes(val route: String) {
     object Feed : Routes("feed")
     object Saved : Routes("saved")
     object LikedReviews : Routes("liked_reviews")
+    object ReviewsMap : Routes("reviews_map")
 
     // tab = "followers" o "following": la pestaña que se abre primero
     object FollowList : Routes("follow_list/{userId}?tab={tab}") {

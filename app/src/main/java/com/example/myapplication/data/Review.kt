@@ -22,5 +22,9 @@ data class Review(
     val productName: String = "",
     val likesCount: Int = 0,
     // Si el usuario de la sesión actual ya le dio like (para pintar el corazón lleno o vacío)
-    val likedByMe: Boolean = false
+    val likedByMe: Boolean = false,
+    // Dónde se publicó (null si el autor no compartió su ubicación)
+    val location: GeoLocation? = null,
+    // Momento de publicación; null mientras el servidor aún no resuelve la fecha de una reseña recién creada
+    val createdAtMillis: Long? = null
 )

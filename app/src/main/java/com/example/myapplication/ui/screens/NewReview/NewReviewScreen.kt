@@ -1,5 +1,10 @@
 package com.example.myapplication.ui.screens.NewReview
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,9 +17,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.R
 import com.example.myapplication.ui.components.BarraSuperior
@@ -47,9 +54,21 @@ fun NewReviewScreen(
         }
     }
 
+    val context = LocalContext.current
+    val permisoLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { concedido ->
+        viewModel.onPermisoUbicacionResultado(concedido)
+    }
+
     NewReviewContent(
         modifier = modifier,
         uiState = uiState,
+        onIncluirUbicacionChange = { activar ->
+            when {
+                !activar -> viewModel.onIncluirUbicacionDesactivado()
+                tienePermisoUbicacion(context) -> viewModel.onPermisoUbicacionResultado(true)
+                else -> permisoLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+            }
+        },
         onPuntuacionChange = viewModel::updatePuntuacion,
         onTituloChange = viewModel::updateTitulo,
         onResenaChange = viewModel::updateResena,
@@ -59,6 +78,9 @@ fun NewReviewScreen(
         onCancelar = onCancelar
     )
 }
+
+private fun tienePermisoUbicacion(context: Context) =
+    ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
 
 @Composable
 fun NewReviewContent(
@@ -70,7 +92,8 @@ fun NewReviewContent(
     onUsuarioChange: (String) -> Unit,
     onCorreoChange: (String) -> Unit,
     onPublicarClick: () -> Unit,
-    onCancelar: () -> Unit
+    onCancelar: () -> Unit,
+    onIncluirUbicacionChange: (Boolean) -> Unit = {}
 ) {
     Column(
         modifier = modifier.fillMaxSize()
@@ -98,6 +121,11 @@ fun NewReviewContent(
                 usuario = uiState.usuario,
                 correo = uiState.correo,
                 enabled = !uiState.isLoading,
+                // Solo al crear: la ubicación de una reseña no se edita después
+                mostrarUbicacion = !uiState.esEdicion,
+                incluirUbicacion = uiState.incluirUbicacion,
+                permisoUbicacionDenegado = uiState.permisoUbicacionDenegado,
+                onIncluirUbicacionChange = onIncluirUbicacionChange,
                 onPuntuacionChange = onPuntuacionChange,
                 onTituloChange = onTituloChange,
                 onResenaChange = onResenaChange,
