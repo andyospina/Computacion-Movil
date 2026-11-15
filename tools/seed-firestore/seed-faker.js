@@ -23,6 +23,7 @@ const counts = {
   reviewsPerUser: Number(args.reviews ?? 2),
   followsPerUser: Number(args.follows ?? 2),
   savedPerUser: Number(args.saved ?? 2),
+  maxCommentsPerReview: Number(args.comments ?? 3),
 };
 
 if (target === 'emulator') {
@@ -105,6 +106,21 @@ const saved = users.flatMap((owner) =>
     .map((p) => ({ userId: owner.id, productId: p.id, createdAt: ts(faker.date.recent({ days: 30 })) })),
 );
 
+// Conversación de cada reseña: entre 0 y maxCommentsPerReview comentarios, posteriores a la reseña.
+const comments = users.length === 0 ? [] : reviews.flatMap((review) =>
+  Array.from({ length: faker.number.int({ min: 0, max: counts.maxCommentsPerReview }) }, () => {
+    const author = faker.helpers.arrayElement(users);
+    return {
+      id: `faker_${faker.string.uuid()}`,
+      reviewId: review.id,
+      userId: author.id,
+      text: faker.lorem.sentence({ min: 6, max: 16 }).slice(0, 500),
+      user: { name: author.name, username: author.username, profileImage: null },
+      createdAt: ts(faker.date.between({ from: review.createdAt.toDate(), to: new Date() })),
+    };
+  }),
+);
+
 async function write(collection, docs, idOf) {
   for (let i = 0; i < docs.length; i += 400) {
     const batch = db.batch();
@@ -124,6 +140,7 @@ async function main() {
   report.reviews = await write('reviews', reviews);
   report.follows = await write('follows', follows, (f) => `${f.followerId}_${f.followedId}`);
   report.saved = await write('saved', saved, (s) => `${s.userId}_${s.productId}`);
+  report.comments = await write('comments', comments);
   console.log(`Carga en ${target} completa:`, report);
 }
 

@@ -20,6 +20,12 @@ sealed class Routes(val route: String) {
         fun createRoute(reviewId: String) = "review_detail/$reviewId"
     }
 
+    // Conversación (comentarios) de una reseña
+    object ReviewComments : Routes("review_comments/{reviewId}") {
+        const val ARG_REVIEW_ID = "reviewId"
+        fun createRoute(reviewId: String) = "review_comments/$reviewId"
+    }
+
     // tab = "followers" o "following": la pestaña que se abre primero
     object FollowList : Routes("follow_list/{userId}?tab={tab}") {
         const val ARG_USER_ID = "userId"

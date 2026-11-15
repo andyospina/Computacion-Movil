@@ -12,7 +12,7 @@ import org.junit.After
 import org.junit.Before
 
 private const val TIMEOUT_MS = 20_000L
-private val COLLECTIONS = listOf("users", "products", "reviews", "follows", "saved")
+private val COLLECTIONS = listOf("users", "products", "reviews", "follows", "saved", "comments")
 
 /**
  * Base de las pruebas de integración: un cliente de Firestore propio (FirebaseApp aparte, ver

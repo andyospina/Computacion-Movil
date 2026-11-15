@@ -117,6 +117,28 @@ service cloud.firestore {
       allow delete: if isOwner(resource.data.userId);
     }
 
+    // comments/{id}: conversación de una reseña (Sprint 15). Lectura para autenticados; cada quien crea
+    // los suyos sobre una reseña existente. No se editan (evita cambiar el sentido de una respuesta ya
+    // leída). Borra su autor o el autor de la reseña, que modera su propia conversación.
+    match /comments/{commentId} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.keys().hasOnly(['reviewId', 'userId', 'text', 'user', 'createdAt'])
+        && request.resource.data.reviewId is string
+        && request.resource.data.text is string
+        && request.resource.data.text.trim().size() > 0
+        && request.resource.data.text.size() <= 500
+        && request.resource.data.user is map
+        && request.resource.data.createdAt == request.time
+        && exists(/databases/$(database)/documents/reviews/$(request.resource.data.reviewId));
+      allow update: if false;
+      allow delete: if signedIn() && (
+        resource.data.userId == request.auth.uid
+        || get(/databases/$(database)/documents/reviews/$(resource.data.reviewId)).data.userId == request.auth.uid
+      );
+    }
+
     // saved/{userId_productId}: productos guardados. Son privados: solo su dueño los ve, guarda o quita.
     match /saved/{savedId} {
       allow read: if signedIn() && resource.data.userId == request.auth.uid;

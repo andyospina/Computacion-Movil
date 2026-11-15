@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Comment
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.PersonAdd
@@ -65,6 +66,7 @@ fun TarjetaNotificacion(
                 imageVector = when (notificacion.type) {
                     NotificationType.LIKE -> Icons.Filled.Favorite
                     NotificationType.FOLLOW -> Icons.Filled.PersonAdd
+                    NotificationType.COMMENT -> Icons.AutoMirrored.Filled.Comment
                     NotificationType.UNKNOWN -> Icons.Filled.Notifications
                 },
                 contentDescription = null,
@@ -81,6 +83,9 @@ fun TarjetaNotificacion(
                     )
                     NotificationType.FOLLOW -> stringResource(
                         R.string.notifications_follow_message, notificacion.actorName
+                    )
+                    NotificationType.COMMENT -> stringResource(
+                        R.string.notifications_comment_message, notificacion.actorName, notificacion.reviewTitle
                     )
                     NotificationType.UNKNOWN -> stringResource(R.string.notifications_unknown_message)
                 },

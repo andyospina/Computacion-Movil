@@ -33,7 +33,8 @@ fun LikedReviewsScreen(
     viewModel: LikedReviewsViewModel = hiltViewModel(),
     onBackClick: () -> Unit,
     onUserClick: (String) -> Unit,
-    onProductoClick: (String) -> Unit
+    onProductoClick: (String) -> Unit,
+    onComentariosClick: ((String) -> Unit)? = null
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -64,7 +65,8 @@ fun LikedReviewsScreen(
                                 resena = resena,
                                 onAuthorClick = { onUserClick(resena.userId) },
                                 onLikeClick = { viewModel.toggleLike(resena) },
-                                onProductClick = { onProductoClick(resena.productId) }
+                                onProductClick = { onProductoClick(resena.productId) },
+                                onCommentsClick = onComentariosClick?.let { { it(resena.id) } }
                             )
                         }
                     }

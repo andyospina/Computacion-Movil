@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import com.example.myapplication.R
 import com.example.myapplication.data.LocalReviewProvider
 import com.example.myapplication.data.Review
+import com.example.myapplication.ui.components.BotonComentarios
 import com.example.myapplication.ui.components.BotonLike
 import com.example.myapplication.ui.components.StarRatingDisplay
 import com.example.myapplication.ui.theme.BorderColor
@@ -34,7 +35,8 @@ import com.example.myapplication.ui.theme.GraySecondary
 
 /**
  * Tarjeta de una reseña. Con [onProductClick] muestra además el nombre del producto (feed
- * «Siguiendo»), y con [onLikeClick] el corazón permite dar o quitar like.
+ * «Siguiendo»), con [onLikeClick] el corazón permite dar o quitar like y con [onCommentsClick] aparece
+ * el acceso a la conversación de la reseña.
  */
 @Composable
 fun TarjetaResena(
@@ -42,7 +44,8 @@ fun TarjetaResena(
     modifier: Modifier = Modifier,
     onAuthorClick: (() -> Unit)? = null,
     onLikeClick: (() -> Unit)? = null,
-    onProductClick: (() -> Unit)? = null
+    onProductClick: (() -> Unit)? = null,
+    onCommentsClick: (() -> Unit)? = null
 ) {
     Column(
         modifier = modifier
@@ -109,6 +112,11 @@ fun TarjetaResena(
             }
 
             Spacer(modifier = Modifier.weight(1f))
+
+            if (onCommentsClick != null) {
+                BotonComentarios(onClick = onCommentsClick)
+                Spacer(modifier = Modifier.width(8.dp))
+            }
 
             BotonLike(likesCount = resena.likesCount, likedByMe = resena.likedByMe, onClick = onLikeClick)
         }

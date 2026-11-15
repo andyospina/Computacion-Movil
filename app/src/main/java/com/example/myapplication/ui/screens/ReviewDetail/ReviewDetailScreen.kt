@@ -25,7 +25,8 @@ fun ReviewDetailScreen(
     viewModel: ReviewDetailViewModel = hiltViewModel(),
     onBackClick: () -> Unit,
     onUserClick: (String) -> Unit,
-    onProductoClick: (String) -> Unit
+    onProductoClick: (String) -> Unit,
+    onComentariosClick: ((String) -> Unit)? = null
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -51,7 +52,8 @@ fun ReviewDetailScreen(
                     modifier = Modifier.padding(16.dp),
                     onAuthorClick = { onUserClick(review.userId) },
                     onLikeClick = viewModel::toggleLike,
-                    onProductClick = { onProductoClick(review.productId) }
+                    onProductClick = { onProductoClick(review.productId) },
+                    onCommentsClick = onComentariosClick?.let { { it(review.id) } }
                 )
             }
         }

@@ -3,6 +3,7 @@ package com.example.myapplication.data
 enum class NotificationType {
     LIKE,
     FOLLOW,
+    COMMENT,
     UNKNOWN
 }
 
@@ -15,5 +16,7 @@ data class AppNotification(
     val reviewTitle: String,
     val productId: String,
     val date: String,
-    val read: Boolean
+    val read: Boolean,
+    // Reseña a la que se refiere (like o comentario); vacío en las de seguidor
+    val reviewId: String = ""
 )

@@ -161,6 +161,31 @@ async function waitFor(name, fn, timeoutMs = 20000) {
   await check('bob no borra el follow de alice', () => assertFails(deleteDoc(doc(bob, 'follows/alice_bob'))));
   await check('consulta de seguidores de bob', () => assertSucceeds(getDocs(query(collection(bob, 'follows'), where('followedId', '==', 'bob')))));
 
+  console.log('\nReglas: comments');
+  const comment = (uid, extra = {}) => ({
+    reviewId: 'r1', userId: uid, text: 'Buena reseña', user: { name: uid, username: uid, profileImage: null },
+    createdAt: serverTimestamp(), ...extra,
+  });
+  await check('alice comenta una reseña', () => assertSucceeds(setDoc(doc(alice, 'comments/c-alice'), comment('alice'))));
+  await check('sin sesión no se leen comentarios', () => assertFails(getDoc(doc(anon, 'comments/c-alice'))));
+  await check('bob lee la conversación', () => assertSucceeds(getDocs(query(collection(bob, 'comments'), where('reviewId', '==', 'r1')))));
+  await check('alice no comenta a nombre de carol', () => assertFails(setDoc(doc(alice, 'comments/c-x1'), comment('carol'))));
+  await check('comentario vacío o solo espacios: denegado', () => assertFails(setDoc(doc(alice, 'comments/c-x2'), comment('alice', { text: '   ' }))));
+  await check('comentario de más de 500 caracteres: denegado', () => assertFails(setDoc(doc(alice, 'comments/c-x3'), comment('alice', { text: 'a'.repeat(501) }))));
+  await check('comentario en reseña inexistente: denegado', () => assertFails(setDoc(doc(alice, 'comments/c-x4'), comment('alice', { reviewId: 'nope' }))));
+  await check('campos extra (likes falsos): denegado', () => assertFails(setDoc(doc(alice, 'comments/c-x5'), comment('alice', { likes: 99 }))));
+  await check('fecha inventada por el cliente: denegado', () => assertFails(setDoc(doc(alice, 'comments/c-x6'), comment('alice', { createdAt: new Date(0) }))));
+  await check('nadie edita un comentario (ni su autora)', () => assertFails(updateDoc(doc(alice, 'comments/c-alice'), { text: 'cambiado' })));
+  await check('carol no borra el comentario de alice', async () => {
+    const carol = env.authenticatedContext('carol').firestore();
+    await assertFails(deleteDoc(doc(carol, 'comments/c-alice')));
+  });
+  await check('bob (autor de la reseña) modera y borra el de alice', () => assertSucceeds(deleteDoc(doc(bob, 'comments/c-alice'))));
+  await check('alice borra su propio comentario', async () => {
+    await assertSucceeds(setDoc(doc(alice, 'comments/c-alice2'), comment('alice')));
+    await assertSucceeds(deleteDoc(doc(alice, 'comments/c-alice2')));
+  });
+
   console.log('\nReglas: tokens y bandeja');
   await check('alice registra su token', () => assertSucceeds(setDoc(doc(alice, 'users/alice/fcmTokens/tok123'), {
     token: 'tok123', platform: 'android', updatedAt: serverTimestamp(),
@@ -227,6 +252,42 @@ async function waitFor(name, fn, timeoutMs = 20000) {
     await new Promise((r) => setTimeout(r, 4000));
     const after = (await getDocs(collection(alice, 'users/alice/notifications'))).size;
     if (after !== before) throw new Error(`${before} -> ${after}`);
+  });
+
+  await check('comentario de alice -> notificación para bob con la reseña', async () => {
+    await setDoc(doc(alice, 'comments/c-notif'), {
+      reviewId: 'r1', userId: 'alice', text: '¿Los recomiendas para correr?',
+      user: { name: 'Falsa', username: 'x', profileImage: null }, createdAt: serverTimestamp(),
+    });
+    const n = await waitFor('notificación comment', async () => {
+      const d = await getDoc(doc(bob, 'users/bob/notifications/comment_c-notif'));
+      return d.exists() ? d : null;
+    });
+    const data = n.data();
+    if (data.type !== 'comment' || data.actorId !== 'alice' || data.reviewId !== 'r1' || data.read !== false) {
+      throw new Error(JSON.stringify(data));
+    }
+  });
+  await check('integridad: copia del autor del comentario se corrige', async () => {
+    await waitFor('autor del comentario corregido', async () => {
+      const d = (await getDoc(doc(alice, 'comments/c-notif'))).data();
+      return d && d.user.name.startsWith('Alice') && d.user.username === 'alice';
+    });
+  });
+  await check('comentar la propia reseña no genera notificación', async () => {
+    await setDoc(doc(bob, 'comments/c-bob'), {
+      reviewId: 'r1', userId: 'bob', text: 'Gracias por leer', user: { name: 'Bob', username: 'bob', profileImage: null },
+      createdAt: serverTimestamp(),
+    });
+    await new Promise((r) => setTimeout(r, 4000));
+    if ((await getDoc(doc(bob, 'users/bob/notifications/comment_c-bob'))).exists()) throw new Error('se notificó');
+  });
+  await check('borrar la reseña borra su conversación', async () => {
+    await assertSucceeds(deleteDoc(doc(bob, 'reviews/r1')));
+    await waitFor('comentarios eliminados', async () => {
+      const s = await getDocs(query(collection(bob, 'comments'), where('reviewId', '==', 'r1')));
+      return s.empty;
+    });
   });
 
   await env.cleanup();

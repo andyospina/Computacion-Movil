@@ -7,11 +7,16 @@
 //   onUserProfileUpdated users/{uid} actualizado  -> integridad: propaga nombre/foto/username a la copia
 //                                                   desnormalizada de todas sus reseñas.
 //
+// Sprint 15 (comentarios en reseñas):
+//   onCommentCreated     comments/{id} creado      -> integridad de la copia del autor y aviso al autor de la reseña.
+//   onReviewDeleted      reviews/{id} borrada      -> borra la conversación (comentarios) de esa reseña.
+//   onUserProfileUpdatedComments users/{uid}       -> propaga nombre/foto/username a sus comentarios.
+//
 // Las notificaciones se guardan en users/{uid}/notifications (bandeja de la app) y se envían por FCM
 // a cada token de users/{uid}/fcmTokens. Los tokens que FCM rechaza se borran.
 //
 // El Admin SDK ignora las reglas de seguridad, por eso aquí se valida todo lo que se lee.
-const { onDocumentCreated, onDocumentUpdated } = require('firebase-functions/v2/firestore');
+const { onDocumentCreated, onDocumentUpdated, onDocumentDeleted } = require('firebase-functions/v2/firestore');
 const { setGlobalOptions } = require('firebase-functions/v2');
 const logger = require('firebase-functions/logger');
 const { initializeApp } = require('firebase-admin/app');
@@ -210,4 +215,104 @@ exports.onUserProfileUpdated = onDocumentUpdated('users/{userId}', async (event)
     await batch.commit();
   }
   logger.info(`Autor sincronizado en ${reviews.size} reseñas de ${event.params.userId}`);
+});
+
+// ---------------------------------------------------------------------------------------------
+// Comentarios (Sprint 15)
+// ---------------------------------------------------------------------------------------------
+
+const NOT_FOUND = 5; // código gRPC de update() sobre un documento que ya no existe
+
+/** Copia del autor tal como la guardan reseñas y comentarios. */
+function authorCopy(user) {
+  return { name: user.name || '', username: user.username || '', profileImage: user.profileImage || null };
+}
+
+/** Borra en lotes todos los documentos de una consulta. Devuelve cuántos borró. */
+async function deleteAll(query) {
+  const snap = await query.get();
+  for (let i = 0; i < snap.docs.length; i += BATCH_LIMIT) {
+    const batch = db.batch();
+    snap.docs.slice(i, i + BATCH_LIMIT).forEach((doc) => batch.delete(doc.ref));
+    await batch.commit();
+  }
+  return snap.size;
+}
+
+// Comentario nuevo: la copia del autor sale de `users` (el cliente podría mentir) y se avisa al autor de
+// la reseña, salvo que se comente a sí mismo. Un comentario huérfano (reseña borrada entre medio) se elimina.
+exports.onCommentCreated = onDocumentCreated('comments/{commentId}', async (event) => {
+  const comment = event.data?.data();
+  if (!comment) return;
+
+  const [userSnap, reviewSnap] = await Promise.all([
+    db.collection('users').doc(comment.userId || '-').get(),
+    db.collection('reviews').doc(comment.reviewId || '-').get(),
+  ]);
+  if (!reviewSnap.exists) {
+    logger.warn(`Comentario ${event.params.commentId} sobre una reseña inexistente: se borra`);
+    await event.data.ref.delete();
+    return;
+  }
+  if (!userSnap.exists) {
+    logger.warn(`Comentario ${event.params.commentId} de un usuario inexistente`);
+    return;
+  }
+
+  const author = authorCopy(userSnap.data());
+  const sent = comment.user || {};
+  if (['name', 'username', 'profileImage'].some((k) => (sent[k] ?? null) !== author[k])) {
+    try {
+      await event.data.ref.update({ user: author });
+    } catch (e) {
+      // Lo borraron (su autor o el de la reseña) antes de que corriera esta función: no hay nada que avisar
+      if (e.code === NOT_FOUND) {
+        logger.info(`Comentario ${event.params.commentId} borrado antes de procesarlo`);
+        return;
+      }
+      throw e;
+    }
+  }
+
+  const review = reviewSnap.data();
+  if (!review.userId || review.userId === comment.userId) return;
+  const actorName = author.name || author.username;
+  const preview = (comment.text || '').slice(0, 80);
+  await notify(
+    review.userId,
+    `comment_${event.params.commentId}`,
+    {
+      type: 'comment',
+      actorId: comment.userId,
+      actorName,
+      reviewId: comment.reviewId,
+      reviewTitle: review.title || '',
+      productId: review.productId || '',
+    },
+    'Nuevo comentario',
+    `${actorName} comentó tu reseña: "${preview}"`
+  );
+});
+
+// Al borrar una reseña su conversación deja de tener sentido: se borran sus comentarios.
+exports.onReviewDeleted = onDocumentDeleted('reviews/{reviewId}', async (event) => {
+  const count = await deleteAll(db.collection('comments').where('reviewId', '==', event.params.reviewId));
+  logger.info(`Reseña ${event.params.reviewId} borrada: ${count} comentarios eliminados`);
+});
+
+// Igual que onUserProfileUpdated, pero para la copia del autor en sus comentarios.
+exports.onUserProfileUpdatedComments = onDocumentUpdated('users/{userId}', async (event) => {
+  const before = event.data.before.data() || {};
+  const after = event.data.after.data() || {};
+  const changed = ['name', 'username', 'profileImage'].some((k) => (before[k] ?? null) !== (after[k] ?? null));
+  if (!changed) return;
+
+  const author = authorCopy(after);
+  const comments = await db.collection('comments').where('userId', '==', event.params.userId).get();
+  for (let i = 0; i < comments.docs.length; i += BATCH_LIMIT) {
+    const batch = db.batch();
+    comments.docs.slice(i, i + BATCH_LIMIT).forEach((doc) => batch.update(doc.ref, { user: author }));
+    await batch.commit();
+  }
+  logger.info(`Autor sincronizado en ${comments.size} comentarios de ${event.params.userId}`);
 });

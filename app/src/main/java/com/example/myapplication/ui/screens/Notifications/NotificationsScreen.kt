@@ -37,7 +37,8 @@ fun NotificationsScreen(
     viewModel: NotificationsViewModel = hiltViewModel(),
     onBackClick: () -> Unit,
     onProductoClick: (String) -> Unit,
-    onUserClick: (String) -> Unit
+    onUserClick: (String) -> Unit,
+    onComentariosClick: (String) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -49,12 +50,14 @@ fun NotificationsScreen(
         onMarcarTodasLeidasClick = viewModel::marcarTodasLeidas,
         onRetry = viewModel::reintentar,
         onBackClick = onBackClick,
-        // Un like lleva al producto de la reseña; un seguidor nuevo, a su perfil
+        // Un like lleva al producto de la reseña; un seguidor nuevo, a su perfil; un comentario, a la conversación
         onNotificacionClick = { notificacion ->
             when (notificacion.type) {
                 NotificationType.LIKE ->
                     if (notificacion.productId.isNotBlank()) onProductoClick(notificacion.productId)
                 NotificationType.FOLLOW -> onUserClick(notificacion.actorId)
+                NotificationType.COMMENT ->
+                    if (notificacion.reviewId.isNotBlank()) onComentariosClick(notificacion.reviewId)
                 NotificationType.UNKNOWN -> Unit
             }
         }

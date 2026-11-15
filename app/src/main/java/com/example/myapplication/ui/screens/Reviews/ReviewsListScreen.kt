@@ -42,7 +42,8 @@ fun ReviewsListScreen(
     modifier: Modifier = Modifier,
     viewModel: ReviewsListViewModel = hiltViewModel(),
     onBackClick: () -> Unit,
-    onUserClick: (String) -> Unit
+    onUserClick: (String) -> Unit,
+    onComentariosClick: ((String) -> Unit)? = null
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -61,7 +62,8 @@ fun ReviewsListScreen(
         onCargarMasClick = viewModel::cargarMas,
         onBackClick = onBackClick,
         onUserClick = onUserClick,
-        onLikeClick = viewModel::toggleLike
+        onLikeClick = viewModel::toggleLike,
+        onComentariosClick = onComentariosClick?.let { abrir -> { resena: Review -> abrir(resena.id) } }
     )
 }
 
@@ -75,7 +77,8 @@ fun ReviewsListContent(
     onCargarMasClick: () -> Unit,
     onBackClick: () -> Unit,
     onUserClick: (String) -> Unit,
-    onLikeClick: (Review) -> Unit
+    onLikeClick: (Review) -> Unit,
+    onComentariosClick: ((Review) -> Unit)? = null
 ) {
     Column(
         modifier = modifier.fillMaxSize().testTag("reviewsListScreen")
@@ -126,7 +129,8 @@ fun ReviewsListContent(
                         TarjetaResena(
                             resena = resena,
                             onAuthorClick = { onUserClick(resena.userId) },
-                            onLikeClick = { onLikeClick(resena) }
+                            onLikeClick = { onLikeClick(resena) },
+                            onCommentsClick = onComentariosClick?.let { { it(resena) } }
                         )
                     }
 

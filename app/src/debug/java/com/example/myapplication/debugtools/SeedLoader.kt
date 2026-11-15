@@ -52,6 +52,7 @@ class SeedLoader(
         write("reviews", dataset.reviews.map { it.id to it })
         write("follows", dataset.follows.map { "${it.followerId}_${it.followedId}" to it })
         write("saved", dataset.saved.map { "${it.userId}_${it.productId}" to it })
+        write("comments", dataset.comments.map { it.id to it })
         return SeedReport(inserted, errors)
     }
 

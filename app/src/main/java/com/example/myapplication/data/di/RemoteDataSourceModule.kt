@@ -1,5 +1,6 @@
 package com.example.myapplication.data.di
 
+import com.example.myapplication.data.datasource.CommentRemoteDataSource
 import com.example.myapplication.data.datasource.DeviceLocationDataSource
 import com.example.myapplication.data.datasource.FollowRemoteDataSource
 import com.example.myapplication.data.datasource.NotificationRemoteDataSource
@@ -7,6 +8,7 @@ import com.example.myapplication.data.datasource.ProductRemoteDataSource
 import com.example.myapplication.data.datasource.ReviewRemoteDataSource
 import com.example.myapplication.data.datasource.SavedRemoteDataSource
 import com.example.myapplication.data.datasource.UserRemoteDataSource
+import com.example.myapplication.data.datasource.impl.CommentFirestoreDataSource
 import com.example.myapplication.data.datasource.impl.FollowFirestoreDataSource
 import com.example.myapplication.data.datasource.impl.FusedDeviceLocationDataSource
 import com.example.myapplication.data.datasource.impl.NotificationFirestoreDataSource
@@ -56,6 +58,11 @@ abstract class RemoteDataSourceModule {
     @Binds
     @Singleton
     abstract fun bindSavedDataSource(impl: SavedFirestoreDataSource): SavedRemoteDataSource
+
+    // Solo Firestore: el backend Express no tiene comentarios en las reseñas
+    @Binds
+    @Singleton
+    abstract fun bindCommentDataSource(impl: CommentFirestoreDataSource): CommentRemoteDataSource
 
     // Ubicación del dispositivo (Fused Location Provider)
     @Binds

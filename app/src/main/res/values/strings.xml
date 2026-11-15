@@ -212,4 +212,25 @@
         <item>Libros</item>
         <item>Moda</item>
     </string-array>
+
+    <!-- Comentarios en reseñas (Sprint 15) -->
+    <string name="comments_title">Conversación</string>
+    <string name="comments_action">Comentar</string>
+    <string name="comments_header">Comentarios (%1$d)</string>
+    <string name="comments_empty">Aún no hay comentarios. Pregunta algo o comparte tu experiencia con este producto.</string>
+    <string name="comments_input_placeholder">Escribe un comentario…</string>
+    <string name="comments_counter">%1$d/%2$d</string>
+    <string name="comments_send">Enviar comentario</string>
+    <string name="comments_delete">Borrar comentario</string>
+    <string name="comments_delete_confirm_title">¿Borrar este comentario?</string>
+    <string name="comments_delete_confirm_message">El comentario se eliminará para todos. Esta acción no se puede deshacer.</string>
+    <string name="comments_delete_confirm_action">Borrar</string>
+    <string name="comments_cancel">Cancelar</string>
+    <string name="comments_you">Tú</string>
+    <string name="comments_review_author_badge">Autor</string>
+    <string name="comments_just_now">Justo ahora</string>
+    <string name="comments_sending">Enviando…</string>
+    <string name="comments_error_empty">Escribe algo antes de enviar</string>
+    <string name="comments_error_too_long">El comentario no puede superar los %1$d caracteres</string>
+    <string name="notifications_comment_message">%1$s comentó tu reseña «%2$s»</string>
 </resources>

@@ -27,6 +27,7 @@ data class FirestoreNotificationDto(
         type = when (type) {
             TYPE_LIKE -> NotificationType.LIKE
             TYPE_FOLLOW -> NotificationType.FOLLOW
+            TYPE_COMMENT -> NotificationType.COMMENT
             else -> NotificationType.UNKNOWN
         },
         actorId = actorId,
@@ -34,12 +35,14 @@ data class FirestoreNotificationDto(
         reviewTitle = reviewTitle,
         productId = productId,
         date = createdAt.toDisplayDate(),
-        read = read
+        read = read,
+        reviewId = reviewId
     )
 
     companion object {
         const val TYPE_LIKE = "like"
         const val TYPE_FOLLOW = "follow"
+        const val TYPE_COMMENT = "comment"
     }
 }
 

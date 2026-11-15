@@ -1,6 +1,7 @@
 package com.example.myapplication.debugtools
 
 import com.example.myapplication.data.dto.FirestoreAuthorDto
+import com.example.myapplication.data.dto.FirestoreCommentDto
 import com.example.myapplication.data.dto.FirestoreFollowDto
 import com.example.myapplication.data.dto.FirestoreProductDto
 import com.example.myapplication.data.dto.FirestoreReviewDto
@@ -19,9 +20,10 @@ data class SeedDataset(
     val products: List<FirestoreProductDto>,
     val reviews: List<FirestoreReviewDto>,
     val follows: List<FirestoreFollowDto>,
-    val saved: List<FirestoreSavedDto> = emptyList()
+    val saved: List<FirestoreSavedDto> = emptyList(),
+    val comments: List<FirestoreCommentDto> = emptyList()
 ) {
-    val totalDocuments get() = users.size + products.size + reviews.size + follows.size + saved.size
+    val totalDocuments get() = users.size + products.size + reviews.size + follows.size + saved.size + comments.size
 }
 
 /**
@@ -79,6 +81,20 @@ class Seeder(seed: Long? = null) {
         )
     }
 
+    /** Comentario de [author] en la conversación de [review], publicado después de la reseña. */
+    fun comment(author: FirestoreUserDto, review: FirestoreReviewDto): FirestoreCommentDto {
+        val reviewMillis = review.createdAt?.time ?: (System.currentTimeMillis() - HOUR_MS)
+        val span = (System.currentTimeMillis() - reviewMillis).coerceAtLeast(1)
+        return FirestoreCommentDto(
+            id = UUID.randomUUID().toString(),
+            reviewId = review.id,
+            userId = author.id,
+            text = faker.lorem().sentence(6 + random.nextInt(10)).take(MAX_COMMENT),
+            user = FirestoreAuthorDto(name = author.name, username = author.username, profileImage = author.profileImage),
+            createdAt = Date(reviewMillis + (random.nextDouble() * span).toLong())
+        )
+    }
+
     /** Un punto cerca de alguna de las ciudades de ejemplo (±0,05° ≈ 5 km). */
     fun location(): GeoPoint {
         val (lat, lng) = CITIES[random.nextInt(CITIES.size)]
@@ -94,7 +110,8 @@ class Seeder(seed: Long? = null) {
         products: Int = 5,
         reviewsPerUser: Int = 2,
         followsPerUser: Int = 2,
-        savedPerUser: Int = 2
+        savedPerUser: Int = 2,
+        maxCommentsPerReview: Int = 3
     ): SeedDataset {
         require(users >= 0 && products >= 0 && reviewsPerUser >= 0 && followsPerUser >= 0) {
             "Las cantidades no pueden ser negativas"
@@ -123,7 +140,15 @@ class Seeder(seed: Long? = null) {
                 FirestoreSavedDto(userId = owner.id, productId = it.id, createdAt = pastDate(daysBack = 30))
             }
         }
-        return SeedDataset(generatedUsers, generatedProducts, reviews, follows, saved)
+        // Cada reseña recibe entre 0 y maxCommentsPerReview comentarios de usuarios generados (a veces del
+        // propio autor, que responde en su conversación).
+        val comments = if (generatedUsers.isEmpty() || maxCommentsPerReview <= 0) emptyList() else
+            reviews.flatMap { review ->
+                List(random.nextInt(maxCommentsPerReview + 1)) {
+                    comment(generatedUsers[random.nextInt(generatedUsers.size)], review)
+                }
+            }
+        return SeedDataset(generatedUsers, generatedProducts, reviews, follows, saved, comments)
     }
 
     private fun <T> sample(list: List<T>, count: Int): List<T> = list.shuffled(random).take(count)
@@ -151,5 +176,6 @@ class Seeder(seed: Long? = null) {
         const val MAX_BIO = 300
         const val MAX_TITLE = 120
         const val MAX_BODY = 2000
+        const val MAX_COMMENT = 500
     }
 }

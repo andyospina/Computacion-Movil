@@ -13,6 +13,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.myapplication.ui.components.AppBottomNavBar
+import com.example.myapplication.ui.screens.Comments.CommentsScreen
 import com.example.myapplication.ui.screens.Feed.FeedScreen
 import com.example.myapplication.ui.screens.FollowList.FollowListScreen
 import com.example.myapplication.ui.screens.FollowList.FollowTab
@@ -145,6 +146,23 @@ fun AppNavigation(
                     onUserClick = { userId -> navController.navigate(Routes.UserProfile.createRoute(userId)) },
                     onProductoClick = { productId ->
                         navController.navigate(Routes.ProductDetail.createRoute(productId))
+                    },
+                    onComentariosClick = { id -> navController.navigate(Routes.ReviewComments.createRoute(id)) }
+                )
+            }
+
+            composable(
+                route = Routes.ReviewComments.route,
+                arguments = listOf(navArgument(Routes.ReviewComments.ARG_REVIEW_ID) { type = NavType.StringType })
+            ) { backStack ->
+                val reviewId = backStack.arguments?.getString(Routes.ReviewComments.ARG_REVIEW_ID).orEmpty()
+
+                CommentsScreen(
+                    reviewId = reviewId,
+                    onBackClick = { navController.popBackStack() },
+                    onUserClick = { userId -> navController.navigate(Routes.UserProfile.createRoute(userId)) },
+                    onProductoClick = { productId ->
+                        navController.navigate(Routes.ProductDetail.createRoute(productId))
                     }
                 )
             }
@@ -207,6 +225,9 @@ fun AppNavigation(
                     },
                     onProductoClick = { productId ->
                         navController.navigate(Routes.ProductDetail.createRoute(productId))
+                    },
+                    onComentariosClick = { reviewId ->
+                        navController.navigate(Routes.ReviewComments.createRoute(reviewId))
                     }
                 )
             }
@@ -219,6 +240,9 @@ fun AppNavigation(
                     },
                     onUserClick = { userId ->
                         navController.navigate(Routes.UserProfile.createRoute(userId))
+                    },
+                    onComentariosClick = { reviewId ->
+                        navController.navigate(Routes.ReviewComments.createRoute(reviewId))
                     }
                 )
             }
@@ -230,6 +254,9 @@ fun AppNavigation(
                     },
                     onProductoClick = { productId ->
                         navController.navigate(Routes.ProductDetail.createRoute(productId))
+                    },
+                    onComentariosClick = { reviewId ->
+                        navController.navigate(Routes.ReviewComments.createRoute(reviewId))
                     }
                 )
             }
@@ -287,6 +314,9 @@ fun AppNavigation(
                     onBackClick = { navController.popBackStack() },
                     onUserClick = { userId ->
                         navController.navigate(Routes.UserProfile.createRoute(userId))
+                    },
+                    onComentariosClick = { reviewId ->
+                        navController.navigate(Routes.ReviewComments.createRoute(reviewId))
                     }
                 )
             }

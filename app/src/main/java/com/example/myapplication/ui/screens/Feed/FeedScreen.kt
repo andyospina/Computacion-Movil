@@ -33,7 +33,8 @@ fun FeedScreen(
     modifier: Modifier = Modifier,
     viewModel: FeedViewModel = hiltViewModel(),
     onUserClick: (String) -> Unit,
-    onProductoClick: (String) -> Unit
+    onProductoClick: (String) -> Unit,
+    onComentariosClick: ((String) -> Unit)? = null
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -45,7 +46,8 @@ fun FeedScreen(
         onRetry = viewModel::reintentar,
         onUserClick = onUserClick,
         onProductoClick = onProductoClick,
-        onLikeClick = viewModel::toggleLike
+        onLikeClick = viewModel::toggleLike,
+        onComentariosClick = onComentariosClick?.let { abrir -> { resena: Review -> abrir(resena.id) } }
     )
 }
 
@@ -56,7 +58,8 @@ fun FeedContent(
     onRetry: () -> Unit,
     onUserClick: (String) -> Unit,
     onProductoClick: (String) -> Unit,
-    onLikeClick: (Review) -> Unit
+    onLikeClick: (Review) -> Unit,
+    onComentariosClick: ((Review) -> Unit)? = null
 ) {
     Column(modifier = modifier.fillMaxSize().testTag("feedScreen")) {
 
@@ -98,7 +101,8 @@ fun FeedContent(
                             resena = resena,
                             onAuthorClick = { onUserClick(resena.userId) },
                             onLikeClick = { onLikeClick(resena) },
-                            onProductClick = { onProductoClick(resena.productId) }
+                            onProductClick = { onProductoClick(resena.productId) },
+                            onCommentsClick = onComentariosClick?.let { { it(resena) } }
                         )
                     }
                 }
