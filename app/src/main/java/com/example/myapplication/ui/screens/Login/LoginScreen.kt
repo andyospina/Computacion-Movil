@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -76,7 +78,11 @@ fun LoginContent(
     onRegistrateClick: () -> Unit
 ) {
     Column(
-        modifier = modifier.fillMaxSize().testTag("loginScreen")
+        modifier = modifier
+            .fillMaxSize()
+            .testTag("loginScreen")
+            // Con scroll: en pantallas bajas, horizontal o con teclado el formulario no cabe
+            .verticalScroll(rememberScrollState())
     ) {
 
         Column(
@@ -108,7 +114,7 @@ fun LoginContent(
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(24.dp),
             verticalArrangement = Arrangement.Top
         ) {

@@ -65,6 +65,7 @@ async function waitFor(name, fn, timeoutMs = 20000) {
 
   const alice = env.authenticatedContext('alice').firestore();
   const bob = env.authenticatedContext('bob').firestore();
+  const carol = env.authenticatedContext('carol').firestore();
   const anon = env.unauthenticatedContext().firestore();
 
   console.log('\nReglas: users');
@@ -142,6 +143,33 @@ async function waitFor(name, fn, timeoutMs = 20000) {
   await check('bob no quita el guardado de alice', () => assertFails(deleteDoc(doc(bob, 'saved/alice_p1'))));
   await check('alice quita su guardado', () => assertSucceeds(deleteDoc(doc(alice, 'saved/alice_p1'))));
 
+  console.log('\nReglas: reports');
+  await check('alice reporta la reseña de bob', () => assertSucceeds(setDoc(doc(alice, 'reports/alice_r1'), {
+    userId: 'alice', reviewId: 'r1', reason: 'spam', createdAt: serverTimestamp(),
+  })));
+  await check('alice no reporta a nombre de carol', () => assertFails(setDoc(doc(alice, 'reports/carol_r1'), {
+    userId: 'carol', reviewId: 'r1', reason: 'spam', createdAt: serverTimestamp(),
+  })));
+  await check('el id debe ser uid_reseña', () => assertFails(setDoc(doc(alice, 'reports/cualquiera'), {
+    userId: 'alice', reviewId: 'r1', reason: 'spam', createdAt: serverTimestamp(),
+  })));
+  await check('motivo inválido: denegado', () => assertFails(setDoc(doc(carol, 'reports/carol_r1'), {
+    userId: 'carol', reviewId: 'r1', reason: 'me-cae-mal', createdAt: serverTimestamp(),
+  })));
+  await check('no se reporta una reseña inexistente', () => assertFails(setDoc(doc(alice, 'reports/alice_nope'), {
+    userId: 'alice', reviewId: 'nope', reason: 'fake', createdAt: serverTimestamp(),
+  })));
+  await check('bob no reporta su propia reseña', () => assertFails(setDoc(doc(bob, 'reports/bob_r1'), {
+    userId: 'bob', reviewId: 'r1', reason: 'other', createdAt: serverTimestamp(),
+  })));
+  await check('campos extra: denegado', () => assertFails(setDoc(doc(carol, 'reports/carol_r1'), {
+    userId: 'carol', reviewId: 'r1', reason: 'spam', createdAt: serverTimestamp(), status: 'resolved',
+  })));
+  await check('alice lee su reporte', () => assertSucceeds(getDoc(doc(alice, 'reports/alice_r1'))));
+  await check('bob no lee el reporte de alice', () => assertFails(getDoc(doc(bob, 'reports/alice_r1'))));
+  await check('el reporte no se edita', () => assertFails(updateDoc(doc(alice, 'reports/alice_r1'), { reason: 'fake' })));
+  await check('el reporte no se borra', () => assertFails(deleteDoc(doc(alice, 'reports/alice_r1'))));
+
   console.log('\nReglas: follows');
   await check('alice sigue a bob', () => assertSucceeds(setDoc(doc(alice, 'follows/alice_bob'), {
     followerId: 'alice', followedId: 'bob', createdAt: serverTimestamp(),
@@ -177,7 +205,6 @@ async function waitFor(name, fn, timeoutMs = 20000) {
   await check('fecha inventada por el cliente: denegado', () => assertFails(setDoc(doc(alice, 'comments/c-x6'), comment('alice', { createdAt: new Date(0) }))));
   await check('nadie edita un comentario (ni su autora)', () => assertFails(updateDoc(doc(alice, 'comments/c-alice'), { text: 'cambiado' })));
   await check('carol no borra el comentario de alice', async () => {
-    const carol = env.authenticatedContext('carol').firestore();
     await assertFails(deleteDoc(doc(carol, 'comments/c-alice')));
   });
   await check('bob (autor de la reseña) modera y borra el de alice', () => assertSucceeds(deleteDoc(doc(bob, 'comments/c-alice'))));

@@ -21,9 +21,12 @@ private val DarkColorScheme = darkColorScheme(
     outline = GraySecondary
 )
 
+// En claro, `primary` es DeepLime: el lima eléctrico sobre el fondo claro casi no se ve y es el color por
+// defecto del texto de los OutlinedButton/TextButton, del indicador de carga y del borde enfocado de los
+// campos. Los botones rellenos fijan ElectricLime + Ink explícitamente, así que no cambian.
 private val LightColorScheme = lightColorScheme(
-    primary = ElectricLime,
-    onPrimary = Ink,
+    primary = DeepLime,
+    onPrimary = Color.White,
     secondary = DeepLime,
     onSecondary = Color.White,
     background = Paper,

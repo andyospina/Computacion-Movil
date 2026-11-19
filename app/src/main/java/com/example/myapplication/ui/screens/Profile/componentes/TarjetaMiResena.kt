@@ -4,15 +4,19 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,7 +51,13 @@ fun TarjetaMiResena(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = nombreProducto, fontWeight = FontWeight.Bold)
+            Text(
+                text = nombreProducto,
+                fontWeight = FontWeight.Bold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f).padding(end = 8.dp)
+            )
             StarRatingDisplay(rating = resena.rating, fontSize = 14.sp)
         }
 
@@ -61,10 +71,18 @@ fun TarjetaMiResena(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = resena.date, fontSize = 12.sp, color = GraySecondary)
+            Text(
+                text = resena.date,
+                fontSize = 12.sp,
+                color = GraySecondary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
             BotonLike(likesCount = resena.likesCount, likedByMe = resena.likedByMe, onClick = onLikeClick)
+            Spacer(modifier = Modifier.width(8.dp))
             Text(
                 text = stringResource(if (esBorrador) R.string.status_draft else R.string.status_published),
                 fontSize = 12.sp,

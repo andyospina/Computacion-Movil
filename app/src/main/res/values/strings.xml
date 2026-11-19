@@ -233,4 +233,23 @@
     <string name="comments_error_empty">Escribe algo antes de enviar</string>
     <string name="comments_error_too_long">El comentario no puede superar los %1$d caracteres</string>
     <string name="notifications_comment_message">%1$s comentó tu reseña «%2$s»</string>
+    <!-- Compartir reseña (Sprint 16) -->
+    <string name="share_review_action">Compartir reseña</string>
+    <string name="share_review_chooser_title">Compartir reseña con…</string>
+    <string name="share_review_subject">Reseña de %1$s en ReviewLab</string>
+    <string name="share_review_text">%1$s reseñó «%2$s» en %6$s\n%3$s\n\n%4$s\n%5$s</string>
+    <string name="share_review_no_app">No hay ninguna app para compartir</string>
+
+    <!-- Reportar reseña (Sprint 16) -->
+    <string name="report_action">Reportar reseña</string>
+    <string name="report_already">Ya reportaste esta reseña</string>
+    <string name="report_dialog_title">¿Por qué reportas esta reseña?</string>
+    <string name="report_dialog_message">Revisaremos tu reporte. La reseña seguirá visible mientras tanto.</string>
+    <string name="report_reason_spam">Spam o publicidad</string>
+    <string name="report_reason_offensive">Lenguaje ofensivo</string>
+    <string name="report_reason_fake">Reseña falsa o engañosa</string>
+    <string name="report_reason_other">Otro motivo</string>
+    <string name="report_submit">Enviar reporte</string>
+    <string name="report_sending">Enviando…</string>
+    <string name="report_sent">Gracias, recibimos tu reporte</string>
 </resources>

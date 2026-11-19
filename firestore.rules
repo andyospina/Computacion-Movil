@@ -153,6 +153,22 @@ service cloud.firestore {
       allow update: if false;
     }
 
+    // reports/{userId_reviewId}: reportes de reseñas. Cada usuario ve y crea solo los suyos (uno por
+    // reseña) y no puede reportar la suya; la moderación se hace desde la consola o con el Admin SDK.
+    match /reports/{reportId} {
+      allow read: if signedIn() && resource.data.userId == request.auth.uid;
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.reviewId is string
+        && reportId == request.auth.uid + '_' + request.resource.data.reviewId
+        && request.resource.data.keys().hasOnly(['userId', 'reviewId', 'reason', 'createdAt'])
+        && request.resource.data.reason in ['spam', 'offensive', 'fake', 'other']
+        && request.resource.data.createdAt == request.time
+        && exists(/databases/$(database)/documents/reviews/$(request.resource.data.reviewId))
+        && get(/databases/$(database)/documents/reviews/$(request.resource.data.reviewId)).data.userId != request.auth.uid;
+      allow update, delete: if false;
+    }
+
     // follows/{followerId_followedId}: un documento por relación «followerId sigue a followedId».
     match /follows/{followId} {
       allow read: if signedIn();

@@ -2,6 +2,7 @@ package com.example.myapplication.ui.screens.Reviews
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -101,47 +102,44 @@ fun ReviewsListContent(
             errorMessageRes = uiState.errorMessageRes,
             onRetry = onRetry
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 20.dp, vertical = 16.dp)
+            // Encabezado, filtros y tarjetas en una sola lista: con letra grande o en horizontal el
+            // encabezado fijo dejaba la lista sin espacio.
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-
                 uiState.producto?.let { producto ->
-                    EncabezadoResenas(producto = producto, modifier = Modifier.fillMaxWidth())
-                    Spacer(modifier = Modifier.height(16.dp))
+                    item(key = "header") {
+                        EncabezadoResenas(producto = producto, modifier = Modifier.fillMaxWidth())
+                    }
                 }
 
-                FiltrosResenas(
-                    orden = uiState.orden,
-                    conFotos = uiState.conFotos,
-                    onOrdenChange = onOrdenChange,
-                    onConFotosChange = onConFotosChange
-                )
+                item(key = "filters") {
+                    FiltrosResenas(
+                        orden = uiState.orden,
+                        conFotos = uiState.conFotos,
+                        onOrdenChange = onOrdenChange,
+                        onConFotosChange = onConFotosChange
+                    )
+                }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                items(uiState.resenasFiltradas.take(uiState.cantidadVisible), key = { it.id }) { resena ->
+                    TarjetaResena(
+                        resena = resena,
+                        onAuthorClick = { onUserClick(resena.userId) },
+                        onLikeClick = { onLikeClick(resena) },
+                        onCommentsClick = onComentariosClick?.let { { it(resena) } }
+                    )
+                }
 
-                LazyColumn(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(uiState.resenasFiltradas.take(uiState.cantidadVisible), key = { it.id }) { resena ->
-                        TarjetaResena(
-                            resena = resena,
-                            onAuthorClick = { onUserClick(resena.userId) },
-                            onLikeClick = { onLikeClick(resena) },
-                            onCommentsClick = onComentariosClick?.let { { it(resena) } }
-                        )
-                    }
-
-                    if (uiState.cantidadVisible < uiState.resenasFiltradas.size) {
-                        item {
-                            OutlinedButton(
-                                onClick = onCargarMasClick,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(text = stringResource(R.string.reviews_load_more))
-                            }
+                if (uiState.cantidadVisible < uiState.resenasFiltradas.size) {
+                    item(key = "loadMore") {
+                        OutlinedButton(
+                            onClick = onCargarMasClick,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(text = stringResource(R.string.reviews_load_more))
                         }
                     }
                 }

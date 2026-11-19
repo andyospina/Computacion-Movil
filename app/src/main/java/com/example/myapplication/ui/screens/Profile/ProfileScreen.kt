@@ -5,6 +5,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -23,16 +25,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.R
-import com.example.myapplication.ui.components.CargaOError
 import com.example.myapplication.ui.screens.Profile.componentes.DialogoEditarPerfil
 import com.example.myapplication.ui.screens.Profile.componentes.EncabezadoPerfil
 import com.example.myapplication.ui.screens.Profile.componentes.EstadisticasPerfil
@@ -140,152 +143,181 @@ fun ProfileContent(
         }
     }
 
-    Column(
-        modifier = modifier.fillMaxSize()
+    // Todo el perfil es una sola lista con scroll: antes los botones ocupaban la pantalla y la lista
+    // «Mis reseñas» quedaba aplastada (o fuera de la vista) en teléfonos pequeños.
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .testTag("profileScreen"),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-
         uiState.user?.let { user ->
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Ink)
-                    .padding(20.dp)
-            ) {
-                EncabezadoPerfil(
-                    user = user,
-                    profileImageUrl = uiState.profileImageUrl,
-                    modifier = Modifier.fillMaxWidth()
-                )
+            item(key = "header") {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Ink)
+                        .padding(20.dp)
+                ) {
+                    EncabezadoPerfil(
+                        user = user,
+                        profileImageUrl = uiState.profileImageUrl,
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-                if (uiState.email.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = uiState.email, color = GraySecondary)
-                }
+                    if (uiState.email.isNotBlank()) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(text = uiState.email, color = GraySecondary)
+                    }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                EstadisticasSeguidores(
-                    followersCount = uiState.followStats.followersCount,
-                    followingCount = uiState.followStats.followingCount,
-                    onFollowersClick = onFollowersClick,
-                    onFollowingClick = onFollowingClick
-                )
-            }
-
-            Column(modifier = Modifier.padding(vertical = 16.dp)) {
-                EstadisticasPerfil(user = user, modifier = Modifier.fillMaxWidth())
-            }
-        }
-
-        OutlinedButton(
-            onClick = { mostrarEdicion = true },
-            enabled = uiState.user != null,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-        ) {
-            Text(text = stringResource(R.string.profile_edit_button))
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedButton(
-            onClick = onSavedClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-        ) {
-            Text(text = stringResource(R.string.profile_saved_button))
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedButton(
-            onClick = onLikedReviewsClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .testTag("btnLikedReviews")
-        ) {
-            Text(text = stringResource(R.string.profile_liked_reviews_button))
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedButton(
-            onClick = onSelectImageClick,
-            enabled = !uiState.isLoading,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-        ) {
-            Text(
-                text = stringResource(
-                    if (uiState.isLoading) R.string.profile_uploading_image
-                    else R.string.profile_select_image_button
-                )
-            )
-        }
-
-        uiState.errorMessageRes?.let { mensajeRes ->
-            Text(
-                text = stringResource(mensajeRes),
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedButton(
-            onClick = onLogoutClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-        ) {
-            Text(text = stringResource(R.string.profile_logout_button))
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        SelectorTema(
-            modoOscuro = modoOscuro,
-            onModoOscuroChange = onModoOscuroChange,
-            modifier = Modifier.padding(horizontal = 20.dp)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = stringResource(R.string.profile_my_reviews_title),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(horizontal = 20.dp)
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        CargaOError(
-            isLoading = uiState.isLoadingData,
-            errorMessageRes = uiState.dataErrorRes,
-            onRetry = onRetry
-        ) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(uiState.misResenas, key = { it.id }) { resena ->
-                    TarjetaMiResena(
-                        resena = resena,
-                        nombreProducto = resena.productName,
-                        onEditClick = { onEditResena(resena.productId, resena.id) },
-                        onDeleteClick = { onDeleteResena(resena.id) }
+                    EstadisticasSeguidores(
+                        followersCount = uiState.followStats.followersCount,
+                        followingCount = uiState.followStats.followingCount,
+                        onFollowersClick = onFollowersClick,
+                        onFollowingClick = onFollowingClick
                     )
                 }
             }
+
+            item(key = "stats") {
+                EstadisticasPerfil(user = user, modifier = Modifier.padding(vertical = 8.dp))
+            }
         }
+
+        item(key = "btnEdit") {
+            OutlinedButton(
+                onClick = { mostrarEdicion = true },
+                enabled = uiState.user != null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+            ) {
+                Text(text = stringResource(R.string.profile_edit_button))
+            }
+        }
+
+        item(key = "btnSaved") {
+            OutlinedButton(
+                onClick = onSavedClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+            ) {
+                Text(text = stringResource(R.string.profile_saved_button))
+            }
+        }
+
+        item(key = "btnLiked") {
+            OutlinedButton(
+                onClick = onLikedReviewsClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .testTag("btnLikedReviews")
+            ) {
+                Text(text = stringResource(R.string.profile_liked_reviews_button))
+            }
+        }
+
+        item(key = "btnImage") {
+            OutlinedButton(
+                onClick = onSelectImageClick,
+                enabled = !uiState.isLoading,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+            ) {
+                Text(
+                    text = stringResource(
+                        if (uiState.isLoading) R.string.profile_uploading_image
+                        else R.string.profile_select_image_button
+                    )
+                )
+            }
+        }
+
+        uiState.errorMessageRes?.let { mensajeRes ->
+            item(key = "error") {
+                Text(
+                    text = stringResource(mensajeRes),
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)
+                )
+            }
+        }
+
+        item(key = "btnLogout") {
+            OutlinedButton(
+                onClick = onLogoutClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+            ) {
+                Text(text = stringResource(R.string.profile_logout_button))
+            }
+        }
+
+        item(key = "theme") {
+            SelectorTema(
+                modoOscuro = modoOscuro,
+                onModoOscuroChange = onModoOscuroChange,
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
+            )
+        }
+
+        item(key = "myReviewsTitle") {
+            Text(
+                text = stringResource(R.string.profile_my_reviews_title),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 4.dp)
+            )
+        }
+
+        when {
+            uiState.isLoadingData -> item(key = "loading") {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            uiState.dataErrorRes != null -> item(key = "dataError") {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = stringResource(uiState.dataErrorRes),
+                        color = MaterialTheme.colorScheme.error,
+                        textAlign = TextAlign.Center
+                    )
+                    OutlinedButton(onClick = onRetry, modifier = Modifier.padding(top = 12.dp)) {
+                        Text(text = stringResource(R.string.action_retry))
+                    }
+                }
+            }
+
+            else -> items(uiState.misResenas, key = { it.id }) { resena ->
+                TarjetaMiResena(
+                    resena = resena,
+                    nombreProducto = resena.productName,
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                    onEditClick = { onEditResena(resena.productId, resena.id) },
+                    onDeleteClick = { onDeleteResena(resena.id) }
+                )
+            }
+        }
+
+        item(key = "bottomSpace") { Spacer(modifier = Modifier.height(16.dp)) }
     }
 }
 
