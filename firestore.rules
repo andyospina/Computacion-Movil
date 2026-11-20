@@ -156,7 +156,9 @@ service cloud.firestore {
     // reports/{userId_reviewId}: reportes de reseñas. Cada usuario ve y crea solo los suyos (uno por
     // reseña) y no puede reportar la suya; la moderación se hace desde la consola o con el Admin SDK.
     match /reports/{reportId} {
-      allow read: if signedIn() && resource.data.userId == request.auth.uid;
+      // Se valida por el id (uid_reseña) y no por resource.data: así también se puede consultar un reporte
+      // que aún no existe (la app lo hace antes de crearlo) sin que la regla falle por documento nulo.
+      allow read: if signedIn() && reportId.matches(request.auth.uid + '_.*');
       allow create: if signedIn()
         && request.resource.data.userId == request.auth.uid
         && request.resource.data.reviewId is string

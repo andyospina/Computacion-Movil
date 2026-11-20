@@ -165,6 +165,8 @@ async function waitFor(name, fn, timeoutMs = 20000) {
   await check('campos extra: denegado', () => assertFails(setDoc(doc(carol, 'reports/carol_r1'), {
     userId: 'carol', reviewId: 'r1', reason: 'spam', createdAt: serverTimestamp(), status: 'resolved',
   })));
+  await check('alice consulta si ya reportó una reseña que aún no reportó (documento inexistente)', () => assertSucceeds(getDoc(doc(alice, 'reports/alice_r2'))));
+  await check('alice no consulta reportes ajenos aunque no existan', () => assertFails(getDoc(doc(alice, 'reports/bob_r2'))));
   await check('alice lee su reporte', () => assertSucceeds(getDoc(doc(alice, 'reports/alice_r1'))));
   await check('bob no lee el reporte de alice', () => assertFails(getDoc(doc(bob, 'reports/alice_r1'))));
   await check('el reporte no se edita', () => assertFails(updateDoc(doc(alice, 'reports/alice_r1'), { reason: 'fake' })));
