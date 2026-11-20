@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -40,7 +41,9 @@ import com.example.myapplication.ui.components.TopBarNavigation
 import com.example.myapplication.ui.screens.Comments.componentes.CampoComentario
 import com.example.myapplication.ui.screens.Comments.componentes.DialogoBorrarComentario
 import com.example.myapplication.ui.screens.Comments.componentes.TarjetaComentario
+import com.example.myapplication.ui.screens.ReviewDetail.componentes.DialogoReportarResena
 import com.example.myapplication.ui.screens.Reviews.componentes.TarjetaResena
+import com.example.myapplication.ui.theme.DeepLime
 import com.example.myapplication.ui.theme.GraySecondary
 
 @Composable
@@ -57,6 +60,15 @@ fun CommentsScreen(
     LaunchedEffect(reviewId) { viewModel.cargar(reviewId) }
 
     MensajeErrorAccion(messageRes = uiState.actionErrorRes, onShown = viewModel::onActionErrorShown)
+    MensajeErrorAccion(messageRes = uiState.infoMessageRes, onShown = viewModel::onInfoMessageShown)
+
+    if (uiState.showReportDialog) {
+        DialogoReportarResena(
+            isSending = uiState.isReporting,
+            onEnviar = viewModel::enviarReporte,
+            onCancelar = viewModel::onReportDismissed
+        )
+    }
 
     if (uiState.comentarioPorBorrar != null) {
         DialogoBorrarComentario(
@@ -75,7 +87,8 @@ fun CommentsScreen(
         onLikeClick = viewModel::toggleLike,
         onTextoChange = viewModel::onTextoChange,
         onEnviarClick = viewModel::enviar,
-        onBorrarClick = viewModel::onBorrarClick
+        onBorrarClick = viewModel::onBorrarClick,
+        onReportClick = viewModel::onReportClick
     )
 }
 
@@ -90,7 +103,8 @@ fun CommentsContent(
     onLikeClick: () -> Unit,
     onTextoChange: (String) -> Unit,
     onEnviarClick: () -> Unit,
-    onBorrarClick: (Comment) -> Unit
+    onBorrarClick: (Comment) -> Unit,
+    onReportClick: () -> Unit = {}
 ) {
     val listState = rememberLazyListState()
     var cantidadAnterior by remember { mutableIntStateOf(uiState.comentarios.size) }
@@ -138,6 +152,23 @@ fun CommentsContent(
                             onLikeClick = onLikeClick,
                             onProductClick = { onProductoClick(review.productId) }
                         )
+                    }
+
+                    if (uiState.canReport) {
+                        item(key = "report") {
+                            TextButton(
+                                onClick = onReportClick,
+                                enabled = !uiState.alreadyReported,
+                                modifier = Modifier.testTag("btnReport")
+                            ) {
+                                Text(
+                                    text = stringResource(
+                                        if (uiState.alreadyReported) R.string.report_already else R.string.report_action
+                                    ),
+                                    color = if (uiState.alreadyReported) GraySecondary else DeepLime
+                                )
+                            }
+                        }
                     }
 
                     item(key = "header") {

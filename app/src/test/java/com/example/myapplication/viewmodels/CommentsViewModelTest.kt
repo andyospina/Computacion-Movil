@@ -5,7 +5,9 @@ import com.example.myapplication.data.Comment
 import com.example.myapplication.data.MAX_COMMENT_LENGTH
 import com.example.myapplication.data.Result
 import com.example.myapplication.data.Review
+import com.example.myapplication.data.identity.CurrentUserIdProvider
 import com.example.myapplication.data.repository.CommentRepository
+import com.example.myapplication.data.repository.ReportRepository
 import com.example.myapplication.data.repository.ReviewRepository
 import com.example.myapplication.ui.screens.Comments.CommentsViewModel
 import io.mockk.coEvery
@@ -31,6 +33,8 @@ class CommentsViewModelTest {
 
     private val reviews = mockk<ReviewRepository>()
     private val comments = mockk<CommentRepository>()
+    private val reports = mockk<ReportRepository>()
+    private val session = mockk<CurrentUserIdProvider> { every { currentUserId() } returns null }
 
     private val review = Review(
         id = "r1", productId = "p1", author = "Bob", verifiedBuyer = false, rating = 5, title = "Excelentes",
@@ -45,7 +49,7 @@ class CommentsViewModelTest {
     private fun loaded(vararg list: Comment): CommentsViewModel {
         coEvery { reviews.getReviewById("r1") } returns Result.Success(review)
         every { comments.observeComments("r1", "bob") } returns flowOf(Result.Success(list.toList()))
-        return CommentsViewModel(reviews, comments).also { it.cargar("r1") }
+        return CommentsViewModel(reviews, comments, reports, session).also { it.cargar("r1") }
     }
 
     @Test
@@ -66,7 +70,7 @@ class CommentsViewModelTest {
         val live = MutableSharedFlow<Result<List<Comment>>>(replay = 1)
         live.tryEmit(Result.Success(listOf(comment("a"))))
         every { comments.observeComments("r1", "bob") } returns live
-        val vm = CommentsViewModel(reviews, comments).also { it.cargar("r1") }
+        val vm = CommentsViewModel(reviews, comments, reports, session).also { it.cargar("r1") }
 
         live.tryEmit(Result.Success(listOf(comment("a"), comment("b"))))
 
@@ -80,7 +84,7 @@ class CommentsViewModelTest {
             Result.Success(review)
         )
         every { comments.observeComments("r1", "bob") } returns flowOf(Result.Success(emptyList()))
-        val vm = CommentsViewModel(reviews, comments).also { it.cargar("r1") }
+        val vm = CommentsViewModel(reviews, comments, reports, session).also { it.cargar("r1") }
         assertEquals(R.string.error_api_unreachable, vm.uiState.value.errorMessageRes)
         assertFalse(vm.uiState.value.isLoading)
 
@@ -209,12 +213,61 @@ class CommentsViewModelTest {
         val live = MutableSharedFlow<Result<List<Comment>>>(replay = 1)
         live.tryEmit(Result.Success(listOf(mine)))
         every { comments.observeComments("r1", "bob") } returns live
-        val vm = CommentsViewModel(reviews, comments).also { it.cargar("r1") }
+        val vm = CommentsViewModel(reviews, comments, reports, session).also { it.cargar("r1") }
         vm.onBorrarClick(mine)
 
         // El autor de la reseña lo borró desde otro dispositivo
         live.tryEmit(Result.Success(emptyList()))
 
         assertNull(vm.uiState.value.comentarioPorBorrar)
+    }
+
+    // ---- Reportar la reseña desde la conversación ----
+
+    private fun loadedAs(me: String?, alreadyReported: Boolean = false): CommentsViewModel {
+        every { session.currentUserId() } returns me
+        coEvery { reports.hasReported("r1") } returns Result.Success(alreadyReported)
+        return loaded()
+    }
+
+    @Test
+    fun anotherUsersReview_canBeReportedFromTheConversation() {
+        val state = loadedAs("ana").uiState.value
+
+        assertTrue(state.canReport)
+        assertFalse(state.alreadyReported)
+    }
+
+    @Test
+    fun myOwnReview_cannotBeReported() {
+        val vm = loadedAs("bob")
+
+        assertFalse(vm.uiState.value.canReport)
+        vm.onReportClick()
+        assertFalse(vm.uiState.value.showReportDialog)
+    }
+
+    @Test
+    fun sendingAReport_marksItReported_closesTheDialog_andShowsThanks() {
+        val vm = loadedAs("ana")
+        coEvery { reports.report("r1", com.example.myapplication.data.ReportReason.SPAM) } returns Result.Success(Unit)
+        vm.onReportClick()
+        assertTrue(vm.uiState.value.showReportDialog)
+
+        vm.enviarReporte(com.example.myapplication.data.ReportReason.SPAM)
+
+        val state = vm.uiState.value
+        assertFalse(state.showReportDialog)
+        assertTrue(state.alreadyReported)
+        assertEquals(R.string.report_sent, state.infoMessageRes)
+    }
+
+    @Test
+    fun alreadyReported_doesNotOpenTheDialogAgain() {
+        val vm = loadedAs("ana", alreadyReported = true)
+
+        vm.onReportClick()
+
+        assertFalse(vm.uiState.value.showReportDialog)
     }
 }

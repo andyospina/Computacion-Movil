@@ -15,5 +15,11 @@ data class CommentsState(
     val isSending: Boolean = false,
     // Comentario pendiente de confirmar en el diálogo «¿Borrar este comentario?»
     val comentarioPorBorrar: Comment? = null,
-    @param:StringRes val actionErrorRes: Int? = null
+    @param:StringRes val actionErrorRes: Int? = null,
+    // Reportar la reseña: solo se ofrece en reseñas ajenas y con sesión iniciada
+    val canReport: Boolean = false,
+    val alreadyReported: Boolean = false,
+    val showReportDialog: Boolean = false,
+    val isReporting: Boolean = false,
+    @param:StringRes val infoMessageRes: Int? = null
 )
