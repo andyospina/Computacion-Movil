@@ -240,6 +240,12 @@
     <string name="share_review_text">%1$s reseñó «%2$s» en %6$s\n%3$s\n\n%4$s\n%5$s</string>
     <string name="share_review_no_app">No hay ninguna app para compartir</string>
 
+    <!-- Compartir producto -->
+    <string name="share_product_action">Compartir producto</string>
+    <string name="share_product_chooser_title">Compartir producto con…</string>
+    <string name="share_product_subject">%1$s en ReviewLab</string>
+    <string name="share_product_text">%1$s · %6$s\n%2$s %3$s (%4$d reseñas)\n%5$d%% de los compradores lo recomiendan\nMíralo en %7$s</string>
+
     <!-- Reportar reseña (Sprint 16) -->
     <string name="report_action">Reportar reseña</string>
     <string name="report_already">Ya reportaste esta reseña</string>

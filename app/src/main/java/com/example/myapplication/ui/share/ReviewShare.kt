@@ -51,13 +51,22 @@ fun shareReview(context: Context, review: Review): Boolean {
         format = context.getString(R.string.share_review_text),
         appName = context.getString(R.string.app_name)
     )
+    return launchShareChooser(
+        context = context,
+        subject = buildReviewShareSubject(review, context.getString(R.string.share_review_subject)),
+        text = text,
+        chooserTitle = context.getString(R.string.share_review_chooser_title)
+    )
+}
+
+/** Abre el selector de apps con un texto plano; false si el dispositivo no tiene ninguna app que lo reciba. */
+fun launchShareChooser(context: Context, subject: String, text: String, chooserTitle: String): Boolean {
     val intent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
-        putExtra(Intent.EXTRA_SUBJECT, buildReviewShareSubject(review, context.getString(R.string.share_review_subject)))
+        putExtra(Intent.EXTRA_SUBJECT, subject)
         putExtra(Intent.EXTRA_TEXT, text)
     }
-    val chooser = Intent.createChooser(intent, context.getString(R.string.share_review_chooser_title))
-        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    val chooser = Intent.createChooser(intent, chooserTitle).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     return try {
         context.startActivity(chooser)
         true

@@ -24,6 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.R
 import com.example.myapplication.data.Review
 import com.example.myapplication.ui.components.BarraSuperior
+import com.example.myapplication.ui.components.BotonCompartir
 import com.example.myapplication.ui.components.CargaOError
 import com.example.myapplication.ui.components.MensajeErrorAccion
 import com.example.myapplication.ui.components.TopBarNavigation
@@ -31,7 +32,9 @@ import com.example.myapplication.ui.screens.ProductDetail.componentes.BotonesAcc
 import com.example.myapplication.ui.screens.ProductDetail.componentes.FotoProducto
 import com.example.myapplication.ui.screens.ProductDetail.componentes.InfoProducto
 import com.example.myapplication.ui.screens.ProductDetail.componentes.ResenasDestacadas
+import com.example.myapplication.ui.share.rememberCompartirProducto
 import com.example.myapplication.ui.theme.GraySecondary
+import com.example.myapplication.ui.theme.Ink
 
 @Composable
 fun ProductDetailScreen(
@@ -76,6 +79,8 @@ fun ProductDetailContent(
     onLikeClick: (Review) -> Unit,
     onGuardarClick: () -> Unit = {}
 ) {
+    val compartirProducto = rememberCompartirProducto()
+
     Column(
         modifier = modifier.fillMaxSize().testTag("productDetailScreen")
     ) {
@@ -85,6 +90,14 @@ fun ProductDetailContent(
             navigation = TopBarNavigation.BACK,
             onNavigationClick = onBackClick,
             trailingContent = {
+                uiState.producto?.let { producto ->
+                    BotonCompartir(
+                        onClick = { compartirProducto(producto) },
+                        tint = Ink,
+                        descripcion = R.string.share_product_action,
+                        modifier = Modifier.testTag("btnShareProduct")
+                    )
+                }
                 Icon(
                     imageVector = Icons.Filled.MoreVert,
                     contentDescription = stringResource(R.string.content_description_more_options),

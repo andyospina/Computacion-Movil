@@ -8,6 +8,11 @@
   `text/plain`). Sin apps disponibles muestra un aviso.
 - Pruebas: `ReviewShareTest` (10, corridas en JVM).
 
+## Compartir producto
+- Ícono de compartir en la barra superior del **detalle de producto** (junto a «más opciones»). Comparte nombre,
+  categoría, estrellas, promedio, cantidad de reseñas y % que lo recomienda (`ui/share/ProductShare.kt`).
+- Comparte con `launchShareChooser`, el mismo helper que usa compartir reseña. Pruebas: `ProductShareTest` (4).
+
 ## Reportar reseña
 - Botón «Reportar reseña» en el detalle de una reseña **ajena** (no aparece en la propia ni sin sesión). Abre un
   diálogo con el motivo (spam, ofensivo, falsa, otro); tras enviar queda «Ya reportaste esta reseña».
