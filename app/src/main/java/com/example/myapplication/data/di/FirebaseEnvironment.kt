@@ -1,5 +1,6 @@
 package com.example.myapplication.data.di
 
+import android.util.Log
 import com.example.myapplication.BuildConfig
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -21,6 +22,15 @@ object FirebaseEnvironment {
     const val STORAGE_PORT = 9199
 
     val usesEmulator: Boolean get() = BuildConfig.DEBUG && BuildConfig.USE_FIREBASE_EMULATOR
+
+    init {
+        // Para saber a simple vista (adb logcat -s FirebaseEnv) si este build habla con el emulador o con Firebase real
+        Log.i(
+            "FirebaseEnv",
+            if (usesEmulator) "Usando Firebase EMULATOR en $EMULATOR_HOST (si no está encendido: «client is offline»)"
+            else "Usando Firebase REAL"
+        )
+    }
 
     // useEmulator solo puede llamarse antes del primer uso de cada cliente: los módulos son singleton,
     // así que cada uno pasa por aquí una única vez.
